@@ -55,7 +55,7 @@ for (let i = 0; i < cubeCount; i++) {
     // Spawn VERY HIGH
 cube.position.set(
     (Math.random() - 0.5) * 200, // X
-    600 + Math.random() * 600,   // Y (600–1200)
+    600 + Math.random() * 3200,   // Y (600–1200)
     (Math.random() - 0.5) * 200  // Z
 );
 
