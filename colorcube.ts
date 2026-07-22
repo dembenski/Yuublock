@@ -53,11 +53,11 @@ for (let i = 0; i < cubeCount; i++) {
     const cube = new THREE.Mesh(geometry, material);
 
     // Spawn VERY HIGH
-    cube.position.set(
-        (Math.random() - 0.5) * 200, // X
-        100 + Math.random() * 100,   // Y (100–200)
-        (Math.random() - 0.5) * 200  // Z
-    );
+cube.position.set(
+    (Math.random() - 0.5) * 200, // X
+    600 + Math.random() * 600,   // Y (600–1200)
+    (Math.random() - 0.5) * 200  // Z
+);
 
     scene.add(cube);
     cubes.push(cube);
