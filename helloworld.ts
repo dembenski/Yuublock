@@ -16,6 +16,7 @@ registerStart(start);
 
 
 
+
 // =====================================
 // GAME DATA
 // =====================================
@@ -115,6 +116,8 @@ const bosses = [
 
 
 
+
+
 // =====================================
 // PLAYER
 // =====================================
@@ -164,6 +167,8 @@ let player = {
 
 
 
+
+
 // =====================================
 // HELPERS
 // =====================================
@@ -178,6 +183,8 @@ function random(list:any[])
     ];
 
 }
+
+
 
 
 
@@ -238,6 +245,7 @@ function spawnCube(
     );
 
 }
+
 // =====================================
 // INTERACTION OBJECT STORAGE
 // =====================================
@@ -249,6 +257,7 @@ let enemyEntities: Entity[] = [];
 let weaponEntities: Entity[] = [];
 
 let doorEntities: Entity[] = [];
+
 
 
 
@@ -282,6 +291,7 @@ function registerDoor(entity:Entity)
 {
     doorEntities.push(entity);
 }
+
 
 
 
@@ -329,6 +339,8 @@ function createSpawnPoint()
 
 
 
+
+
 // =====================================
 // DUNGEON ROOM BUILDER
 // =====================================
@@ -336,15 +348,20 @@ function createSpawnPoint()
 async function createRoom(room:number)
 {
 
+    // FIXED ROOM DISTANCE
+
     let offset =
-    room * 20;
+    room * 14;
 
 
 
     console.log(
-        "Building room "+
+        "Building room "
+        +
         room
     );
+
+
 
 
 
@@ -369,23 +386,35 @@ async function createRoom(room:number)
             spawnCube(
 
                 new Vector3(
+
                     offset+x,
+
                     0,
+
                     z
+
                 ),
 
 
                 new Vector3(
+
                     1,
+
                     .2,
+
                     1
+
                 ),
 
 
                 new Color(
+
                     .25,
+
                     .25,
+
                     .25
+
                 )
 
             );
@@ -393,6 +422,8 @@ async function createRoom(room:number)
         }
 
     }
+
+
 
 
 
@@ -410,49 +441,75 @@ async function createRoom(room:number)
         spawnCube(
 
             new Vector3(
+
                 offset+x,
+
                 3,
+
                 -6
+
             ),
 
 
             new Vector3(
+
                 1,
+
                 6,
+
                 1
+
             ),
 
 
             new Color(
+
                 .5,
+
                 .5,
+
                 .5
+
             )
 
         );
 
 
 
+
+
         spawnCube(
 
             new Vector3(
+
                 offset+x,
+
                 3,
+
                 6
+
             ),
 
 
             new Vector3(
+
                 1,
+
                 6,
+
                 1
+
             ),
 
 
             new Color(
+
                 .5,
+
                 .5,
+
                 .5
+
             )
 
         );
@@ -463,8 +520,11 @@ async function createRoom(room:number)
 
 
 
+
+
     // =================================
-    // DOOR
+    // FIXED DOOR
+    // NOW INSIDE ROOM
     // =================================
 
 
@@ -474,7 +534,7 @@ async function createRoom(room:number)
 
         new Vector3(
 
-            offset+10,
+            offset+5,
 
             1.5,
 
@@ -507,6 +567,7 @@ async function createRoom(room:number)
     );
 
 
+
     registerDoor(door);
 
 
@@ -528,7 +589,6 @@ async function createRoom(room:number)
 
     if(Math.random()<0.5)
     {
-
 
         let chest =
 
@@ -572,9 +632,7 @@ async function createRoom(room:number)
 
         registerTreasure(chest);
 
-
     }
-
 
 
 
@@ -589,7 +647,6 @@ async function createRoom(room:number)
 
     if(Math.random()<0.7)
     {
-
 
         let enemy =
 
@@ -633,8 +690,8 @@ async function createRoom(room:number)
 
         registerEnemy(enemy);
 
-
     }
+
 
 
 
@@ -701,6 +758,9 @@ function getLookedAtEntity(): Entity | undefined
 
 
 
+
+
+
 // =====================================
 // CHEST INTERACTION
 // =====================================
@@ -759,6 +819,7 @@ function openChest(entity:Entity)
     }
 
 }
+
 
 
 
@@ -831,6 +892,7 @@ function attackEnemy(entity:Entity)
 
 
 
+
 // =====================================
 // WEAPON PICKUP
 // =====================================
@@ -894,6 +956,43 @@ function pickupWeapon(entity:Entity)
 
 
 
+
+// =====================================
+// DOOR INTERACTION
+// =====================================
+
+function openDoor(entity:Entity)
+{
+
+    let index =
+
+    doorEntities.indexOf(entity);
+
+
+
+    if(index >= 0)
+    {
+
+        console.log(
+
+            "🚪 Door opened!"
+
+        );
+
+
+        enterNextRoom(entity);
+
+    }
+
+}
+
+
+
+
+
+
+
+
 // =====================================
 // MAIN INTERACTION
 // =====================================
@@ -929,6 +1028,7 @@ function interact()
 
 
 
+
     else if(
 
         enemyEntities.includes(target)
@@ -939,6 +1039,7 @@ function interact()
         attackEnemy(target);
 
     }
+
 
 
 
@@ -953,7 +1054,22 @@ function interact()
 
     }
 
+
+
+
+    else if(
+
+        doorEntities.includes(target)
+
+    )
+    {
+
+        openDoor(target);
+
+    }
+
 }
+
 
 
 
@@ -977,6 +1093,7 @@ function setupInteractions()
         interact
 
     );
+
 
 
     console.log(
@@ -1025,6 +1142,9 @@ function showInventory()
     );
 
 }
+
+
+
 
 
 
@@ -1090,6 +1210,9 @@ function usePotion()
     }
 
 }
+
+
+
 
 
 
@@ -1162,6 +1285,7 @@ function checkLevel()
 
 
 
+
 // =====================================
 // COMBAT
 // =====================================
@@ -1181,11 +1305,15 @@ function battle(enemy:any)
 
     console.log(
 
-        enemy.name +
+        enemy.name
+
+        +
 
         " appears!"
 
     );
+
+
 
 
 
@@ -1218,6 +1346,7 @@ function battle(enemy:any)
             damage *= 2;
 
 
+
             console.log(
 
                 "💥 CRITICAL HIT!"
@@ -1225,6 +1354,7 @@ function battle(enemy:any)
             );
 
         }
+
 
 
 
@@ -1250,6 +1380,8 @@ function battle(enemy:any)
 
 
 
+
+
         if(
 
             enemy.hp <= 0
@@ -1260,6 +1392,8 @@ function battle(enemy:any)
             break;
 
         }
+
+
 
 
 
@@ -1300,6 +1434,7 @@ function battle(enemy:any)
 
 
 
+
         if(
 
             player.hp < 40 &&
@@ -1317,7 +1452,10 @@ function battle(enemy:any)
 
         }
 
+
     }
+
+
 
 
 
@@ -1340,6 +1478,8 @@ function battle(enemy:any)
         return false;
 
     }
+
+
 
 
 
@@ -1375,6 +1515,7 @@ function battle(enemy:any)
     return true;
 
 }
+
 
 
 
@@ -1475,16 +1616,23 @@ async function start()
 
 
 
+
     for(
+
         let room = 0;
+
         room < 10;
+
         room++
+
     )
     {
 
         await createRoom(room);
 
     }
+
+
 
 
 
@@ -1508,6 +1656,9 @@ async function start()
 
 
 
+
+
+
 // =====================================
 // PROXIMITY ADVENTURE SYSTEM
 // =====================================
@@ -1515,7 +1666,10 @@ async function start()
 
 let discoveredRooms:number[] = [];
 
+
 let currentRoom = 0;
+
+
 
 
 
@@ -1534,17 +1688,25 @@ function checkExploration()
 
 
 
+
+
+
+
     // CHESTS
 
     for(
+
         let chest of treasureEntities
+
     )
     {
 
         if(
 
             playerPos.distanceTo(
+
                 chest.pos
+
             )
 
             < 2
@@ -1566,17 +1728,25 @@ function checkExploration()
 
 
 
+
+
+
+
     // ENEMIES
 
     for(
+
         let enemy of enemyEntities
+
     )
     {
 
         if(
 
             playerPos.distanceTo(
+
                 enemy.pos
+
             )
 
             < 3
@@ -1594,21 +1764,26 @@ function checkExploration()
 
     }
 
+
+
 }
 
 
 
 
 
-// =====================================
-// DOOR SYSTEM
-// =====================================
 
 
-function checkDoors()
+
+// =====================================
+// MOVING WORLD CONSOLE
+// ALWAYS IN FRONT OF PLAYER
+// =====================================
+
+function updateConsolePosition()
 {
 
-    let playerPos =
+    let headPosition =
 
     Player.position.get()
 
@@ -1618,29 +1793,47 @@ function checkDoors()
 
 
 
-    for(
-        let door of doorEntities
-    )
-    {
+    let forward =
 
-        if(
+    Player.forward.get()
 
-            playerPos.distanceTo(
-                door.pos
-            )
+    ??
 
-            < 2
+    new Vector3(
 
-        )
-        {
+        0,
 
-            enterNextRoom(
-                door
-            );
+        0,
 
-        }
+        -1
 
-    }
+    );
+
+
+
+    let consolePosition =
+
+    headPosition.add(
+
+        forward.multiply(2)
+
+    );
+
+
+
+    consolePosition.y += 1.2;
+
+
+
+    inWorldConsole.visible(
+
+        true,
+
+        consolePosition
+
+    );
+
+
 
 }
 
@@ -1648,101 +1841,14 @@ function checkDoors()
 
 
 
-async function enterNextRoom(
-    door:Entity
-)
-{
-
-    console.log(
-
-        "🚪 Entering new room"
-
-    );
 
 
 
-    door.destroy();
+// =====================================
+// DISCOVER ROOMS
+// =====================================
 
-
-
-    let index =
-
-    doorEntities.indexOf(
-        door
-    );
-
-
-
-    if(index >= 0)
-    {
-
-        doorEntities.splice(
-
-            index,
-
-            1
-
-        );
-
-    }
-
-
-
-    currentRoom++;
-
-
-
-    if(
-
-        currentRoom < 10
-
-    )
-    {
-
-        discoverRoom(
-            currentRoom
-        );
-
-
-
-        await createRoom(
-
-            currentRoom
-
-        );
-
-
-
-        console.log(
-
-            "🗺 New dungeon area created"
-
-        );
-
-    }
-    else
-    {
-
-        console.log(
-
-            "👑 Boss chamber unlocked!"
-
-        );
-
-
-        bossFight();
-
-    }
-
-}
-
-
-
-
-
-function discoverRoom(
-    room:number
-)
+function discoverRoom(room:number)
 {
 
     if(
@@ -1770,23 +1876,211 @@ function discoverRoom(
 
 }
 
+// =====================================
+// DOOR SYSTEM
+// =====================================
+
+
+async function enterNextRoom(
+
+    door:Entity
+
+)
+{
+
+    console.log(
+
+        "🚪 Entering new room..."
+
+    );
+
+
+
+    door.destroy();
+
+
+
+    let index =
+
+    doorEntities.indexOf(
+
+        door
+
+    );
+
+
+
+    if(index >= 0)
+    {
+
+        doorEntities.splice(
+
+            index,
+
+            1
+
+        );
+
+    }
+
+
+
+
+
+    currentRoom++;
+
+
+
+
+
+    if(
+
+        currentRoom < 10
+
+    )
+    {
+
+
+        console.log(
+
+            "Loading Room "
+
+            +
+
+            currentRoom
+
+        );
+
+
+
+        discoverRoom(
+
+            currentRoom
+
+        );
+
+
+
+        await createRoom(
+
+            currentRoom
+
+        );
+
+
+
+        console.log(
+
+            "🗺 New room created!"
+
+        );
+
+
+    }
+
+    else
+
+    {
+
+
+        console.log(
+
+            "👑 Boss chamber unlocked!"
+
+        );
+
+
+        bossFight();
+
+
+    }
+
+}
+
+
+
 
 
 
 
 // =====================================
-// WORLD UPDATE LOOPS
+// CHECK DOORS NEAR PLAYER
 // =====================================
 
+function checkDoors()
+{
+
+    let playerPos =
+
+    Player.position.get()
+
+    ??
+
+    Vector3.zero;
+
+
+
+
+
+    for(
+
+        let door of doorEntities
+
+    )
+    {
+
+
+        if(
+
+            playerPos.distanceTo(
+
+                door.pos
+
+            )
+
+            < 2
+
+        )
+        {
+
+            console.log(
+
+                "🚪 Door nearby - press trigger"
+
+            );
+
+        }
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+// =====================================
+// FINAL WORLD UPDATE LOOP
+// =====================================
 
 Events.onPhysicsUpdate(
 
     () =>
+
     {
 
         checkExploration();
 
+
         checkDoors();
+
+
+        updateConsolePosition();
+
 
     }
 
