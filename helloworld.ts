@@ -9,9 +9,11 @@ import { Controller } from "./Yuu API/Controller";
 import { Entity } from "./Yuu API/Entity";
 import { Player } from "./Yuu API/Player";
 import { Raycast } from "./Yuu API/Raycast";
+import { Events } from "./Yuu API/Events";
 
 
 registerStart(start);
+
 
 
 // =====================================
@@ -19,76 +21,97 @@ registerStart(start);
 // =====================================
 
 const locations = [
+
     "Dark Cave",
     "Ancient Temple",
     "Crystal Cavern",
     "Lost Library",
     "Forgotten Armory",
     "Frozen Chamber"
+
 ];
 
 
+
 const enemyTypes = [
+
     {
         name:"Goblin",
         hp:40,
         damage:8
     },
+
     {
         name:"Skeleton",
         hp:60,
         damage:12
     },
+
     {
         name:"Orc",
         hp:100,
         damage:20
     },
+
     {
         name:"Shadow Beast",
         hp:150,
         damage:25
     }
+
 ];
 
 
+
 const weaponDrops = [
+
     {
         name:"Iron Sword",
         damage:10
     },
+
     {
         name:"Flame Blade",
         damage:20
     },
+
     {
         name:"Crystal Axe",
         damage:35
     },
+
     {
         name:"Dragon Slayer",
         damage:50
     }
+
 ];
 
 
+
 const bosses = [
+
     {
         name:"Dragon",
         hp:300,
         damage:35
     },
+
     {
         name:"Demon Lord",
         hp:450,
         damage:45
     },
+
     {
         name:"Ancient Golem",
         hp:500,
         damage:30
     }
+
 ];
+
+
 
 
 
@@ -101,28 +124,43 @@ let player = {
     level:1,
 
     hp:100,
+
     maxHp:100,
+
 
     damage:10,
 
+
     xp:0,
+
 
     gold:0,
 
-    weapon:{
+
+    weapon:
+    {
         name:"Rusty Sword",
         damage:10
     },
 
-    inventory:[
+
+    inventory:
+    [
         "Health Potion",
         "Health Potion"
     ],
 
+
     position:
-    new Vector3(0,1,0)
+    new Vector3(
+        0,
+        1,
+        0
+    )
 
 };
+
+
 
 
 
@@ -132,10 +170,16 @@ let player = {
 
 function random(list:any[])
 {
+
     return list[
-        Math.floor(Math.random()*list.length)
+        Math.floor(
+            Math.random()*list.length
+        )
     ];
+
 }
+
+
 
 
 
@@ -144,9 +188,13 @@ function random(list:any[])
 // =====================================
 
 function spawnCube(
+
     position:Vector3,
+
     scale:Vector3,
+
     color:Color
+
 ): Entity
 {
 
@@ -154,44 +202,66 @@ function spawnCube(
 
         position,
 
+
         scale,
 
+
         Quaternion.fromEuler(
+
             new Vector3(
+
                 0,
+
                 Math.random()*Math.PI,
+
                 0
+
             )
+
         ),
+
 
         color,
 
+
         1,
+
 
         true,
 
+
         "Static",
+
 
         undefined
 
     );
 
 }
-
 // =====================================
 // INTERACTION OBJECT STORAGE
 // =====================================
 
 let treasureEntities: Entity[] = [];
+
 let enemyEntities: Entity[] = [];
+
 let weaponEntities: Entity[] = [];
 
+let doorEntities: Entity[] = [];
 
+
+
+
+// =====================================
+// REGISTER OBJECTS
+// =====================================
 
 function registerTreasure(entity:Entity)
 {
     treasureEntities.push(entity);
 }
+
 
 
 function registerEnemy(entity:Entity)
@@ -200,10 +270,19 @@ function registerEnemy(entity:Entity)
 }
 
 
+
 function registerWeapon(entity:Entity)
 {
     weaponEntities.push(entity);
 }
+
+
+
+function registerDoor(entity:Entity)
+{
+    doorEntities.push(entity);
+}
+
 
 
 
@@ -223,11 +302,13 @@ function createSpawnPoint()
             0
         ),
 
+
         new Vector3(
             3,
             .2,
             3
         ),
+
 
         new Color(
             0,
@@ -246,6 +327,8 @@ function createSpawnPoint()
 
 
 
+
+
 // =====================================
 // DUNGEON ROOM BUILDER
 // =====================================
@@ -257,10 +340,13 @@ async function createRoom(room:number)
     room * 20;
 
 
+
     console.log(
         "Building room "+
         room
     );
+
+
 
 
 
@@ -270,13 +356,15 @@ async function createRoom(room:number)
         let x=-6;
         x<=6;
         x++
-    ){
+    )
+    {
 
         for(
             let z=-6;
-        z<=6;
-        z++
-        ){
+            z<=6;
+            z++
+        )
+        {
 
             spawnCube(
 
@@ -286,11 +374,13 @@ async function createRoom(room:number)
                     z
                 ),
 
+
                 new Vector3(
                     1,
                     .2,
                     1
                 ),
+
 
                 new Color(
                     .25,
@@ -306,13 +396,16 @@ async function createRoom(room:number)
 
 
 
+
+
     // WALLS
 
     for(
         let x=-6;
         x<=6;
         x++
-    ){
+    )
+    {
 
         spawnCube(
 
@@ -322,11 +415,13 @@ async function createRoom(room:number)
                 -6
             ),
 
+
             new Vector3(
                 1,
                 6,
                 1
             ),
+
 
             new Color(
                 .5,
@@ -346,11 +441,13 @@ async function createRoom(room:number)
                 6
             ),
 
+
             new Vector3(
                 1,
                 6,
                 1
             ),
+
 
             new Color(
                 .5,
@@ -364,29 +461,62 @@ async function createRoom(room:number)
 
 
 
+
+
+    // =================================
     // DOOR
+    // =================================
+
+
+    let door =
 
     spawnCube(
 
         new Vector3(
+
             offset+10,
+
             1.5,
+
             0
+
         ),
+
 
         new Vector3(
+
             2,
+
             3,
+
             .5
+
         ),
 
+
         new Color(
+
             .4,
+
             .2,
+
             0
+
         )
 
     );
+
+
+    registerDoor(door);
+
+
+
+    console.log(
+        "Door registered"
+    );
+
+
+
 
 
 
@@ -395,41 +525,58 @@ async function createRoom(room:number)
     // TREASURE CHEST
     // =================================
 
+
     if(Math.random()<0.5)
     {
 
+
         let chest =
+
         spawnCube(
 
             new Vector3(
+
                 offset-3,
+
                 1,
+
                 0
+
             ),
+
 
             new Vector3(
+
                 1,
+
                 1,
+
                 1
+
             ),
 
+
             new Color(
+
                 1,
+
                 .8,
+
                 0
+
             )
 
         );
 
 
+
         registerTreasure(chest);
 
 
-        console.log(
-            "Treasure registered"
-        );
-
     }
+
+
+
 
 
 
@@ -439,39 +586,53 @@ async function createRoom(room:number)
     // ENEMY
     // =================================
 
+
     if(Math.random()<0.7)
     {
 
+
         let enemy =
+
         spawnCube(
 
             new Vector3(
+
                 offset+3,
+
                 1,
+
                 2
+
             ),
+
 
             new Vector3(
+
                 1,
+
                 2,
+
                 1
+
             ),
 
+
             new Color(
+
                 1,
+
                 0,
+
                 0
+
             )
 
         );
 
 
+
         registerEnemy(enemy);
 
-
-        console.log(
-            "Enemy registered"
-        );
 
     }
 
@@ -494,19 +655,28 @@ function getLookedAtEntity(): Entity | undefined
 {
 
     let handPosition =
+
     Player.rightHand.position.get()
+
     ??
+
     Vector3.zero;
+
 
 
     let handDirection =
+
     Player.rightHand.forward.get()
+
     ??
+
     Vector3.zero;
+
 
 
 
     let hit =
+
     Raycast.directional(
 
         handPosition,
@@ -522,9 +692,11 @@ function getLookedAtEntity(): Entity | undefined
     );
 
 
+
     return hit?.entity;
 
 }
+
 
 
 
@@ -537,6 +709,7 @@ function openChest(entity:Entity)
 {
 
     let index =
+
     treasureEntities.indexOf(entity);
 
 
@@ -545,27 +718,40 @@ function openChest(entity:Entity)
     {
 
         treasureEntities.splice(
+
             index,
+
             1
+
         );
+
 
 
         player.gold += 50;
 
 
+
         player.inventory.push(
+
             "Health Potion"
+
         );
 
 
+
         console.log(
+
             "💰 Chest opened!"
+
         );
 
 
         console.log(
+
             "+50 Gold"
+
         );
+
 
 
         entity.destroy();
@@ -573,6 +759,8 @@ function openChest(entity:Entity)
     }
 
 }
+
+
 
 
 
@@ -586,26 +774,35 @@ function attackEnemy(entity:Entity)
 {
 
     let index =
+
     enemyEntities.indexOf(entity);
 
 
 
-    if(index >=0)
+    if(index >= 0)
     {
 
+
         enemyEntities.splice(
+
             index,
+
             1
+
         );
 
 
+
         console.log(
+
             "⚔ Enemy encountered!"
+
         );
 
 
 
         let enemy =
+
         random(enemyTypes);
 
 
@@ -632,6 +829,8 @@ function attackEnemy(entity:Entity)
 
 
 
+
+
 // =====================================
 // WEAPON PICKUP
 // =====================================
@@ -640,34 +839,45 @@ function pickupWeapon(entity:Entity)
 {
 
     let index =
+
     weaponEntities.indexOf(entity);
 
 
 
-    if(index >=0)
+    if(index >= 0)
     {
 
+
         weaponEntities.splice(
+
             index,
+
             1
+
         );
 
 
 
         let weapon =
+
         random(weaponDrops);
 
 
 
         player.weapon =
+
         weapon;
 
 
 
         console.log(
+
             "🗡 Equipped "
+
             +
+
             weapon.name
+
         );
 
 
@@ -682,6 +892,8 @@ function pickupWeapon(entity:Entity)
 
 
 
+
+
 // =====================================
 // MAIN INTERACTION
 // =====================================
@@ -690,6 +902,7 @@ function interact()
 {
 
     let target =
+
     getLookedAtEntity();
 
 
@@ -701,8 +914,12 @@ function interact()
 
 
 
+
+
     if(
+
         treasureEntities.includes(target)
+
     )
     {
 
@@ -711,8 +928,11 @@ function interact()
     }
 
 
+
     else if(
+
         enemyEntities.includes(target)
+
     )
     {
 
@@ -721,8 +941,11 @@ function interact()
     }
 
 
+
     else if(
+
         weaponEntities.includes(target)
+
     )
     {
 
@@ -731,6 +954,8 @@ function interact()
     }
 
 }
+
+
 
 
 
@@ -755,7 +980,9 @@ function setupInteractions()
 
 
     console.log(
+
         "VR interactions ready!"
+
     );
 
 }
@@ -780,18 +1007,26 @@ function showInventory()
     {
 
         console.log(
-            "- "+item
+            "- " + item
         );
 
     }
 
 
+
     console.log(
-        "Weapon: "+
+
+        "Weapon: "
+
+        +
+
         player.weapon.name
+
     );
 
 }
+
+
 
 
 
@@ -803,40 +1038,60 @@ function usePotion()
 {
 
     let index =
+
     player.inventory.indexOf(
+
         "Health Potion"
+
     );
+
 
 
     if(index >= 0)
     {
 
         player.inventory.splice(
+
             index,
+
             1
+
         );
+
 
 
         player.hp += 40;
 
 
+
         if(
+
             player.hp >
+
             player.maxHp
+
         )
         {
+
             player.hp =
+
             player.maxHp;
+
         }
 
 
+
         console.log(
+
             "🧪 Health restored!"
+
         );
 
     }
 
 }
+
+
 
 
 
@@ -848,41 +1103,61 @@ function checkLevel()
 {
 
     let needed =
+
     player.level * 50;
 
 
 
     if(
+
         player.xp >= needed
+
     )
     {
 
         player.level++;
 
-        player.xp=0;
 
-        player.maxHp+=25;
+        player.xp = 0;
+
+
+        player.maxHp += 25;
+
 
         player.hp =
+
         player.maxHp;
 
 
-        player.damage+=5;
+
+        player.damage += 5;
+
 
 
         console.log(
+
             "⭐ LEVEL UP!"
+
         );
 
 
+
         console.log(
-            "Level "+
+
+            "Level "
+
+            +
+
             player.level
+
         );
 
     }
 
 }
+
+
+
 
 
 
@@ -897,88 +1172,144 @@ function battle(enemy:any)
     console.log("");
 
     console.log(
+
         "⚔ BATTLE!"
+
     );
+
 
 
     console.log(
-        enemy.name+
+
+        enemy.name +
+
         " appears!"
+
     );
+
+
 
 
 
     while(
+
         enemy.hp > 0 &&
+
         player.hp > 0
+
     )
     {
 
+
         let damage =
+
         player.weapon.damage;
 
 
 
+
         if(
-            Math.random()<0.2
+
+            Math.random() < .2
+
         )
         {
 
-            damage*=2;
+            damage *= 2;
 
 
             console.log(
+
                 "💥 CRITICAL HIT!"
+
             );
 
         }
 
 
 
+
         enemy.hp -= damage;
 
 
+
         console.log(
-            "You deal "+
+
+            "You deal "
+
+            +
+
             damage
+
+            +
+
+            " damage"
+
         );
 
 
 
+
         if(
+
             enemy.hp <= 0
+
         )
         {
+
             break;
+
         }
 
 
 
+
         player.hp -=
+
         enemy.damage;
 
 
 
         console.log(
-            enemy.name+
-            " hits you for "+
+
+            enemy.name
+
+            +
+
+            " hits for "
+
+            +
+
             enemy.damage
+
         );
 
 
 
         console.log(
-            "HP: "+
+
+            "HP: "
+
+            +
+
             player.hp
+
         );
 
 
 
+
+
         if(
+
             player.hp < 40 &&
+
             player.inventory.includes(
+
                 "Health Potion"
+
             )
+
         )
         {
 
@@ -990,13 +1321,19 @@ function battle(enemy:any)
 
 
 
+
+
     if(
+
         player.hp <= 0
+
     )
     {
 
         console.log(
+
             "☠ YOU DIED"
+
         );
 
 
@@ -1006,29 +1343,41 @@ function battle(enemy:any)
 
 
 
+
+
     console.log(
+
         "🏆 Enemy defeated!"
+
     );
 
 
 
     player.xp += 25;
 
+
     player.gold += 20;
 
 
 
     console.log(
+
         "+20 Gold"
+
     );
+
 
 
     checkLevel();
 
 
+
     return true;
 
 }
+
+
+
 
 
 
@@ -1041,13 +1390,19 @@ function bossFight()
 {
 
     let boss =
+
     random(bosses);
 
 
 
     console.log(
-        "👑 BOSS: "+
+
+        "👑 BOSS: "
+
+        +
+
         boss.name
+
     );
 
 
@@ -1063,8 +1418,6 @@ function bossFight()
     });
 
 }
-
-
 
 // =====================================
 // START GAME
@@ -1082,9 +1435,13 @@ async function start()
         true,
 
         new Vector3(
+
             0,
+
             1.5,
+
             -1.5
+
         )
 
     );
@@ -1117,9 +1474,10 @@ async function start()
 
 
 
+
     for(
-        let room=0;
-        room<10;
+        let room = 0;
+        room < 10;
         room++
     )
     {
@@ -1130,14 +1488,14 @@ async function start()
 
 
 
+
     console.log(
         "Dungeon ready!"
     );
 
 
-
     console.log(
-        "Explore!"
+        "Explore the dungeon!"
     );
 
 
@@ -1145,3 +1503,291 @@ async function start()
     showInventory();
 
 }
+
+
+
+
+
+// =====================================
+// PROXIMITY ADVENTURE SYSTEM
+// =====================================
+
+
+let discoveredRooms:number[] = [];
+
+let currentRoom = 0;
+
+
+
+
+
+function checkExploration()
+{
+
+    let playerPos =
+
+    Player.position.get()
+
+    ??
+
+    Vector3.zero;
+
+
+
+    // CHESTS
+
+    for(
+        let chest of treasureEntities
+    )
+    {
+
+        if(
+
+            playerPos.distanceTo(
+                chest.pos
+            )
+
+            < 2
+
+        )
+        {
+
+            console.log(
+
+                "💰 Chest nearby! Press trigger."
+
+            );
+
+        }
+
+    }
+
+
+
+
+
+    // ENEMIES
+
+    for(
+        let enemy of enemyEntities
+    )
+    {
+
+        if(
+
+            playerPos.distanceTo(
+                enemy.pos
+            )
+
+            < 3
+
+        )
+        {
+
+            console.log(
+
+                "⚔ Enemy nearby!"
+
+            );
+
+        }
+
+    }
+
+}
+
+
+
+
+
+// =====================================
+// DOOR SYSTEM
+// =====================================
+
+
+function checkDoors()
+{
+
+    let playerPos =
+
+    Player.position.get()
+
+    ??
+
+    Vector3.zero;
+
+
+
+    for(
+        let door of doorEntities
+    )
+    {
+
+        if(
+
+            playerPos.distanceTo(
+                door.pos
+            )
+
+            < 2
+
+        )
+        {
+
+            enterNextRoom(
+                door
+            );
+
+        }
+
+    }
+
+}
+
+
+
+
+
+async function enterNextRoom(
+    door:Entity
+)
+{
+
+    console.log(
+
+        "🚪 Entering new room"
+
+    );
+
+
+
+    door.destroy();
+
+
+
+    let index =
+
+    doorEntities.indexOf(
+        door
+    );
+
+
+
+    if(index >= 0)
+    {
+
+        doorEntities.splice(
+
+            index,
+
+            1
+
+        );
+
+    }
+
+
+
+    currentRoom++;
+
+
+
+    if(
+
+        currentRoom < 10
+
+    )
+    {
+
+        discoverRoom(
+            currentRoom
+        );
+
+
+
+        await createRoom(
+
+            currentRoom
+
+        );
+
+
+
+        console.log(
+
+            "🗺 New dungeon area created"
+
+        );
+
+    }
+    else
+    {
+
+        console.log(
+
+            "👑 Boss chamber unlocked!"
+
+        );
+
+
+        bossFight();
+
+    }
+
+}
+
+
+
+
+
+function discoverRoom(
+    room:number
+)
+{
+
+    if(
+
+        !discoveredRooms.includes(room)
+
+    )
+    {
+
+        discoveredRooms.push(room);
+
+
+
+        console.log(
+
+            "🗺 Discovered Room "
+
+            +
+
+            room
+
+        );
+
+    }
+
+}
+
+
+
+
+
+// =====================================
+// WORLD UPDATE LOOPS
+// =====================================
+
+
+Events.onPhysicsUpdate(
+
+    () =>
+    {
+
+        checkExploration();
+
+        checkDoors();
+
+    }
+
+);
