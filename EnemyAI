@@ -1,0 +1,123 @@
+import { Vector3 } from "./Yuu API/Basic Types/Vector3";
+import { Player } from "./Yuu API/Player";
+import { Events } from "./Yuu API/Events";
+
+
+let enemies:any[] = [];
+
+
+
+export function addEnemyAI(entity:any)
+{
+
+    enemies.push({
+
+        entity:entity,
+
+        speed:0.03
+
+    });
+
+
+}
+
+
+
+function updateEnemyAI()
+{
+
+
+    let playerPos =
+
+    Player.position.get()
+
+    ?? Vector3.zero;
+
+
+
+    for(let enemy of enemies)
+    {
+
+
+        let cube = enemy.entity;
+
+
+        if(!cube)
+            continue;
+
+
+
+        let pos = cube.pos;
+
+
+
+        let direction = new Vector3(
+
+            playerPos.x - pos.x,
+
+            0,
+
+            playerPos.z - pos.z
+
+        );
+
+
+
+        let distance = pos.distanceTo(playerPos);
+
+
+
+        if(distance < 10)
+        {
+
+
+            let length = Math.sqrt(
+
+                direction.x * direction.x +
+
+                direction.z * direction.z
+
+            );
+
+
+
+            if(length > 0)
+            {
+
+                direction.x /= length;
+
+                direction.z /= length;
+
+
+
+                cube.position.set(
+
+                    new Vector3(
+
+                        pos.x + direction.x * enemy.speed,
+
+                        pos.y,
+
+                        pos.z + direction.z * enemy.speed
+
+                    )
+
+                );
+
+            }
+
+        }
+
+
+    }
+
+
+}
+
+
+
+Events.onPhysicsUpdate(()=>{
+
+    updateEnemyAI();
+
+});

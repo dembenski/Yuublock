@@ -10,7 +10,7 @@ import { Entity } from "./Yuu API/Entity";
 import { Player } from "./Yuu API/Player";
 import { Raycast } from "./Yuu API/Raycast";
 import { Events } from "./Yuu API/Events";
-
+import { addEnemyAI } from "./EnemyAI";
 
 registerStart(start);
 
