@@ -6,338 +6,432 @@ import { registerStart } from "./Yuu API/RegisterStart";
 registerStart(start);
 
 
-// ==========================
-// GAME DATA
-// ==========================
+// =============================
+// DUNGEON DATA
+// =============================
 
 const locations = [
-  "Dusty Library",
-  "Dark Cave",
-  "Crystal Cavern",
-  "Ancient Temple",
-  "Forgotten Armory",
-  "Flooded Hall",
-  "Frozen Chamber",
-  "Lost Laboratory"
+    "Dark Cave",
+    "Crystal Cavern",
+    "Ancient Temple",
+    "Lost Library",
+    "Frozen Chamber",
+    "Forgotten Armory"
 ];
 
 
-const enemyTypes = [
-  { name:"Goblin", hp:35, damage:8 },
-  { name:"Skeleton", hp:50, damage:12 },
-  { name:"Zombie", hp:70, damage:15 },
-  { name:"Orc", hp:100, damage:20 }
+const enemies = [
+    {name:"Goblin", hp:40, damage:8},
+    {name:"Skeleton", hp:60, damage:12},
+    {name:"Orc", hp:100, damage:20},
+    {name:"Shadow Beast", hp:150, damage:25}
 ];
 
 
-const treasures = [
-  "Health Potion",
-  "Magic Sword",
-  "Ancient Ring",
-  "Golden Key",
-  "Rare Gem"
+const weapons = [
+    {name:"Iron Sword", damage:10},
+    {name:"Flame Blade", damage:20},
+    {name:"Crystal Axe", damage:30},
+    {name:"Dragon Slayer", damage:50}
+];
+
+
+const items = [
+    "Health Potion",
+    "Gold Coin",
+    "Magic Scroll"
 ];
 
 
 const bosses = [
-  { name:"Dragon", hp:250, damage:30 },
-  { name:"Demon Lord", hp:300, damage:35 },
-  { name:"Ancient Golem", hp:400, damage:25 }
+    {name:"Dragon", hp:300, damage:35},
+    {name:"Demon King", hp:400, damage:45}
 ];
 
 
-// ==========================
+// =============================
 // PLAYER
-// ==========================
+// =============================
 
 let player = {
-  level:1,
-  hp:100,
-  maxHp:100,
-  damage:20,
-  xp:0,
-  gold:0,
-  rooms:0
+
+    level:1,
+
+    hp:100,
+    maxHp:100,
+
+    xp:0,
+
+    gold:0,
+
+    weapon:{
+        name:"Rusty Sword",
+        damage:5
+    },
+
+    inventory:[
+        "Health Potion",
+        "Health Potion"
+    ],
+
+    position:new Vector3(0,0,0)
+
 };
 
 
-// ==========================
+
+// =============================
 // HELPERS
-// ==========================
+// =============================
 
-function random(list:any[]) {
-  return list[Math.floor(Math.random()*list.length)];
+function random(array:any[]){
+
+    return array[
+        Math.floor(Math.random()*array.length)
+    ];
+
 }
 
 
-// ==========================
-// BATTLE SYSTEM
-// ==========================
 
-function battle(enemy:any) {
+// =============================
+// INVENTORY
+// =============================
 
-  console.log("");
-  console.log("⚔️ BATTLE START!");
-  console.log(enemy.name + " appears!");
-  console.log(enemy.name + " HP: " + enemy.hp);
+function showInventory(){
+
+    console.log("");
+    console.log("🎒 INVENTORY");
+
+    player.inventory.forEach(item=>{
+        console.log("- "+item);
+    });
+
+    console.log(
+        "Weapon: "+
+        player.weapon.name
+    );
+
+}
 
 
-  while(enemy.hp > 0 && player.hp > 0) {
+
+// =============================
+// USE POTION
+// =============================
+
+function usePotion(){
+
+    let index =
+    player.inventory.indexOf(
+        "Health Potion"
+    );
 
 
-    let critical = Math.random() < 0.2;
+    if(index >= 0){
 
-    let damage = player.damage;
+        player.inventory.splice(index,1);
+
+        player.hp += 40;
 
 
-    if(critical){
-      damage *= 2;
-      console.log("💥 Critical Hit!");
+        if(player.hp > player.maxHp){
+            player.hp = player.maxHp;
+        }
+
+
+        console.log(
+            "🧪 Potion used!"
+        );
+
+        console.log(
+            "HP restored"
+        );
+
+    }
+
+}
+
+
+
+// =============================
+// LEVELING
+// =============================
+
+function levelUp(){
+
+    let needed =
+    player.level * 50;
+
+
+    if(player.xp >= needed){
+
+        player.level++;
+
+        player.xp=0;
+
+        player.maxHp+=25;
+
+        player.hp=
+        player.maxHp;
+
+
+        player.weapon.damage+=5;
+
+
+        console.log("");
+        console.log(
+            "⭐ LEVEL UP!"
+        );
+
+        console.log(
+            "Level "+
+            player.level
+        );
+
+    }
+
+}
+
+
+
+// =============================
+// COMBAT
+// =============================
+
+function battle(enemy:any){
+
+
+    console.log("");
+    console.log(
+        "⚔ "+enemy.name+
+        " attacks!"
+    );
+
+
+    while(enemy.hp>0 &&
+          player.hp>0){
+
+
+        let damage =
+        player.weapon.damage;
+
+
+        enemy.hp-=damage;
+
+
+        console.log(
+            "You hit for "+
+            damage
+        );
+
+
+        if(enemy.hp<=0){
+            break;
+        }
+
+
+        player.hp-=enemy.damage;
+
+
+        console.log(
+            "Enemy hits for "+
+            enemy.damage
+        );
+
+
+        if(
+        player.hp < 40 &&
+        player.inventory.includes(
+        "Health Potion"))
+        {
+            usePotion();
+        }
+
     }
 
 
-    enemy.hp -= damage;
 
+    if(player.hp<=0){
 
-    console.log(
-      "You deal " +
-      damage +
-      " damage"
-    );
+        console.log(
+            "☠ GAME OVER"
+        );
 
+        return false;
 
-    if(enemy.hp <= 0){
-      break;
     }
 
 
-    player.hp -= enemy.damage;
-
-
     console.log(
-      enemy.name +
-      " hits you for " +
-      enemy.damage
+        "🏆 Enemy defeated!"
     );
 
 
+    player.xp+=25;
+
+
+    let gold =
+    Math.floor(Math.random()*50);
+
+
+    player.gold+=gold;
+
+
     console.log(
-      "Your HP: " +
-      player.hp
+        "+"+gold+" gold"
     );
 
-  }
+
+    if(Math.random()<0.3){
+
+        let weapon =
+        random(weapons);
 
 
-  if(player.hp <= 0){
-
-    console.log("");
-    console.log("☠ YOU DIED");
-    return false;
-
-  }
+        player.weapon=weapon;
 
 
-  let xpGain = 25;
-  let goldGain = Math.floor(Math.random()*50)+10;
+        console.log(
+            "🗡 New Weapon: "+
+            weapon.name
+        );
+
+    }
 
 
-  player.xp += xpGain;
-  player.gold += goldGain;
+    levelUp();
 
 
-  console.log("");
-  console.log("🏆 Enemy defeated!");
-  console.log("+"+xpGain+" XP");
-  console.log("+"+goldGain+" Gold");
-
-
-  levelCheck();
-
-
-  return true;
+    return true;
 
 }
 
 
-// ==========================
-// LEVEL SYSTEM
-// ==========================
 
-function levelCheck(){
+// =============================
+// DUNGEON MAP
+// =============================
 
-  let needed = player.level * 50;
+function generateRoom(room:number){
 
 
-  if(player.xp >= needed){
-
-    player.level++;
-
-    player.xp = 0;
-
-    player.maxHp += 25;
-    player.hp = player.maxHp;
-
-    player.damage += 5;
+    player.position =
+    new Vector3(
+        room*10,
+        0,
+        Math.random()*20
+    );
 
 
     console.log("");
-    console.log("⭐ LEVEL UP!");
     console.log(
-      "You are now level " +
-      player.level
+        "ROOM "+room
     );
 
-  }
 
-}
-
-
-// ==========================
-// TREASURE
-// ==========================
-
-function treasureRoom(){
-
-  let item = random(treasures);
-
-  let gold = Math.floor(Math.random()*40)+10;
-
-  player.gold += gold;
+    console.log(
+        "Location: "+
+        random(locations)
+    );
 
 
-  console.log("");
-  console.log("💰 TREASURE FOUND!");
-  console.log(item);
-  console.log("+"+gold+" Gold");
+    if(Math.random()<0.7){
 
-}
+        let enemy=random(enemies);
 
 
+        battle({
+            name:enemy.name,
+            hp:enemy.hp+room*10,
+            damage:enemy.damage+room
+        });
 
-// ==========================
-// DUNGEON GENERATION
-// ==========================
+    }
 
-function createRoom(room:number){
+    else{
 
-
-  console.log("");
-  console.log("======================");
-  console.log("ROOM " + room);
-  console.log("======================");
-
-
-  console.log(
-    "Location: " +
-    random(locations)
-  );
+        console.log(
+            "💰 Treasure!"
+        );
 
 
-  let event = Math.random();
+        player.inventory.push(
+            random(items)
+        );
 
-
-  if(event < 0.65){
-
-    let baseEnemy = random(enemyTypes);
-
-
-    let enemy = {
-      name:baseEnemy.name,
-      hp:baseEnemy.hp + room * 5,
-      damage:baseEnemy.damage + room
-    };
-
-
-    battle(enemy);
-
-
-  }
-  else {
-
-    treasureRoom();
-
-  }
-
-
-  console.log("");
-  console.log(
-    "❤️ HP: " + player.hp
-  );
-
-  console.log(
-    "⭐ Level: " + player.level
-  );
-
-  console.log(
-    "💰 Gold: " + player.gold
-  );
+    }
 
 }
 
 
 
-// ==========================
-// START GAME
-// ==========================
+// =============================
+// START
+// =============================
 
 function start(){
 
 
-  inWorldConsole.visible(
-    true,
-    new Vector3(0,1.5,-1.5)
-  );
-
-
-  console.log("==============================");
-  console.log("       THE LOST DUNGEON");
-  console.log("==============================");
-
-
-  console.log("");
-  console.log(
-    "You enter a forgotten dungeon..."
-  );
-
-
-  for(let i = 1; i <= 10; i++){
-
-    createRoom(i);
-
-
-    if(player.hp <= 0){
-      return;
-    }
-
-  }
+inWorldConsole.visible(
+true,
+new Vector3(0,1.5,-1.5)
+);
 
 
 
-  console.log("");
-  console.log("==============================");
-  console.log("        FINAL BOSS");
-  console.log("==============================");
+console.log(
+"=============================="
+);
+
+console.log(
+"      THE LOST DUNGEON RPG"
+);
+
+console.log(
+"=============================="
+);
 
 
-  let boss = random(bosses);
+
+for(let room=1;room<=10;room++){
+
+    generateRoom(room);
 
 
-  battle({
-    name:boss.name,
-    hp:boss.hp,
-    damage:boss.damage
-  });
+    if(player.hp<=0)
+    return;
+
+}
 
 
-  if(player.hp > 0){
 
-    console.log("");
-    console.log("🎉 VICTORY!");
-    console.log(
-      "You conquered the dungeon!"
-    );
+console.log("");
+console.log(
+"👑 FINAL BOSS"
+);
 
-  }
+
+
+let boss=random(bosses);
+
+
+battle({
+name:boss.name,
+hp:boss.hp,
+damage:boss.damage
+});
+
+
+
+console.log("");
+
+showInventory();
+
+
+console.log(
+"🎉 ADVENTURE COMPLETE!"
+);
+
 
 }
