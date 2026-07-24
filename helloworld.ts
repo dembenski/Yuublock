@@ -1,21 +1,24 @@
+import { Async } from "./Yuu API/Async";
+import { Color } from "./Yuu API/Basic Types/Color";
+import { Quaternion } from "./Yuu API/Basic Types/Quaternion";
 import { Vector3 } from "./Yuu API/Basic Types/Vector3";
 import { inWorldConsole } from "./Yuu API/Console";
 import { registerStart } from "./Yuu API/RegisterStart";
+import { spawnPrimitive } from "./Yuu API/SpawnPrimitive";
 
 
 registerStart(start);
 
 
 // =============================
-// DUNGEON DATA
+// GAME DATA
 // =============================
 
 const locations = [
     "Dark Cave",
-    "Crystal Cavern",
     "Ancient Temple",
+    "Crystal Cavern",
     "Lost Library",
-    "Frozen Chamber",
     "Forgotten Armory"
 ];
 
@@ -36,17 +39,11 @@ const weapons = [
 ];
 
 
-const items = [
-    "Health Potion",
-    "Gold Coin",
-    "Magic Scroll"
-];
-
-
 const bosses = [
     {name:"Dragon", hp:300, damage:35},
-    {name:"Demon King", hp:400, damage:45}
+    {name:"Demon Lord", hp:400, damage:45}
 ];
+
 
 
 // =============================
@@ -56,25 +53,19 @@ const bosses = [
 let player = {
 
     level:1,
-
     hp:100,
     maxHp:100,
 
-    xp:0,
+    damage:10,
 
+    xp:0,
     gold:0,
 
-    weapon:{
-        name:"Rusty Sword",
-        damage:5
-    },
+    weapon:"Rusty Sword",
 
     inventory:[
-        "Health Potion",
         "Health Potion"
-    ],
-
-    position:new Vector3(0,0,0)
+    ]
 
 };
 
@@ -84,10 +75,10 @@ let player = {
 // HELPERS
 // =============================
 
-function random(array:any[]){
+function random(list:any[]){
 
-    return array[
-        Math.floor(Math.random()*array.length)
+    return list[
+        Math.floor(Math.random()*list.length)
     ];
 
 }
@@ -95,101 +86,192 @@ function random(array:any[]){
 
 
 // =============================
-// INVENTORY
+// 3D WORLD
 // =============================
 
-function showInventory(){
+function cube(
+    position:Vector3,
+    scale:Vector3,
+    color:Color
+){
 
-    console.log("");
-    console.log("🎒 INVENTORY");
-
-    player.inventory.forEach(item=>{
-        console.log("- "+item);
-    });
-
-    console.log(
-        "Weapon: "+
-        player.weapon.name
+    spawnPrimitive.cube(
+        position,
+        scale,
+        Quaternion.fromEuler(
+            new Vector3(
+                0,
+                Math.random()*Math.PI,
+                0
+            )
+        ),
+        color,
+        1,
+        true,
+        "Static",
+        undefined
     );
 
 }
 
 
 
-// =============================
-// USE POTION
-// =============================
-
-function usePotion(){
-
-    let index =
-    player.inventory.indexOf(
-        "Health Potion"
-    );
+async function buildDungeon(){
 
 
-    if(index >= 0){
-
-        player.inventory.splice(index,1);
-
-        player.hp += 40;
+    console.log("Building 3D Dungeon...");
 
 
-        if(player.hp > player.maxHp){
-            player.hp = player.maxHp;
+    for(let room=0; room<10; room++){
+
+
+        let offset = room * 15;
+
+
+
+        // Floor
+
+        for(let x=-5;x<=5;x++){
+
+            for(let z=-5;z<=5;z++){
+
+                cube(
+                    new Vector3(
+                        offset+x,
+                        0,
+                        z
+                    ),
+
+                    new Vector3(
+                        1,
+                        0.2,
+                        1
+                    ),
+
+                    new Color(
+                        0.25,
+                        0.25,
+                        0.25
+                    )
+                );
+
+            }
         }
 
 
-        console.log(
-            "🧪 Potion used!"
-        );
 
-        console.log(
-            "HP restored"
-        );
+        // Walls
+
+        for(let x=-5;x<=5;x++){
+
+            cube(
+                new Vector3(
+                    offset+x,
+                    3,
+                    -5
+                ),
+
+                new Vector3(
+                    1,
+                    6,
+                    1
+                ),
+
+                new Color(
+                    0.5,
+                    0.5,
+                    0.5
+                )
+            );
+
+
+            cube(
+                new Vector3(
+                    offset+x,
+                    3,
+                    5
+                ),
+
+                new Vector3(
+                    1,
+                    6,
+                    1
+                ),
+
+                new Color(
+                    0.5,
+                    0.5,
+                    0.5
+                )
+            );
+
+        }
+
+
+
+        // Treasure
+
+        if(Math.random()<0.5){
+
+            cube(
+                new Vector3(
+                    offset,
+                    1,
+                    0
+                ),
+
+                new Vector3(
+                    1,
+                    1,
+                    1
+                ),
+
+                new Color(
+                    1,
+                    0.7,
+                    0
+                )
+            );
+
+        }
+
+
+
+        // Enemy marker
+
+        if(Math.random()<0.6){
+
+            cube(
+                new Vector3(
+                    offset+3,
+                    1,
+                    2
+                ),
+
+                new Vector3(
+                    1,
+                    2,
+                    1
+                ),
+
+                new Color(
+                    1,
+                    0,
+                    0
+                )
+            );
+
+        }
+
+
+        await Async.wait(50);
 
     }
 
-}
 
-
-
-// =============================
-// LEVELING
-// =============================
-
-function levelUp(){
-
-    let needed =
-    player.level * 50;
-
-
-    if(player.xp >= needed){
-
-        player.level++;
-
-        player.xp=0;
-
-        player.maxHp+=25;
-
-        player.hp=
-        player.maxHp;
-
-
-        player.weapon.damage+=5;
-
-
-        console.log("");
-        console.log(
-            "⭐ LEVEL UP!"
-        );
-
-        console.log(
-            "Level "+
-            player.level
-        );
-
-    }
+    console.log(
+        "Dungeon Ready!"
+    );
 
 }
 
@@ -204,49 +286,41 @@ function battle(enemy:any){
 
     console.log("");
     console.log(
-        "⚔ "+enemy.name+
-        " attacks!"
+        "⚔ Fight: "+enemy.name
     );
 
 
-    while(enemy.hp>0 &&
-          player.hp>0){
+    while(
+        enemy.hp>0 &&
+        player.hp>0
+    ){
 
 
         let damage =
-        player.weapon.damage;
+        player.damage;
 
 
         enemy.hp-=damage;
 
 
         console.log(
-            "You hit for "+
-            damage
+            "You deal "+damage
         );
 
 
-        if(enemy.hp<=0){
+
+        if(enemy.hp<=0)
             break;
-        }
+
 
 
         player.hp-=enemy.damage;
 
 
         console.log(
-            "Enemy hits for "+
-            enemy.damage
+            "Enemy hits "+enemy.damage
         );
 
-
-        if(
-        player.hp < 40 &&
-        player.inventory.includes(
-        "Health Potion"))
-        {
-            usePotion();
-        }
 
     }
 
@@ -255,183 +329,154 @@ function battle(enemy:any){
     if(player.hp<=0){
 
         console.log(
-            "☠ GAME OVER"
+            "☠ You died"
         );
 
-        return false;
+        return;
 
     }
 
 
+
     console.log(
-        "🏆 Enemy defeated!"
+        "Enemy defeated!"
     );
 
 
     player.xp+=25;
 
-
-    let gold =
-    Math.floor(Math.random()*50);
+    player.gold+=20;
 
 
-    player.gold+=gold;
 
+    if(player.xp>=50){
 
-    console.log(
-        "+"+gold+" gold"
-    );
+        player.level++;
 
+        player.xp=0;
 
-    if(Math.random()<0.3){
+        player.damage+=5;
 
-        let weapon =
-        random(weapons);
+        player.maxHp+=20;
 
-
-        player.weapon=weapon;
+        player.hp=
+        player.maxHp;
 
 
         console.log(
-            "🗡 New Weapon: "+
-            weapon.name
+            "⭐ LEVEL UP!"
         );
 
     }
-
-
-    levelUp();
-
-
-    return true;
 
 }
 
 
 
 // =============================
-// DUNGEON MAP
+// GAME START
 // =============================
 
-function generateRoom(room:number){
+async function start(){
 
 
-    player.position =
-    new Vector3(
-        room*10,
-        0,
-        Math.random()*20
-    );
-
-
-    console.log("");
-    console.log(
-        "ROOM "+room
+    inWorldConsole.visible(
+        true,
+        new Vector3(
+            0,
+            1.5,
+            -1.5
+        )
     );
 
 
     console.log(
-        "Location: "+
-        random(locations)
+        "======================"
+    );
+
+    console.log(
+        " THE LOST DUNGEON VR"
+    );
+
+    console.log(
+        "======================"
     );
 
 
-    if(Math.random()<0.7){
-
-        let enemy=random(enemies);
+    await buildDungeon();
 
 
-        battle({
-            name:enemy.name,
-            hp:enemy.hp+room*10,
-            damage:enemy.damage+room
-        });
 
-    }
+    console.log(
+        "Adventure Begins!"
+    );
 
-    else{
+
+
+    for(let room=1;room<=10;room++){
+
 
         console.log(
-            "💰 Treasure!"
+            "Entering Room "+room
         );
 
 
-        player.inventory.push(
-            random(items)
+        console.log(
+            "Location: "+
+            random(locations)
         );
+
+
+
+        if(Math.random()<0.7){
+
+            let enemy=random(enemies);
+
+
+            battle({
+                name:enemy.name,
+                hp:enemy.hp+room*10,
+                damage:enemy.damage+room
+            });
+
+
+        }
+
+
+        else{
+
+            console.log(
+                "Found Treasure!"
+            );
+
+            player.gold+=50;
+
+        }
+
 
     }
 
-}
+
+
+    console.log(
+        "FINAL BOSS"
+    );
+
+
+    let boss=random(bosses);
+
+
+    battle({
+        name:boss.name,
+        hp:boss.hp,
+        damage:boss.damage
+    });
 
 
 
-// =============================
-// START
-// =============================
-
-function start(){
-
-
-inWorldConsole.visible(
-true,
-new Vector3(0,1.5,-1.5)
-);
-
-
-
-console.log(
-"=============================="
-);
-
-console.log(
-"      THE LOST DUNGEON RPG"
-);
-
-console.log(
-"=============================="
-);
-
-
-
-for(let room=1;room<=10;room++){
-
-    generateRoom(room);
-
-
-    if(player.hp<=0)
-    return;
-
-}
-
-
-
-console.log("");
-console.log(
-"👑 FINAL BOSS"
-);
-
-
-
-let boss=random(bosses);
-
-
-battle({
-name:boss.name,
-hp:boss.hp,
-damage:boss.damage
-});
-
-
-
-console.log("");
-
-showInventory();
-
-
-console.log(
-"🎉 ADVENTURE COMPLETE!"
-);
+    console.log(
+        "Dungeon Complete!"
+    );
 
 
 }
