@@ -1,5 +1,4 @@
 import { Vector3 } from "./Yuu API/Basic Types/Vector3";
-import { Quaternion } from "./Yuu API/Basic Types/Quaternion";
 import { inWorldConsole } from "./Yuu API/Console";
 import { Player } from "./Yuu API/Player";
 import { Events } from "./Yuu API/Events";
@@ -15,17 +14,18 @@ function start()
 {
     console.log("Console Follow Test");
 
+    // Show the console immediately
     updateConsolePosition();
 }
 
 // =====================================
 // MOVE CONSOLE
-// ALWAYS FACES PLAYER
 // =====================================
 
 function updateConsolePosition()
 {
-    let playerPos =
+    // Player head position
+    let headPosition =
 
         Player.position.get()
 
@@ -33,8 +33,7 @@ function updateConsolePosition()
 
         Vector3.zero;
 
-
-
+    // Direction player is looking
     let forward =
 
         Player.forward.get()
@@ -51,63 +50,30 @@ function updateConsolePosition()
 
         );
 
+    // Position console 2 metres ahead
+    let consolePosition =
 
+        headPosition.add(
 
-    // Position console 2 metres in front
-    let consolePos =
-
-        new Vector3(
-
-            playerPos.x + forward.x * 2,
-
-            playerPos.y + 1.2,
-
-            playerPos.z + forward.z * 2
+            forward.multiply(2)
 
         );
 
+    // Raise console to eye level
+    consolePosition.y += 1.2;
 
-
-    // Make console face the player
-    let lookDirection =
-
-        new Vector3(
-
-            playerPos.x - consolePos.x,
-
-            0,
-
-            playerPos.z - consolePos.z
-
-        );
-
-
-
-    let rotation =
-
-        Quaternion.lookRotation(
-
-            lookDirection,
-
-            Vector3.up
-
-        );
-
-
-
+    // Show console
     inWorldConsole.visible(
 
         true,
 
-        consolePos,
-
-        rotation
+        consolePosition
 
     );
 }
 
 // =====================================
-// UPDATE LOOP
+// UPDATE EVERY PHYSICS FRAME
 // =====================================
 
 Events.onPhysicsUpdate(
