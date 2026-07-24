@@ -41,7 +41,6 @@ const locations = [
 
 
 
-
 // =====================================
 // ENEMY TYPES
 // =====================================
@@ -98,7 +97,6 @@ const enemyTypes = [
 
 
 
-
 // =====================================
 // WEAPON DROPS
 // =====================================
@@ -148,7 +146,6 @@ const weaponDrops = [
 
 
 
-
 // =====================================
 // BOSSES
 // =====================================
@@ -189,23 +186,37 @@ const bosses = [
     }
 
 ];
+
+
+
+
+
+
 // =====================================
 // PLAYER
 // =====================================
 
+
 let player = {
+
 
     level:1,
 
+
     hp:100,
+
 
     maxHp:100,
 
+
     damage:10,
+
 
     xp:0,
 
+
     gold:0,
+
 
 
     weapon:
@@ -218,6 +229,7 @@ let player = {
     },
 
 
+
     inventory:
     [
 
@@ -226,6 +238,7 @@ let player = {
         "Health Potion"
 
     ],
+
 
 
     position:
@@ -240,13 +253,8 @@ let player = {
 
     )
 
+
 };
-
-
-
-
-
-
 
 // =====================================
 // HELPERS
@@ -273,30 +281,28 @@ function random(list:any[])
 
 
 
-
 // =====================================
 // COMBAT TRACKING
+// ENEMY DATA CONNECTED TO RED CUBES
 // =====================================
 
 
-// stores the real enemy attached
-// to each red cube
+// stores enemy stats for each red cube
 
 let enemyStats:any[] = [];
 
 
 
-
-// current enemy being attacked
+// currently fighting enemy
 
 let currentEnemy:any = undefined;
 
 
 
-
-// prevents repeated attacks
+// prevents instant repeated attacks
 
 let combatCooldown = 0;
+
 
 
 
@@ -360,6 +366,11 @@ function spawnCube(
 
 }
 
+
+
+
+
+
 // =====================================
 // INTERACTION OBJECT STORAGE
 // =====================================
@@ -367,9 +378,12 @@ function spawnCube(
 
 let treasureEntities: Entity[] = [];
 
+
 let enemyEntities: Entity[] = [];
 
+
 let weaponEntities: Entity[] = [];
+
 
 let doorEntities: Entity[] = [];
 
@@ -378,8 +392,11 @@ let doorEntities: Entity[] = [];
 
 
 
+
+
 // =====================================
 // ENEMY AI STORAGE
+// KEEPING MOVEMENT SYSTEM
 // =====================================
 
 
@@ -404,16 +421,10 @@ function registerTreasure(entity:Entity)
 
 }
 
-
-
-
-
-
-
-
 // =====================================
 // REGISTER ENEMY
 // CREATES REAL ENEMY DATA
+// AND KEEPS AI ACTIVE
 // =====================================
 
 
@@ -424,7 +435,10 @@ function registerEnemy(entity:Entity)
 
 
 
+    // choose enemy type
+
     let type = random(enemyTypes);
+
 
 
 
@@ -453,12 +467,16 @@ function registerEnemy(entity:Entity)
 
 
 
+    // connect red cube to enemy stats
+
     enemyStats.push(stats);
 
 
 
 
 
+
+    // ADD TO AI SYSTEM
 
     enemyAI.push({
 
@@ -485,6 +503,7 @@ function registerEnemy(entity:Entity)
         ),
 
 
+
         chase:false,
 
 
@@ -492,6 +511,8 @@ function registerEnemy(entity:Entity)
 
 
     });
+
+
 
 
 
@@ -506,15 +527,33 @@ function registerEnemy(entity:Entity)
 
         +
 
-        " spawned HP: "
+        " spawned"
+
+    );
+
+
+
+    console.log(
+
+        "HP: "
 
         +
 
         stats.hp
 
+        +
+
+        " Damage: "
+
+        +
+
+        stats.damage
+
     );
 
+
 }
+
 
 
 
@@ -542,6 +581,7 @@ function registerDoor(entity:Entity)
     doorEntities.push(entity);
 
 }
+
 // =====================================
 // SPAWN PAD
 // =====================================
@@ -630,6 +670,7 @@ async function createRoom(room:number)
 
 
 
+
     // =================================
     // FLOOR
     // =================================
@@ -645,6 +686,7 @@ async function createRoom(room:number)
 
     )
     {
+
 
         for(
 
@@ -698,6 +740,7 @@ async function createRoom(room:number)
         }
 
     }
+
 
 
 
@@ -802,9 +845,7 @@ async function createRoom(room:number)
     }
 
 
-
-
-// =====================================
+    // =====================================
 // DOOR INSIDE ROOM
 // =====================================
 
@@ -850,6 +891,7 @@ spawnCube(
 
 
 registerDoor(door);
+
 
 
 
@@ -916,6 +958,7 @@ if(Math.random()<0.5)
 
 
 
+
 // =====================================
 // ENEMY SPAWN
 // RED CUBE GETS REAL STATS
@@ -967,6 +1010,11 @@ if(Math.random()<0.7)
 
 
 
+    // registers:
+    // - enemyEntities
+    // - enemyStats
+    // - enemyAI
+
     registerEnemy(enemy);
 
 
@@ -984,7 +1032,6 @@ if(Math.random()<0.7)
 
 
 
-
 await Async.wait(50);
 
 
@@ -992,6 +1039,7 @@ await Async.wait(50);
 
 // =====================================
 // ENEMY AI SYSTEM
+// MOVEMENT + CHASING + PLAYER DAMAGE
 // =====================================
 
 
@@ -1032,6 +1080,7 @@ function updateEnemyAI()
             continue;
 
         }
+
 
 
 
@@ -1115,6 +1164,7 @@ function updateEnemyAI()
 
 
 
+
             let length =
 
             Math.sqrt(
@@ -1130,6 +1180,7 @@ function updateEnemyAI()
 
 
 
+
             if(length > 0)
 
             {
@@ -1137,6 +1188,7 @@ function updateEnemyAI()
                 direction.x /= length;
 
                 direction.z /= length;
+
 
 
 
@@ -1155,7 +1207,9 @@ function updateEnemyAI()
                     ai.speed,
 
 
+
                     enemyPos.y,
+
 
 
                     enemyPos.z
@@ -1182,6 +1236,7 @@ function updateEnemyAI()
 
 
         }
+
 
 
 
@@ -1229,6 +1284,8 @@ function updateEnemyAI()
 
 
 
+
+
             enemy.pos =
 
 
@@ -1243,7 +1300,9 @@ function updateEnemyAI()
                 ai.speed,
 
 
+
                 enemyPos.y,
+
 
 
                 enemyPos.z
@@ -1265,8 +1324,10 @@ function updateEnemyAI()
 
 
 
+
+
         // =============================
-        // ENEMY ATTACK PLAYER
+        // ATTACK PLAYER
         // =============================
 
 
@@ -1291,6 +1352,7 @@ function updateEnemyAI()
 
 
 
+
                 console.log(
 
                     "👹 "
@@ -1301,21 +1363,35 @@ function updateEnemyAI()
 
                     +
 
-                    " attacks! Damage: "
+                    " attacks!"
+
+                );
+
+
+
+                console.log(
+
+                    "Damage: "
 
                     +
 
                     ai.stats.damage
 
-                    +
+                );
 
-                    " HP: "
+
+
+                console.log(
+
+                    "Player HP: "
 
                     +
 
                     player.hp
 
                 );
+
+
 
 
 
@@ -1326,6 +1402,8 @@ function updateEnemyAI()
 
 
         }
+
+
 
 
 
@@ -1352,10 +1430,6 @@ function updateEnemyAI()
 
 // =====================================
 // VR INTERACTION SYSTEM
-// =====================================
-
-
-// =====================================
 // FIND OBJECT PLAYER IS AIMING AT
 // =====================================
 
@@ -1382,6 +1456,7 @@ function getLookedAtEntity(): Entity | undefined
     ??
 
     Vector3.zero;
+
 
 
 
@@ -1423,6 +1498,7 @@ function getLookedAtEntity(): Entity | undefined
 
 
 
+
 // =====================================
 // CHEST INTERACTION
 // =====================================
@@ -1455,7 +1531,9 @@ function openChest(entity:Entity)
 
 
 
+
         player.gold += 50;
+
 
 
 
@@ -1470,11 +1548,14 @@ function openChest(entity:Entity)
 
 
 
+
+
         console.log(
 
             "💰 Chest opened!"
 
         );
+
 
 
 
@@ -1492,23 +1573,15 @@ function openChest(entity:Entity)
         entity.destroy();
 
 
-
     }
 
 
 }
 
 
-
-
-
-
-
-
-
-
 // =====================================
 // ENEMY CLICK ATTACK SYSTEM
+// D20 ROLL COMBAT
 // =====================================
 
 
@@ -1564,7 +1637,11 @@ function attackEnemy(entity:Entity)
 
 
 
-    // DICE ROLL
+
+    // =============================
+    // D20 ATTACK ROLL
+    // =============================
+
 
     let roll =
 
@@ -1579,9 +1656,10 @@ function attackEnemy(entity:Entity)
 
 
 
+
     console.log(
 
-        "🎲 Attack roll: "
+        "🎲 Attack Roll: "
 
         +
 
@@ -1603,6 +1681,10 @@ function attackEnemy(entity:Entity)
 
 
 
+
+
+    // NATURAL 20 CRITICAL
+
     if(roll == 20)
 
     {
@@ -1622,6 +1704,11 @@ function attackEnemy(entity:Entity)
     }
 
 
+
+
+
+    // NORMAL HIT
+
     else if(roll >= 10)
 
     {
@@ -1633,13 +1720,18 @@ function attackEnemy(entity:Entity)
 
         console.log(
 
-            "⚔ Hit!"
+            "⚔ HIT!"
 
         );
 
 
     }
 
+
+
+
+
+    // MISS
 
     else
 
@@ -1648,7 +1740,7 @@ function attackEnemy(entity:Entity)
 
         console.log(
 
-            "❌ Miss!"
+            "❌ MISS!"
 
         );
 
@@ -1662,12 +1754,16 @@ function attackEnemy(entity:Entity)
 
 
 
+
+    // APPLY DAMAGE
+
     if(damage > 0)
 
     {
 
 
         enemy.hp -= damage;
+
 
 
 
@@ -1713,7 +1809,6 @@ function attackEnemy(entity:Entity)
         );
 
 
-
     }
 
 
@@ -1722,12 +1817,20 @@ function attackEnemy(entity:Entity)
 
 
 
+
+
+    // =============================
+    // ENEMY DEATH
+    // =============================
+
+
     if(enemy.hp <= 0)
 
     {
 
 
         enemy.alive = false;
+
 
 
 
@@ -1757,6 +1860,8 @@ function attackEnemy(entity:Entity)
 
 
 
+
+
         console.log(
 
             "+25 XP"
@@ -1765,11 +1870,15 @@ function attackEnemy(entity:Entity)
 
 
 
+
+
         console.log(
 
             "+20 Gold"
 
         );
+
+
 
 
 
@@ -1787,11 +1896,15 @@ function attackEnemy(entity:Entity)
 
 
 
+
+
         enemyAI = enemyAI.filter(
 
             ai => ai.entity != entity
 
         );
+
+
 
 
 
@@ -1806,6 +1919,7 @@ function attackEnemy(entity:Entity)
 
 
 }
+
 
 // =====================================
 // WEAPON PICKUP
@@ -1839,6 +1953,7 @@ function pickupWeapon(entity:Entity)
 
 
 
+
         let weapon =
 
         random(weaponDrops);
@@ -1847,7 +1962,9 @@ function pickupWeapon(entity:Entity)
 
 
 
+
         player.weapon = weapon;
+
 
 
 
@@ -1881,6 +1998,8 @@ function pickupWeapon(entity:Entity)
 
 
 
+
+
         entity.destroy();
 
 
@@ -1888,6 +2007,9 @@ function pickupWeapon(entity:Entity)
 
 
 }
+
+
+
 
 
 
@@ -1928,6 +2050,7 @@ function openDoor(entity:Entity)
 
 
 
+
         enterNextRoom(entity);
 
 
@@ -1936,16 +2059,9 @@ function openDoor(entity:Entity)
 
 }
 
-
-
-
-
-
-
-
-
 // =====================================
 // MAIN INTERACTION
+// CHEST / ENEMY / WEAPON / DOOR
 // =====================================
 
 
@@ -1977,7 +2093,11 @@ function interact()
 
 
 
+
+    // =============================
     // CHEST
+    // =============================
+
 
     if(
 
@@ -2000,7 +2120,10 @@ function interact()
 
 
 
+    // =============================
     // ENEMY
+    // =============================
+
 
     else if(
 
@@ -2023,7 +2146,11 @@ function interact()
 
 
 
+
+    // =============================
     // WEAPON
+    // =============================
+
 
     else if(
 
@@ -2046,7 +2173,11 @@ function interact()
 
 
 
+
+    // =============================
     // DOOR
+    // =============================
+
 
     else if(
 
@@ -2065,6 +2196,15 @@ function interact()
 
 
 }
+
+
+
+
+
+
+
+
+
 // =====================================
 // CONTROLLER SETUP
 // =====================================
@@ -2088,6 +2228,7 @@ function setupInteractions()
 
 
 
+
     console.log(
 
         "VR interactions ready!"
@@ -2096,6 +2237,84 @@ function setupInteractions()
 
 
 }
+
+// =====================================
+// MOVING WORLD CONSOLE
+// ALWAYS IN FRONT OF PLAYER
+// =====================================
+
+
+function updateConsolePosition()
+{
+
+    let headPosition =
+
+    Player.position.get()
+
+    ??
+
+    Vector3.zero;
+
+
+
+
+
+    let forward =
+
+    Player.forward.get()
+
+    ??
+
+    new Vector3(
+
+        0,
+
+        0,
+
+        -1
+
+    );
+
+
+
+
+
+
+
+    let consolePosition =
+
+
+    headPosition.add(
+
+        forward.multiply(2)
+
+    );
+
+
+
+
+
+    consolePosition.y += 1.2;
+
+
+
+
+
+
+
+    inWorldConsole.visible(
+
+        true,
+
+        consolePosition
+
+    );
+
+
+}
+
+
+
 
 
 
@@ -2127,6 +2346,7 @@ function showInventory()
 
 
 
+
     for(
 
         let item of player.inventory
@@ -2147,6 +2367,7 @@ function showInventory()
 
 
     }
+
 
 
 
@@ -2188,6 +2409,8 @@ function showInventory()
 
 
 
+
+
 // =====================================
 // POTIONS
 // =====================================
@@ -2205,7 +2428,6 @@ function usePotion()
         "Health Potion"
 
     );
-
 
 
 
@@ -2295,8 +2517,16 @@ function usePotion()
     }
 
 
-
 }
+
+
+
+
+
+
+
+
+
 // =====================================
 // LEVEL SYSTEM
 // =====================================
@@ -2309,6 +2539,8 @@ function checkLevel()
 
 
     player.level * 50;
+
+
 
 
 
@@ -2354,6 +2586,8 @@ function checkLevel()
 
 
 
+
+
         console.log(
 
             "⭐ LEVEL UP!"
@@ -2389,20 +2623,10 @@ function checkLevel()
         );
 
 
-
     }
 
 
 }
-
-
-
-
-
-
-
-
-
 
 // =====================================
 // BATTLE SYSTEM
@@ -2415,15 +2639,11 @@ function battle(enemy:any)
 
     console.log("");
 
-
-
     console.log(
 
         "⚔ BATTLE!"
 
     );
-
-
 
 
 
@@ -2452,7 +2672,6 @@ function battle(enemy:any)
         player.hp > 0
 
     )
-
     {
 
 
@@ -2497,7 +2716,6 @@ function battle(enemy:any)
             roll >= 10
 
         )
-
         {
 
 
@@ -2510,12 +2728,9 @@ function battle(enemy:any)
                 roll == 20
 
             )
-
             {
 
-
                 damage *= 2;
-
 
 
                 console.log(
@@ -2524,10 +2739,7 @@ function battle(enemy:any)
 
                 );
 
-
             }
-
-
 
 
 
@@ -2554,13 +2766,11 @@ function battle(enemy:any)
             );
 
 
-
         }
 
         else
 
         {
-
 
             console.log(
 
@@ -2568,7 +2778,6 @@ function battle(enemy:any)
 
             );
 
-
         }
 
 
@@ -2577,21 +2786,13 @@ function battle(enemy:any)
 
 
 
-
-        if(
-
-            enemy.hp <= 0
-
-        )
+        if(enemy.hp <= 0)
 
         {
 
-
             break;
 
-
         }
-
 
 
 
@@ -2635,34 +2836,6 @@ function battle(enemy:any)
 
 
 
-
-
-
-
-        if(
-
-            player.hp < 40
-
-            &&
-
-            player.inventory.includes(
-
-                "Health Potion"
-
-            )
-
-        )
-
-        {
-
-
-            usePotion();
-
-
-        }
-
-
-
     }
 
 
@@ -2672,12 +2845,7 @@ function battle(enemy:any)
 
 
 
-
-    if(
-
-        player.hp <= 0
-
-    )
+    if(player.hp <= 0)
 
     {
 
@@ -2690,7 +2858,6 @@ function battle(enemy:any)
 
 
         return false;
-
 
     }
 
@@ -2712,29 +2879,7 @@ function battle(enemy:any)
 
     player.xp += 25;
 
-
-
     player.gold += 20;
-
-
-
-
-
-    console.log(
-
-        "+25 XP"
-
-    );
-
-
-
-
-
-    console.log(
-
-        "+20 Gold"
-
-    );
 
 
 
@@ -2744,13 +2889,18 @@ function battle(enemy:any)
 
 
 
-
-
     return true;
 
 
-
 }
+
+
+
+
+
+
+
+
 
 // =====================================
 // FINAL BOSS
@@ -2783,6 +2933,8 @@ function bossFight()
 
 
 
+
+
     battle({
 
         name:boss.name,
@@ -2792,7 +2944,6 @@ function bossFight()
         damage:boss.damage
 
     });
-
 
 
 }
@@ -2815,6 +2966,7 @@ async function start()
 
 
     setupInteractions();
+
 
 
 
@@ -2868,6 +3020,7 @@ async function start()
 
 
 
+
     console.log(
 
         "Generating dungeon..."
@@ -2878,8 +3031,8 @@ async function start()
 
 
 
-    createSpawnPoint();
 
+    createSpawnPoint();
 
 
 
@@ -2895,7 +3048,6 @@ async function start()
         room++
 
     )
-
     {
 
 
@@ -2934,8 +3086,15 @@ async function start()
     showInventory();
 
 
-
 }
+
+
+
+
+
+
+
+
 
 // =====================================
 // CHECK DOORS NEAR PLAYER
@@ -2960,12 +3119,12 @@ function checkDoors()
 
 
 
+
     for(
 
         let door of doorEntities
 
     )
-
     {
 
 
@@ -2980,7 +3139,6 @@ function checkDoors()
             < 2
 
         )
-
         {
 
 
@@ -3009,7 +3167,6 @@ function checkDoors()
 
 
 
-
 // =====================================
 // FINAL WORLD UPDATE LOOP
 // =====================================
@@ -3022,31 +3179,28 @@ Events.onPhysicsUpdate(
     {
 
 
-        // CHESTS AND ENEMIES NEAR PLAYER
+        // proximity messages
 
         checkExploration();
 
 
 
 
-
-        // DOOR DETECTION
+        // door detection
 
         checkDoors();
 
 
 
 
-
-        // KEEP WORLD CONSOLE IN FRONT OF PLAYER
+        // moving console
 
         updateConsolePosition();
 
 
 
 
-
-        // ENEMY MOVEMENT + CHASING + DAMAGE
+        // enemy AI movement + attacks
 
         updateEnemyAI();
 
