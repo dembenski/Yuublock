@@ -3,6 +3,7 @@ import { Color } from "./Yuu API/Basic Types/Color";
 import { Quaternion } from "./Yuu API/Basic Types/Quaternion";
 import { Entity } from "./Yuu API/Entity";
 import { Player } from "./Yuu API/Player";
+import { Events } from "./Yuu API/Events";
 import { spawnPrimitive } from "./Yuu API/SpawnPrimitive";
 
 import { addEnemyAI } from "./EnemyAI";
@@ -11,18 +12,29 @@ import { spawnDungeonCollectibles } from "./DungeonCollectibles";
 
 
 
+
 // =====================================
 // DUNGEON SIZE
 // =====================================
 
+
 const mazeWidth = 31;
+
 const mazeHeight = 31;
 
 const blockSize = 8;
 
 
+
 let maze:number[][] = [];
 
+
+
+
+
+// =====================================
+// OBJECT STORAGE
+// =====================================
 
 
 export let enemies:any[] = [];
@@ -34,8 +46,21 @@ export let chests:Entity[] = [];
 
 
 // =====================================
+// ENEMY HEALTH BAR STORAGE
+// =====================================
+
+
+let enemyHealthBars:any[]=[];
+
+
+
+
+
+
+// =====================================
 // CREATE CUBE
 // =====================================
+
 
 function cube(
 
@@ -48,6 +73,7 @@ color:Color
 ):Entity
 
 {
+
 
 return spawnPrimitive.cube(
 
@@ -90,15 +116,363 @@ undefined
 
 
 
+
+
+
+// =====================================
+// FLOATING HEALTH BAR CREATOR
+// =====================================
+
+
+function createEnemyHealthBar(enemyData:any)
+
+{
+
+
+let barBackground = cube(
+
+new Vector3(
+
+enemyData.entity.pos.x,
+
+4.5,
+
+enemyData.entity.pos.z
+
+),
+
+
+new Vector3(
+
+2.5,
+
+0.15,
+
+0.15
+
+),
+
+
+new Color(
+
+0.15,
+
+0,
+
+0
+
+)
+
+);
+
+
+
+
+
+
+
+let barHealth = cube(
+
+new Vector3(
+
+enemyData.entity.pos.x,
+
+4.5,
+
+enemyData.entity.pos.z-0.25
+
+),
+
+
+new Vector3(
+
+2.5,
+
+0.18,
+
+0.18
+
+),
+
+
+new Color(
+
+0,
+
+1,
+
+0
+
+)
+
+);
+
+
+
+
+
+
+enemyHealthBars.push(
+
+{
+
+enemy:enemyData,
+
+background:barBackground,
+
+health:barHealth
+
+}
+
+);
+
+
+
+
+
+console.log(
+
+"Health bar created for "
+
++
+
+enemyData.name
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+// =====================================
+// UPDATE FLOATING HEALTH BARS
+// =====================================
+
+
+function updateEnemyHealthBars()
+
+{
+
+
+for(let ui of enemyHealthBars)
+
+{
+
+
+if(!ui.enemy.entity)
+
+{
+
+continue;
+
+}
+
+
+
+
+let pos = ui.enemy.entity.pos;
+
+
+
+
+
+// move above enemy
+
+
+ui.background.pos = new Vector3(
+
+pos.x,
+
+pos.y + 3.5,
+
+pos.z
+
+);
+
+
+
+ui.health.pos = new Vector3(
+
+pos.x,
+
+pos.y + 3.5,
+
+pos.z - 0.25
+
+);
+
+
+
+
+
+
+
+// calculate health
+
+
+let percent =
+
+ui.enemy.hp /
+
+ui.enemy.maxHp;
+
+
+
+
+
+if(percent < 0)
+
+{
+
+percent=0;
+
+}
+
+
+
+if(percent > 1)
+
+{
+
+percent=1;
+
+}
+
+
+
+
+
+ui.health.scale = new Vector3(
+
+2.5 * percent,
+
+0.18,
+
+0.18
+
+);
+
+
+
+
+
+
+// enemy dead
+
+
+if(ui.enemy.hp<=0)
+
+{
+
+
+ui.background.destroy();
+
+ui.health.destroy();
+
+
+enemyHealthBars.splice(
+
+enemyHealthBars.indexOf(ui),
+
+1
+
+);
+
+
+
+console.log(
+
+ui.enemy.name +
+
+" health bar removed"
+
+);
+
+
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+// =====================================
+// ENEMY DATA CREATOR
+// =====================================
+
+
+function createEnemyData(
+
+enemy:Entity,
+
+name:string
+
+)
+
+{
+
+
+return {
+
+
+entity:enemy,
+
+
+name:name,
+
+
+hp:100,
+
+
+maxHp:100,
+
+
+damage:10,
+
+
+alive:true
+
+
+
+};
+
+
+}
+
+ 
 // =====================================
 // RETRO WALL COLORS
 // =====================================
 
-function wallColor(x:number,z:number):Color
+
+function wallColor(
+
+x:number,
+
+z:number
+
+):Color
 
 {
 
-let pattern = (x+z)%5;
+
+let pattern=(x+z)%5;
+
 
 
 if(pattern==0)
@@ -107,15 +481,16 @@ if(pattern==0)
 
 return new Color(
 
-.55,
+0.55,
 
-.45,
+0.45,
 
-.35
+0.35
 
 );
 
 }
+
 
 
 if(pattern==1)
@@ -124,15 +499,16 @@ if(pattern==1)
 
 return new Color(
 
-.42,
+0.42,
 
-.35,
+0.35,
 
-.28
+0.28
 
 );
 
 }
+
 
 
 if(pattern==2)
@@ -141,15 +517,16 @@ if(pattern==2)
 
 return new Color(
 
-.32,
+0.32,
 
-.30,
+0.30,
 
-.28
+0.28
 
 );
 
 }
+
 
 
 if(pattern==3)
@@ -158,11 +535,11 @@ if(pattern==3)
 
 return new Color(
 
-.25,
+0.25,
 
-.22,
+0.22,
 
-.18
+0.18
 
 );
 
@@ -172,16 +549,18 @@ return new Color(
 
 return new Color(
 
-.48,
+0.48,
 
-.38,
+0.38,
 
-.30
+0.30
 
 );
 
 
 }
+
+
 
 
 
@@ -191,39 +570,53 @@ return new Color(
 // RETRO FLOOR COLORS
 // =====================================
 
-function floorColor(x:number,z:number):Color
+
+function floorColor(
+
+x:number,
+
+z:number
+
+):Color
 
 {
+
 
 if((x+z)%2==0)
 
 {
 
-return new Color(
-
-.18,
-
-.15,
-
-.12
-
-);
-
-}
-
 
 return new Color(
 
-.10,
+0.18,
 
-.10,
+0.15,
 
-.08
+0.12
 
 );
 
 
 }
+
+
+
+return new Color(
+
+0.10,
+
+0.10,
+
+0.08
+
+);
+
+
+
+}
+
+
 
 
 
@@ -232,6 +625,7 @@ return new Color(
 // =====================================
 // GENERATE OPEN ROOM MAZE
 // =====================================
+
 
 function generateMaze()
 
@@ -242,31 +636,34 @@ maze=[];
 
 
 
-// fill walls
-
 for(let x=0;x<mazeWidth;x++)
 
 {
 
+
 maze[x]=[];
+
 
 
 for(let z=0;z<mazeHeight;z++)
 
 {
 
+
 maze[x][z]=1;
 
-}
-
 
 }
 
 
 
+}
 
 
-// create rooms
+
+
+
+
 
 for(
 
@@ -279,6 +676,7 @@ x+=2
 )
 
 {
+
 
 
 for(
@@ -294,9 +692,9 @@ z+=2
 {
 
 
-// room center
 
 maze[x][z]=0;
+
 
 
 let exits=0;
@@ -304,9 +702,10 @@ let exits=0;
 
 
 
-// east opening
 
-if(x < mazeWidth-2)
+// EAST
+
+if(x<mazeWidth-2)
 
 {
 
@@ -320,7 +719,9 @@ exits++;
 
 
 
-// west opening
+
+
+// WEST
 
 if(
 
@@ -342,9 +743,12 @@ exits++;
 
 
 
-// south opening
 
-if(z < mazeHeight-2)
+
+
+// SOUTH
+
+if(z<mazeHeight-2)
 
 {
 
@@ -358,7 +762,10 @@ exits++;
 
 
 
-// north opening
+
+
+
+// NORTH
 
 if(
 
@@ -380,7 +787,10 @@ exits++;
 
 
 
-// emergency door
+
+
+
+// emergency opening
 
 if(exits==0)
 
@@ -391,16 +801,20 @@ maze[x+1][z]=0;
 }
 
 
-}
-
 
 }
 
 
+}
 
 
 
-// start room
+
+
+
+
+// player starting room
+
 
 maze[1][1]=0;
 
@@ -412,11 +826,17 @@ maze[1][2]=0;
 
 
 
-// final room opening
+
+
+
+// final room
+
 
 maze[mazeWidth-2][mazeHeight-2]=0;
 
 maze[mazeWidth-3][mazeHeight-2]=0;
+
+
 
 
 
@@ -433,9 +853,15 @@ console.log(
 
 
 
+
+
+
+
+
 // =====================================
 // BUILD DUNGEON
 // =====================================
+
 
 export async function createDungeon()
 
@@ -454,23 +880,40 @@ console.log(
 
 
 
+
+
+
+
+// spawn collectibles
+
 spawnDungeonCollectibles(
-    maze,
-    mazeWidth,
-    mazeHeight,
-    blockSize
+
+maze,
+
+mazeWidth,
+
+mazeHeight,
+
+blockSize
+
 );
 
 
-let offsetX =
-
--(mazeWidth * blockSize)/2;
 
 
 
-let offsetZ =
 
--(mazeHeight * blockSize)/2;
+let offsetX=
+
+-(mazeWidth*blockSize)/2;
+
+
+
+let offsetZ=
+
+-(mazeHeight*blockSize)/2;
+
+
 
 
 
@@ -483,20 +926,23 @@ for(let x=0;x<mazeWidth;x++)
 {
 
 
+
 for(let z=0;z<mazeHeight;z++)
 
 {
 
 
-let worldX =
 
-(x * blockSize) + offsetX;
+let worldX=
+
+(x*blockSize)+offsetX;
 
 
 
-let worldZ =
+let worldZ=
 
-(z * blockSize) + offsetZ;
+(z*blockSize)+offsetZ;
+
 
 
 
@@ -505,8 +951,9 @@ let worldZ =
 
 
 // ================================
-// WALL BLOCKS
+// WALLS
 // ================================
+
 
 if(maze[x][z]==1)
 
@@ -558,9 +1005,11 @@ z
 
 
 
+
 // ================================
-// FLOOR BLOCKS
+// FLOORS
 // ================================
+
 
 else
 
@@ -608,7 +1057,10 @@ z
 
 
 
-// keep starting room clear
+
+
+// don't spawn around player
+
 
 if(
 
@@ -636,6 +1088,12 @@ worldZ
 );
 
 
+
+}
+
+
+
+
 }
 
 
@@ -643,10 +1101,9 @@ worldZ
 }
 
 
-}
-
 
 }
+
 
 
 
@@ -656,7 +1113,7 @@ worldZ
 
 
 // =================================
-// PLAYER SPAWN
+// PLAYER START
 // =================================
 
 
@@ -664,15 +1121,16 @@ Player.position.set(
 
 new Vector3(
 
-offsetX + blockSize,
+offsetX+blockSize,
 
 1,
 
-offsetZ + blockSize
+offsetZ+blockSize
 
 )
 
 );
+
 
 
 
@@ -687,18 +1145,21 @@ console.log(
 );
 
 
+
 console.log(
 
-" DUNGEON READY "
+"DUNGEON READY"
 
 );
 
 
+
 console.log(
 
-" PLAYER SPAWNED "
+"PLAYER SPAWNED"
 
 );
+
 
 
 console.log(
@@ -710,271 +1171,3 @@ console.log(
 
 
 }
-
-
-
-
-
-
-
-
-
-// =====================================
-// SPAWN ENEMIES + CHESTS
-// =====================================
-
-function spawnObjects(
-
-x:number,
-
-z:number
-
-)
-
-{
-
-
-let chance = Math.random();
-
-
-
-
-
-// =================================
-// ENEMIES
-// =================================
-
-
-if(chance < .12)
-
-{
-
-
-let enemy = cube(
-
-new Vector3(
-
-x,
-
-1,
-
-z
-
-),
-
-
-new Vector3(
-
-1,
-
-2,
-
-1
-
-),
-
-
-new Color(
-
-1,
-
-0,
-
-0
-
-)
-
-);
-
-
-
-
-
-
-
-let data =
-
-{
-
-
-entity:enemy,
-
-
-name:getEnemyName(),
-
-
-hp:100,
-
-
-damage:10,
-
-
-alive:true
-
-
-
-};
-
-
-
-
-
-
-enemies.push(data);
-
-
-
-
-addEnemyAI(enemy);
-
-
-
-
-registerEnemyCombat(data);
-
-
-
-
-
-console.log(
-
-"Enemy spawned"
-
-);
-
-
-
-}
-
-
-
-
-
-
-
-// =================================
-// CHESTS
-// =================================
-
-
-else if(chance < .18)
-
-{
-
-
-let chest = cube(
-
-new Vector3(
-
-x,
-
-1,
-
-z
-
-),
-
-
-new Vector3(
-
-1,
-
-1,
-
-1
-
-),
-
-
-new Color(
-
-1,
-
-.8,
-
-0
-
-)
-
-);
-
-
-
-
-
-chests.push(chest);
-
-
-
-
-
-console.log(
-
-"Chest spawned"
-
-);
-
-
-
-}
-
-
-
-}
-
-
-
-
-
-// =====================================
-// ENEMY NAME LIST
-// =====================================
-
-function getEnemyName()
-
-{
-
-
-let list =
-
-[
-
-"Goblin",
-
-"Skeleton",
-
-"Orc",
-
-"Shadow Beast",
-
-"Mutant Guard",
-
-"Cyber Demon"
-
-];
-
-
-
-
-
-return list[
-
-Math.floor(
-
-Math.random()*list.length
-
-)
-
-];
-
-
-
-}
-
-
-
-
-
-// =====================================
-// END OF DUNGEON SCRIPT
-// =====================================
