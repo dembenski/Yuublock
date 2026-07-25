@@ -19,7 +19,6 @@ const mazeWidth = 31;
 
 const mazeHeight = 31;
 
-
 const blockSize = 8;
 
 
@@ -27,10 +26,10 @@ let maze:number[][] = [];
 
 
 
+
 export let enemies:any[] = [];
 
 export let chests:Entity[] = [];
-
 
 
 
@@ -96,12 +95,161 @@ undefined
 
 
 
+// =====================================
+// RETRO WALL TEXTURE COLORS
+// =====================================
+
+
+function wallColor(x:number,z:number):Color
+{
+
+
+let pattern = (x+z)%5;
+
+
+
+if(pattern==0)
+
+{
+
+return new Color(
+
+.55,
+
+.45,
+
+.35
+
+);
+
+}
+
+
+
+if(pattern==1)
+
+{
+
+return new Color(
+
+.42,
+
+.35,
+
+.28
+
+);
+
+}
+
+
+
+if(pattern==2)
+
+{
+
+return new Color(
+
+.32,
+
+.30,
+
+.28
+
+);
+
+}
+
+
+
+if(pattern==3)
+
+{
+
+return new Color(
+
+.25,
+
+.22,
+
+.18
+
+);
+
+}
+
+
+
+return new Color(
+
+.48,
+
+.38,
+
+.30
+
+);
+
+
+}
+
+
+
+
 
 
 
 // =====================================
-// GENERATE ROOM MAZE
-// EVERY ROOM HAS EXITS
+// RETRO FLOOR TILE COLORS
+// =====================================
+
+
+function floorColor(x:number,z:number):Color
+{
+
+
+let tile = (x+z)%2;
+
+
+
+if(tile==0)
+
+{
+
+return new Color(
+
+.18,
+
+.15,
+
+.12
+
+);
+
+}
+
+
+
+return new Color(
+
+.10,
+
+.10,
+
+.08
+
+);
+
+
+}
+
+
+
+
+
+
+// =====================================
+// GENERATE MAZE
 // =====================================
 
 function generateMaze()
@@ -133,107 +281,70 @@ maze[x][z]=1;
 
 
 
+// carve connected paths
 
-
-
-
-// create rooms
-
-for(
-
-let x=1;
-
-x<mazeWidth-1;
-
-x+=2
-
-)
+function carve(x:number,z:number)
 
 {
-
-
-for(
-
-let z=1;
-
-z<mazeHeight-1;
-
-z+=2
-
-)
-
-{
-
-
-// room center
 
 maze[x][z]=0;
 
 
 
+let dirs =
 
+[
 
-// east opening
+[2,0],
 
-if(x < mazeWidth-2)
+[-2,0],
 
-{
+[0,2],
 
-maze[x+1][z]=0;
+[0,-2]
 
-}
-
-
-
-
-
-// south opening
-
-if(z < mazeHeight-2)
-
-{
-
-maze[x][z+1]=0;
-
-}
+];
 
 
 
+dirs.sort(()=>Math.random()-0.5);
 
 
 
-// extra random openings
-
-if(Math.random()<0.6)
+for(let d of dirs)
 
 {
 
-if(x>1)
+let nx=x+d[0];
+
+let nz=z+d[1];
+
+
+
+if(
+
+nx>0 &&
+
+nz>0 &&
+
+nx<mazeWidth-1 &&
+
+nz<mazeHeight-1 &&
+
+maze[nx][nz]==1
+
+)
 
 {
 
-maze[x-1][z]=0;
+
+maze[x+d[0]/2][z+d[1]/2]=0;
+
+
+carve(nx,nz);
+
 
 }
-
-}
-
-
-
-if(Math.random()<0.6)
-
-{
-
-if(z>1)
-
-{
-
-maze[x][z-1]=0;
-
-}
-
-}
-
 
 
 }
@@ -243,14 +354,13 @@ maze[x][z-1]=0;
 
 
 
+carve(1,1);
 
 
 
-
-// guaranteed start room
+// guaranteed start
 
 maze[1][1]=0;
-
 
 
 // guaranteed exit
@@ -258,17 +368,7 @@ maze[1][1]=0;
 maze[mazeWidth-2][mazeHeight-2]=0;
 
 
-
-
 }
-
-
-
-
-
-
-
-
 
 // =====================================
 // BUILD DUNGEON
@@ -285,11 +385,9 @@ generateMaze();
 
 console.log(
 
-"Generating LARGE WOLFENSTEIN DUNGEON..."
+"Generating RETRO WOLFENSTEIN DUNGEON..."
 
 );
-
-
 
 
 
@@ -304,8 +402,6 @@ let offsetX =
 let offsetZ =
 
 -(mazeHeight * blockSize)/2;
-
-
 
 
 
@@ -338,7 +434,10 @@ let worldZ =
 
 
 
-// WALL
+
+// ================================
+// WALLS
+// ================================
 
 if(maze[x][z]==1)
 
@@ -369,15 +468,7 @@ blockSize
 ),
 
 
-new Color(
-
-.45,
-
-.45,
-
-.45
-
-)
+wallColor(x,z)
 
 );
 
@@ -393,7 +484,9 @@ new Color(
 
 
 
-// FLOOR
+// ================================
+// FLOORS
+// ================================
 
 else
 
@@ -424,15 +517,7 @@ blockSize
 ),
 
 
-new Color(
-
-.15,
-
-.15,
-
-.15
-
-)
+floorColor(x,z)
 
 );
 
@@ -442,7 +527,7 @@ new Color(
 
 
 
-// don't spawn beside player
+// keep start room empty
 
 if(
 
@@ -482,9 +567,10 @@ worldZ
 
 
 
-
-
+// =================================
 // PLAYER START
+// =================================
+
 
 Player.position.set(
 
@@ -499,7 +585,6 @@ offsetZ + blockSize
 )
 
 );
-
 
 
 
@@ -522,16 +607,6 @@ console.log(
 
 }
 
-
-
-
-
-
-
-
-
-
-
 // =====================================
 // SPAWN OBJECTS
 // =====================================
@@ -547,20 +622,22 @@ z:number
 {
 
 
-let chance=Math.random();
+let chance = Math.random();
 
 
 
 
 
-// enemies spread out
+// ================================
+// ENEMIES
+// ================================
 
 if(chance < .12)
 
 {
 
 
-let enemy=cube(
+let enemy = cube(
 
 new Vector3(
 
@@ -601,20 +678,24 @@ new Color(
 
 
 
-
 let data =
 
 {
 
 entity:enemy,
 
+
 name:getEnemyName(),
+
 
 hp:100,
 
+
 damage:10,
 
+
 alive:true
+
 
 };
 
@@ -651,14 +732,18 @@ console.log(
 
 
 
-// treasure
+
+
+// ================================
+// CHESTS
+// ================================
 
 else if(chance < .18)
 
 {
 
 
-let chest=cube(
+let chest = cube(
 
 new Vector3(
 
@@ -697,6 +782,7 @@ new Color(
 
 
 
+
 chests.push(chest);
 
 
@@ -713,11 +799,7 @@ console.log(
 
 
 
-
 }
-
-
-
 
 
 
@@ -752,6 +834,7 @@ let list =
 
 
 
+
 return list[
 
 Math.floor(
@@ -761,7 +844,5 @@ Math.random()*list.length
 )
 
 ];
-
-
 
 }
