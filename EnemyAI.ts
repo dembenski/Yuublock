@@ -2,6 +2,7 @@ import { Vector3 } from "./Yuu API/Basic Types/Vector3";
 import { Player } from "./Yuu API/Player";
 import { Events } from "./Yuu API/Events";
 
+import { damagePlayer } from "./PlayerData";
 
 
 
@@ -10,7 +11,6 @@ import { Events } from "./Yuu API/Events";
 // =====================================
 
 let enemies:any[] = [];
-
 
 
 
@@ -30,6 +30,13 @@ export function addEnemyAI(entity:any)
 
         speed:0.02,
 
+
+        attackDamage:10,
+
+
+        attackCooldown:0,
+
+
         patrolDirection:
 
         new Vector3(
@@ -40,9 +47,8 @@ export function addEnemyAI(entity:any)
 
             Math.random()-0.5
 
-        ),
+        )
 
-        chase:false
 
     });
 
@@ -105,6 +111,7 @@ function updateEnemyAI()
 
 
 
+
         let pos = cube.pos;
 
 
@@ -137,6 +144,7 @@ function updateEnemyAI()
 
 
 
+
         // =========================
         // CHASE PLAYER
         // =========================
@@ -160,6 +168,7 @@ function updateEnemyAI()
 
 
 
+
             if(length > 0)
 
             {
@@ -167,6 +176,7 @@ function updateEnemyAI()
                 direction.x /= length;
 
                 direction.z /= length;
+
 
 
 
@@ -197,7 +207,9 @@ function updateEnemyAI()
             }
 
 
+
         }
+
 
 
 
@@ -238,6 +250,7 @@ function updateEnemyAI()
 
 
 
+
             cube.pos =
 
             new Vector3(
@@ -265,11 +278,91 @@ function updateEnemyAI()
         }
 
 
+
+
+
+
+
+
+        // =========================
+        // ATTACK PLAYER
+        // =========================
+
+        if(distance < 2)
+
+        {
+
+
+            if(enemy.attackCooldown <=0)
+
+            {
+
+
+                console.log(
+
+                    "👹 Enemy hits player!"
+
+                );
+
+
+
+                console.log(
+
+                    "Damage: "
+
+                    +
+
+                    enemy.attackDamage
+
+                );
+
+
+
+
+
+                damagePlayer(
+
+                    enemy.attackDamage
+
+                );
+
+
+
+
+
+                enemy.attackCooldown = 120;
+
+
+            }
+
+
+
+        }
+
+
+
+
+
+
+
+        // reduce cooldown
+
+        if(enemy.attackCooldown > 0)
+
+        {
+
+            enemy.attackCooldown--;
+
+        }
+
+
+
     }
 
 
 
 }
+
 
 
 

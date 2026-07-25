@@ -1,3 +1,28 @@
+import { Vector3 } from "./Yuu API/Basic Types/Vector3";
+import { Player } from "./Yuu API/Player";
+
+
+
+// =====================================
+// RESPAWN LOCATION
+// CHANGE THIS IF YOU MOVE THE START ROOM
+// =====================================
+
+export let spawnPoint = new Vector3(
+
+0,
+
+1,
+
+0
+
+);
+
+
+
+
+
+
 // =====================================
 // PLAYER RPG DATA
 // =====================================
@@ -8,56 +33,87 @@ export let player =
 {
 
 
-    level:1,
+level:1,
 
 
-    xp:0,
+xp:0,
 
 
-    gold:0,
-
-
-
-    hp:100,
-
-
-    maxHp:100,
+gold:0,
 
 
 
-    damage:10,
+hp:100,
+
+
+maxHp:100,
 
 
 
-
-
-    weapon:
-
-    {
-
-        name:"Rusty Sword",
-
-        damage:10
-
-    },
+damage:10,
 
 
 
 
 
-    inventory:
+weapon:
 
-    [
+{
 
-        "Health Potion",
+name:"Rusty Sword",
 
-        "Health Potion"
+damage:10
 
-    ]
+},
+
+
+
+
+
+inventory:
+
+[
+
+"Health Potion",
+
+"Health Potion"
+
+]
 
 
 
 };
+
+
+
+
+
+
+
+
+
+// =====================================
+// SET SPAWN POINT
+// =====================================
+
+export function setSpawnPoint(pos:Vector3)
+
+{
+
+
+spawnPoint = pos;
+
+
+
+console.log(
+
+"Spawn point saved"
+
+);
+
+
+
+}
 
 
 
@@ -76,31 +132,33 @@ export function addXP(amount:number)
 {
 
 
-    player.xp += amount;
+player.xp += amount;
 
 
 
-    console.log(
+console.log(
 
-        "+"
+"+"
 
-        +
++
 
-        amount
+amount
 
-        +
++
 
-        " XP"
+" XP"
 
-    );
+);
 
 
 
-    checkLevel();
+checkLevel();
 
 
 
 }
+
+
 
 
 
@@ -119,81 +177,84 @@ function checkLevel()
 {
 
 
-    let needed =
+let needed =
 
-    player.level * 100;
-
-
-
-
-
-    if(player.xp >= needed)
-
-    {
-
-
-        player.level++;
-
-
-
-        player.xp = 0;
+player.level * 100;
 
 
 
 
 
-        player.maxHp += 25;
+if(player.xp >= needed)
+
+{
+
+
+player.level++;
 
 
 
-        player.hp = player.maxHp;
+player.xp = 0;
 
 
 
 
 
-        player.weapon.damage += 5;
+player.maxHp += 25;
+
+
+
+player.hp = player.maxHp;
 
 
 
 
 
-        console.log(
-
-            "⭐ LEVEL UP!"
-
-        );
+player.weapon.damage += 5;
 
 
 
-        console.log(
 
-            "Level "
 
-            +
+console.log(
 
-            player.level
+"⭐ LEVEL UP!"
 
-        );
+);
 
 
 
-        console.log(
+console.log(
 
-            "Max HP "
+"Level "
 
-            +
++
 
-            player.maxHp
+player.level
 
-        );
+);
 
 
 
-    }
+console.log(
+
+"Max HP "
+
++
+
+player.maxHp
+
+);
+
 
 
 }
+
+
+
+}
+
+
 
 
 
@@ -212,54 +273,58 @@ export function damagePlayer(amount:number)
 {
 
 
-    player.hp -= amount;
+player.hp -= amount;
 
 
 
-    console.log(
+console.log(
 
-        "Player took "
+"👹 Player took "
 
-        +
++
 
-        amount
+amount
 
-        +
++
 
-        " damage"
+" damage"
 
-    );
-
-
-
-    console.log(
-
-        "HP "
-
-        +
-
-        player.hp
-
-    );
+);
 
 
+
+console.log(
+
+"HP "
+
++
+
+player.hp
+
+);
 
 
 
 
-    if(player.hp <=0)
-
-    {
 
 
-        respawn();
+
+if(player.hp <= 0)
+
+{
 
 
-    }
+respawn();
 
 
 
 }
+
+
+
+}
+
+
 
 
 
@@ -273,41 +338,114 @@ export function damagePlayer(amount:number)
 // RESPAWN
 // =====================================
 
-function respawn()
+export function respawn()
 
 {
 
 
-    console.log(
+console.log(
 
-        "☠ YOU DIED"
+"☠ YOU DIED"
 
-    );
-
-
-
-    player.hp = player.maxHp;
+);
 
 
 
-    player.gold =
+console.log(
 
-    Math.floor(
+"Respawning..."
 
-        player.gold / 2
-
-    );
+);
 
 
 
-    console.log(
 
-        "Respawned"
 
-    );
+
+// restore health
+
+player.hp = player.maxHp;
+
+
+
+
+
+
+// lose half gold
+
+player.gold =
+
+Math.floor(
+
+player.gold / 2
+
+);
+
+
+
+
+
+
+
+
+// move VR player
+
+Player.position.set(
+
+new Vector3(
+
+spawnPoint.x,
+
+spawnPoint.y,
+
+spawnPoint.z
+
+)
+
+);
+
+
+
+
+
+
+console.log(
+
+"⭐ Respawn complete"
+
+);
+
+
+
+console.log(
+
+"HP restored: "
+
++
+
+player.hp
+
+);
+
+
+
+console.log(
+
+"Gold remaining: "
+
++
+
+player.gold
+
+);
+
 
 
 }
+
+
+
+
 
 
 
@@ -324,17 +462,42 @@ export function healPlayer(amount:number)
 {
 
 
-    player.hp += amount;
+player.hp += amount;
 
 
 
-    if(player.hp > player.maxHp)
+if(player.hp > player.maxHp)
 
-    {
+{
 
-        player.hp = player.maxHp;
+player.hp = player.maxHp;
 
-    }
+}
+
+
+
+console.log(
+
+"🧪 Healed "
+
++
+
+amount
+
+);
+
+
+
+console.log(
+
+"HP "
+
++
+
+player.hp
+
+);
+
 
 
 }

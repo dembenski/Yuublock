@@ -10,21 +10,17 @@ import { registerEnemyCombat } from "./Combat";
 
 
 
-
 // =====================================
-// MAZE SIZE
+// LARGE WOLFENSTEIN MAP
 // =====================================
 
 const mazeWidth = 31;
-
 const mazeHeight = 31;
-
 
 const blockSize = 8;
 
 
 let maze:number[][] = [];
-
 
 
 export let enemies:any[] = [];
@@ -34,25 +30,16 @@ export let chests:Entity[] = [];
 
 
 
-
-
-
 // =====================================
-// CREATE BLOCK
+// CREATE CUBE
 // =====================================
 
 function cube(
-
 pos:Vector3,
-
 scale:Vector3,
-
 color:Color
-
 ):Entity
-
 {
-
 
 return spawnPrimitive.cube(
 
@@ -60,21 +47,15 @@ pos,
 
 scale,
 
-
 Quaternion.fromEuler(
 
 new Vector3(
-
 0,
-
 0,
-
 0
-
 )
 
 ),
-
 
 color,
 
@@ -88,153 +69,139 @@ undefined
 
 );
 
-
 }
 
 
 
 
 
-
-
-
-
 // =====================================
-// GENERATE ROOM MAZE
-// EVERY ROOM HAS EXITS
+// CREATE GUARANTEED CONNECTED MAZE
 // =====================================
 
 function generateMaze()
-
 {
-
 
 maze=[];
 
 
 
 for(let x=0;x<mazeWidth;x++)
-
 {
 
 maze[x]=[];
 
 
 for(let z=0;z<mazeHeight;z++)
-
 {
 
 maze[x][z]=1;
 
 }
 
-
 }
 
 
 
 
-
-
-
-// create rooms
-
-for(
-
-let x=1;
-
-x<mazeWidth-1;
-
-x+=2
-
-)
-
+function carve(x:number,z:number)
 {
 
-
-for(
-
-let z=1;
-
-z<mazeHeight-1;
-
-z+=2
-
-)
-
-{
-
-
-// room center
 
 maze[x][z]=0;
 
 
+let directions=[
+
+[2,0],
+[-2,0],
+[0,2],
+[0,-2]
+
+];
+
+
+directions.sort(()=>Math.random()-0.5);
 
 
 
-// east opening
+for(let dir of directions)
+{
 
-if(x < mazeWidth-2)
+
+let nx=x+dir[0];
+
+let nz=z+dir[1];
+
+
+
+if(
+
+nx>0 &&
+nz>0 &&
+nx<mazeWidth-1 &&
+nz<mazeHeight-1 &&
+maze[nx][nz]==1
+
+)
 
 {
+
+
+maze[x+dir[0]/2][z+dir[1]/2]=0;
+
+
+carve(nx,nz);
+
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+carve(1,1);
+
+
+
+
+
+// create extra openings
+// prevents dead rooms
+
+for(let x=1;x<mazeWidth-1;x++)
+{
+
+for(let z=1;z<mazeHeight-1;z++)
+{
+
+
+if(maze[x][z]==0)
+{
+
+
+let exits=0;
+
+
+if(maze[x+1][z]==0) exits++;
+if(maze[x-1][z]==0) exits++;
+if(maze[x][z+1]==0) exits++;
+if(maze[x][z-1]==0) exits++;
+
+
+
+if(exits==0)
+{
+
 
 maze[x+1][z]=0;
 
-}
-
-
-
-
-
-// south opening
-
-if(z < mazeHeight-2)
-
-{
-
-maze[x][z+1]=0;
-
-}
-
-
-
-
-
-
-// extra random openings
-
-if(Math.random()<0.6)
-
-{
-
-if(x>1)
-
-{
-
-maze[x-1][z]=0;
-
-}
-
-}
-
-
-
-if(Math.random()<0.6)
-
-{
-
-if(z>1)
-
-{
-
-maze[x][z-1]=0;
-
-}
-
-}
-
-
 
 }
 
@@ -243,13 +210,11 @@ maze[x][z-1]=0;
 
 
 
+}
+
+}
 
 
-
-
-// guaranteed start room
-
-maze[1][1]=0;
 
 
 
@@ -258,13 +223,7 @@ maze[1][1]=0;
 maze[mazeWidth-2][mazeHeight-2]=0;
 
 
-
-
 }
-
-
-
-
 
 
 
@@ -275,7 +234,6 @@ maze[mazeWidth-2][mazeHeight-2]=0;
 // =====================================
 
 export async function createDungeon()
-
 {
 
 
@@ -284,64 +242,46 @@ generateMaze();
 
 
 console.log(
-
-"Generating LARGE WOLFENSTEIN DUNGEON..."
-
+"Generating Wolfenstein Dungeon..."
 );
 
 
 
+let offsetX=
+
+-(mazeWidth*blockSize)/2;
 
 
+let offsetZ=
 
-
-let offsetX =
-
--(mazeWidth * blockSize)/2;
-
-
-
-let offsetZ =
-
--(mazeHeight * blockSize)/2;
-
-
-
+-(mazeHeight*blockSize)/2;
 
 
 
 
 
 for(let x=0;x<mazeWidth;x++)
-
 {
 
 
 for(let z=0;z<mazeHeight;z++)
-
 {
 
 
-let worldX =
+let worldX=
 
-(x*blockSize)+offsetX;
+x*blockSize+offsetX;
 
 
+let worldZ=
 
-let worldZ =
-
-(z*blockSize)+offsetZ;
-
+z*blockSize+offsetZ;
 
 
 
 
-
-
-// WALL
 
 if(maze[x][z]==1)
-
 {
 
 
@@ -357,7 +297,6 @@ worldZ
 
 ),
 
-
 new Vector3(
 
 blockSize,
@@ -367,7 +306,6 @@ blockSize,
 blockSize
 
 ),
-
 
 new Color(
 
@@ -382,21 +320,11 @@ new Color(
 );
 
 
-
 }
 
 
 
-
-
-
-
-
-
-// FLOOR
-
 else
-
 {
 
 
@@ -412,7 +340,6 @@ worldZ
 
 ),
 
-
 new Vector3(
 
 blockSize,
@@ -422,7 +349,6 @@ blockSize,
 blockSize
 
 ),
-
 
 new Color(
 
@@ -440,18 +366,17 @@ new Color(
 
 
 
-
-
-// don't spawn beside player
+// no objects near start
 
 if(
 
-!(x==1 && z==1)
+Math.abs(x-1)>3 ||
+
+Math.abs(z-1)>3
 
 )
 
 {
-
 
 spawnObjects(
 
@@ -472,13 +397,7 @@ worldZ
 
 }
 
-
-
 }
-
-
-
-
 
 
 
@@ -490,11 +409,11 @@ Player.position.set(
 
 new Vector3(
 
-offsetX + blockSize,
+offsetX+(blockSize),
 
 1,
 
-offsetZ + blockSize
+offsetZ+(blockSize)
 
 )
 
@@ -503,21 +422,14 @@ offsetZ + blockSize
 
 
 
-
-
 console.log(
-
-"MAZE COMPLETE"
-
+"PLAYER SPAWNED INSIDE DUNGEON"
 );
 
 
 console.log(
-
-"PLAYER INSIDE START ROOM"
-
+"WOLFENSTEIN MAZE COMPLETE"
 );
-
 
 
 }
@@ -527,23 +439,14 @@ console.log(
 
 
 
-
-
-
-
-
 // =====================================
-// SPAWN OBJECTS
+// OBJECT SPAWNING
 // =====================================
 
 function spawnObjects(
-
 x:number,
-
 z:number
-
 )
-
 {
 
 
@@ -552,11 +455,9 @@ let chance=Math.random();
 
 
 
+// ENEMY
 
-// enemies spread out
-
-if(chance < .12)
-
+if(chance < .10)
 {
 
 
@@ -572,7 +473,6 @@ z
 
 ),
 
-
 new Vector3(
 
 1,
@@ -582,7 +482,6 @@ new Vector3(
 1
 
 ),
-
 
 new Color(
 
@@ -598,11 +497,7 @@ new Color(
 
 
 
-
-
-
-
-let data =
+let data=
 
 {
 
@@ -620,15 +515,10 @@ alive:true
 
 
 
-
-
-
 enemies.push(data);
 
 
-
 addEnemyAI(enemy);
-
 
 
 registerEnemyCombat(data);
@@ -636,9 +526,7 @@ registerEnemyCombat(data);
 
 
 console.log(
-
-"Enemy spawned"
-
+"Enemy placed"
 );
 
 
@@ -650,11 +538,9 @@ console.log(
 
 
 
+// CHEST
 
-// treasure
-
-else if(chance < .18)
-
+else if(chance < .16)
 {
 
 
@@ -670,7 +556,6 @@ z
 
 ),
 
-
 new Vector3(
 
 1,
@@ -680,7 +565,6 @@ new Vector3(
 1
 
 ),
-
 
 new Color(
 
@@ -696,15 +580,11 @@ new Color(
 
 
 
-
 chests.push(chest);
 
 
-
 console.log(
-
-"Chest spawned"
-
+"Chest placed"
 );
 
 
@@ -713,7 +593,6 @@ console.log(
 
 
 
-
 }
 
 
@@ -723,21 +602,10 @@ console.log(
 
 
 
-
-
-
-// =====================================
-// ENEMY NAMES
-// =====================================
-
 function getEnemyName()
-
 {
 
-
-let list =
-
-[
+let list=[
 
 "Goblin",
 
@@ -750,8 +618,6 @@ let list =
 ];
 
 
-
-
 return list[
 
 Math.floor(
@@ -761,7 +627,5 @@ Math.random()*list.length
 )
 
 ];
-
-
 
 }
