@@ -1,4 +1,5 @@
 import { player } from "./PlayerData";
+import { Entity } from "./Yuu API/Entity";
 
 
 
@@ -12,38 +13,26 @@ const weapons =
 [
 
     {
-
         name:"Iron Sword",
-
         damage:15
-
     },
 
 
     {
-
         name:"Flame Blade",
-
         damage:25
-
     },
 
 
     {
-
         name:"Crystal Axe",
-
         damage:40
-
     },
 
 
     {
-
         name:"Dragon Slayer",
-
         damage:60
-
     }
 
 ];
@@ -58,84 +47,53 @@ const weapons =
 // CHEST OPEN
 // =====================================
 
-export function openChest()
+export function openChest(chest:Entity)
 
 {
 
 
-    console.log(
+console.log(
 
-        "📦 Chest opened!"
+"📦 Chest opened!"
 
-    );
-
-
-
-
-
-    let gold =
-
-    Math.floor(
-
-        Math.random()*100
-
-    )
-
-    +50;
+);
 
 
 
 
 
-    player.gold += gold;
+let gold =
+
+Math.floor(
+
+Math.random()*100
+
+)
+
++50;
 
 
 
 
 
-    console.log(
-
-        "+"
-
-        +
-
-        gold
-
-        +
-
-        " Gold"
-
-    );
+player.gold += gold;
 
 
 
 
+console.log(
 
+"+"
 
++
 
-    // potion chance
+gold
 
-    if(Math.random()<0.7)
++
 
-    {
+" Gold"
 
-
-        player.inventory.push(
-
-            "Health Potion"
-
-        );
-
-
-
-        console.log(
-
-            "🧪 Found Health Potion"
-
-        );
-
-
-    }
+);
 
 
 
@@ -143,17 +101,72 @@ export function openChest()
 
 
 
-    // weapon chance
+// potion chance
 
-    if(Math.random()<0.4)
+if(Math.random()<0.7)
 
-    {
-
-
-        giveWeapon();
+{
 
 
-    }
+player.inventory.push(
+
+"Health Potion"
+
+);
+
+
+
+console.log(
+
+"🧪 Found Health Potion"
+
+);
+
+
+}
+
+
+
+
+
+
+
+// weapon chance
+
+if(Math.random()<0.4)
+
+{
+
+
+giveWeapon();
+
+
+}
+
+
+
+
+
+
+
+// remove chest
+
+if(chest)
+
+{
+
+chest.destroy();
+
+
+console.log(
+
+"Chest removed"
+
+);
+
+
+}
+
 
 
 }
@@ -175,50 +188,52 @@ export function enemyDrop()
 {
 
 
-    console.log(
+console.log(
 
-        "🎁 Enemy dropped loot"
+"🎁 Enemy dropped loot"
 
-    );
-
-
+);
 
 
-    if(Math.random()<0.25)
-
-    {
 
 
-        giveWeapon();
+
+if(Math.random()<0.25)
+
+{
 
 
-    }
+giveWeapon();
 
 
-    else
+}
 
-    {
+else
 
-
-        player.inventory.push(
-
-            "Health Potion"
-
-        );
+{
 
 
-        console.log(
+player.inventory.push(
 
-            "🧪 Found Potion"
+"Health Potion"
 
-        );
+);
 
 
-    }
+
+console.log(
+
+"🧪 Found Potion"
+
+);
+
+
+}
 
 
 
 }
+
 
 
 
@@ -236,56 +251,62 @@ function giveWeapon()
 {
 
 
-    let weapon =
+let weapon =
 
-    weapons[
+weapons[
 
-        Math.floor(
+Math.floor(
 
-            Math.random()
+Math.random()
 
-            *
+*
 
-            weapons.length
+weapons.length
 
-        )
+)
 
-    ];
-
-
-
-
-
-    player.weapon = weapon;
+];
 
 
 
 
-    console.log(
 
-        "🗡 Equipped "
 
-        +
-
-        weapon.name
-
-    );
+player.weapon = weapon;
 
 
 
 
-    console.log(
 
-        "Damage "
+console.log(
 
-        +
+"🗡 Equipped "
 
-        weapon.damage
++
 
-    );
+weapon.name
+
+);
+
+
+
+
+
+console.log(
+
+"Damage "
+
++
+
+weapon.damage
+
+);
+
 
 
 }
+
+
 
 
 
@@ -302,97 +323,101 @@ export function usePotion()
 {
 
 
-    let index =
+let index =
 
-    player.inventory.indexOf(
+player.inventory.indexOf(
 
-        "Health Potion"
+"Health Potion"
 
-    );
-
-
-
-
-
-    if(index < 0)
-
-    {
-
-
-        console.log(
-
-            "No potions"
-
-        );
-
-
-        return;
-
-
-    }
+);
 
 
 
 
 
+if(index < 0)
+
+{
 
 
-    player.inventory.splice(
+console.log(
 
-        index,
+"No potions"
 
-        1
-
-    );
+);
 
 
+return;
 
 
-
-    player.hp += 50;
-
-
-
-
-
-    if(
-
-        player.hp >
-
-        player.maxHp
-
-    )
-
-    {
-
-
-        player.hp = player.maxHp;
-
-
-    }
+}
 
 
 
 
 
-    console.log(
-
-        "🧪 Healed!"
-
-    );
 
 
+player.inventory.splice(
+
+index,
+
+1
+
+);
 
 
-    console.log(
 
-        "HP "
 
-        +
 
-        player.hp
 
-    );
+player.hp += 50;
+
+
+
+
+
+
+if(
+
+player.hp >
+
+player.maxHp
+
+)
+
+{
+
+
+player.hp = player.maxHp;
+
+
+}
+
+
+
+
+
+
+
+console.log(
+
+"🧪 Healed!"
+
+);
+
+
+
+console.log(
+
+"HP "
+
++
+
+player.hp
+
+);
+
 
 
 }

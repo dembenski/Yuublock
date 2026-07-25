@@ -4,9 +4,10 @@ import { Controller } from "./Yuu API/Controller";
 import { Events } from "./Yuu API/Events";
 import { inWorldConsole } from "./Yuu API/Console";
 import { registerStart } from "./Yuu API/RegisterStart";
+import { Raycast } from "./Yuu API/Raycast";
 
 
-import { createRoom, enemies, chests } from "./Dungeon";
+import { createDungeon, enemies, chests } from "./Dungeon";
 
 import { attackEnemy } from "./Combat";
 
@@ -30,73 +31,41 @@ async function start()
 
 {
 
+console.log(
+"======================"
+);
 
-    console.log(
+console.log(
+" THE LOST DUNGEON VR "
+);
 
-        "======================"
-
-    );
-
-
-    console.log(
-
-        " THE LOST DUNGEON VR "
-
-    );
-
-
-    console.log(
-
-        "======================"
-
-    );
+console.log(
+"======================"
+);
 
 
 
-    console.log(
-
-        "Generating dungeon..."
-
-    );
+console.log(
+"Generating dungeon..."
+);
 
 
 
-
-
-    for(
-
-        let i = 0;
-
-        i < 10;
-
-        i++
-
-    )
-    {
-
-
-        await createRoom(i);
-
-
-    }
+await createDungeon();
 
 
 
-
-
-    console.log(
-
-        "Dungeon Ready!"
-
-    );
+console.log(
+"Dungeon Ready!"
+);
 
 
 
-    showStats();
+showStats();
 
 
 
-    setupVR();
+setupVR();
 
 
 
@@ -117,29 +86,29 @@ function setupVR()
 {
 
 
-    Controller.subscribe(
+Controller.subscribe(
 
-        "rightTrigger",
+"rightTrigger",
 
-        "Pressed",
+"Pressed",
 
-        ()=>{
-
-
-            interact();
+()=>{
 
 
-        }
-
-    );
+interact();
 
 
+}
 
-    console.log(
+);
 
-        "VR controls ready"
 
-    );
+
+console.log(
+
+"VR controls ready"
+
+);
 
 
 }
@@ -159,76 +128,105 @@ function interact()
 {
 
 
-    let target = findTarget();
+let target = findTarget();
 
 
 
-    if(!target)
+if(!target)
 
-    {
+{
 
-        return;
+console.log(
 
-    }
+"No target"
 
+);
 
+return;
 
-
-
-    // CHEST
-
-    for(let chest of chests)
-
-    {
-
-
-        if(chest == target)
-
-        {
-
-
-            openChest();
-
-
-            chest.destroy();
-
-
-            return;
-
-
-        }
-
-
-    }
+}
 
 
 
 
 
+// ===============================
+// CHEST
+// ===============================
 
 
-    // ENEMY
+for(let chest of chests)
 
-    for(let enemy of enemies)
-
-    {
+{
 
 
-        if(enemy.entity == target)
+if(chest == target)
 
-        {
-
-
-            attackEnemy(enemy);
+{
 
 
-            return;
+console.log(
+
+"Opening chest"
+
+);
 
 
-        }
+
+openChest(chest);
 
 
-    }
+
+return;
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+// ===============================
+// ENEMY
+// ===============================
+
+
+for(let enemy of enemies)
+
+{
+
+
+if(enemy.entity == target)
+
+{
+
+
+console.log(
+
+"Attacking "
+
++ enemy.name
+
+);
+
+
+
+attackEnemy(enemy);
+
+
+
+return;
+
+
+}
+
+
+}
 
 
 
@@ -243,7 +241,7 @@ function interact()
 
 
 // =====================================
-// FIND OBJECT IN FRONT
+// FIND OBJECT PLAYER AIMING AT
 // =====================================
 
 function findTarget()
@@ -251,96 +249,61 @@ function findTarget()
 {
 
 
-    let hand =
+let hand =
 
-    Player.rightHand.position.get()
+Player.rightHand.position.get()
 
-    ??
+??
 
-    Vector3.zero;
-
-
-
-    let forward =
-
-    Player.rightHand.forward.get()
-
-    ??
-
-    new Vector3(
-
-        0,
-
-        0,
-
-        -1
-
-    );
+Vector3.zero;
 
 
 
+let direction =
 
+Player.rightHand.forward.get()
 
-    // simple distance check
+??
 
-    for(let enemy of enemies)
+new Vector3(
 
-    {
+0,
 
+0,
 
-        if(
+-1
 
-            enemy.entity.pos.distanceTo(hand)
-
-            <
-
-            5
-
-        )
-
-        {
-
-
-            return enemy.entity;
-
-
-        }
-
-
-    }
+);
 
 
 
 
-    for(let chest of chests)
 
-    {
+let hit = Raycast.directional(
 
+hand,
 
-        if(
+direction,
 
-            chest.pos.distanceTo(hand)
+6,
 
-            <
+{
 
-            5
+getEntity:true
 
-        )
+}
 
-        {
-
-
-            return chest;
+);
 
 
-        }
 
 
-    }
 
+return hit?.entity;
 
 
 }
+
 
 
 
@@ -358,65 +321,69 @@ function showStats()
 {
 
 
-    console.log("");
+console.log("");
 
-    console.log(
+console.log(
 
-        "PLAYER"
+"PLAYER"
 
-    );
-
-
-    console.log(
-
-        "Level: "
-
-        +
-
-        player.level
-
-    );
+);
 
 
-    console.log(
+console.log(
 
-        "HP: "
+"Level: "
 
-        +
++
 
-        player.hp
+player.level
 
-        +
-
-        "/"
-
-        +
-
-        player.maxHp
-
-    );
+);
 
 
-    console.log(
 
-        "Weapon: "
+console.log(
 
-        +
+"HP: "
 
-        player.weapon.name
++
 
-    );
+player.hp
+
++
+
+"/"
+
++
+
+player.maxHp
+
+);
 
 
-    console.log(
 
-        "Damage: "
+console.log(
 
-        +
+"Weapon: "
 
-        player.weapon.damage
++
 
-    );
+player.weapon.name
+
+);
+
+
+
+console.log(
+
+"Damage: "
+
++
+
+player.weapon.damage
+
+);
+
 
 
 }
@@ -438,60 +405,63 @@ function updateConsole()
 {
 
 
-    let head =
+let head =
 
-    Player.position.get()
+Player.position.get()
 
-    ??
+??
 
-    Vector3.zero;
-
-
-
-    let forward =
-
-    Player.forward.get()
-
-    ??
-
-    new Vector3(
-
-        0,
-
-        0,
-
-        -1
-
-    );
+Vector3.zero;
 
 
 
+let forward =
 
-    let pos =
+Player.forward.get()
 
-    head.add(
+??
 
-        forward.multiply(2)
+new Vector3(
 
-    );
+0,
 
+0,
 
+-1
 
-    pos.y += 1.2;
+);
 
 
 
 
-    inWorldConsole.visible(
 
-        true,
+let pos =
 
-        pos
+head.add(
 
-    );
+forward.multiply(2)
+
+);
+
+
+
+pos.y += 1.2;
+
+
+
+
+
+inWorldConsole.visible(
+
+true,
+
+pos
+
+);
 
 
 }
+
 
 
 
@@ -509,7 +479,7 @@ Events.onPhysicsUpdate(
 ()=>{
 
 
-    updateConsole();
+updateConsole();
 
 
 
