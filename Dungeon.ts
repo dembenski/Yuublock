@@ -454,7 +454,12 @@ console.log(
 
 
 
-
+spawnDungeonCollectibles(
+    maze,
+    mazeWidth,
+    mazeHeight,
+    blockSize
+);
 
 
 let offsetX =
