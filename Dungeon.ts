@@ -3,11 +3,12 @@ import { Color } from "./Yuu API/Basic Types/Color";
 import { Quaternion } from "./Yuu API/Basic Types/Quaternion";
 import { Entity } from "./Yuu API/Entity";
 import { Player } from "./Yuu API/Player";
+import { Events } from "./Yuu API/Events";
 import { spawnPrimitive } from "./Yuu API/SpawnPrimitive";
 
 import { addEnemyAI } from "./EnemyAI";
 import { registerEnemyCombat } from "./Combat";
-import { spawnDungeonCollectibles } from "./DungeonCollectibles";
+
 
 
 
@@ -21,960 +22,138 @@ const mazeHeight = 31;
 const blockSize = 8;
 
 
+
 let maze:number[][] = [];
 
 
 
 export let enemies:any[] = [];
 
-export let chests:Entity[] = [];
-
-
-
-
-
-// =====================================
-// CREATE CUBE
-// =====================================
-
-function cube(
-
-pos:Vector3,
-
-scale:Vector3,
-
-color:Color
-
-):Entity
-
-{
-
-return spawnPrimitive.cube(
-
-pos,
-
-scale,
-
-
-Quaternion.fromEuler(
-
-new Vector3(
-
-0,
-
-0,
-
-0
-
-)
-
-),
-
-
-color,
-
-1,
-
-true,
-
-"Static",
-
-undefined
-
-);
-
-
-}
-
+export let chests:any[] = [];
 
 
 
 
 // =====================================
-// RETRO WALL COLORS
+// CHEST ITEM STORAGE
 // =====================================
 
-function wallColor(x:number,z:number):Color
 
+export let collectedItems:string[] = [];
+
+
+
+interface LootItem
 {
 
-let pattern = (x+z)%5;
+name:string;
 
-
-if(pattern==0)
-
-{
-
-return new Color(
-
-.55,
-
-.45,
-
-.35
-
-);
-
-}
-
-
-if(pattern==1)
-
-{
-
-return new Color(
-
-.42,
-
-.35,
-
-.28
-
-);
-
-}
-
-
-if(pattern==2)
-
-{
-
-return new Color(
-
-.32,
-
-.30,
-
-.28
-
-);
-
-}
-
-
-if(pattern==3)
-
-{
-
-return new Color(
-
-.25,
-
-.22,
-
-.18
-
-);
+rarity:string;
 
 }
 
 
 
-return new Color(
-
-.48,
-
-.38,
-
-.30
-
-);
-
-
-}
-
-
-
-
-
-// =====================================
-// RETRO FLOOR COLORS
-// =====================================
-
-function floorColor(x:number,z:number):Color
+let lootTable:LootItem[] = [
 
 {
-
-if((x+z)%2==0)
-
-{
-
-return new Color(
-
-.18,
-
-.15,
-
-.12
-
-);
-
-}
-
-
-return new Color(
-
-.10,
-
-.10,
-
-.08
-
-);
-
-
-}
-
-
-
-
-
-// =====================================
-// GENERATE OPEN ROOM MAZE
-// =====================================
-
-function generateMaze()
+name:"Ancient Bronze Key",
+rarity:"Common"
+},
 
 {
-
-
-maze=[];
-
-
-
-// fill walls
-
-for(let x=0;x<mazeWidth;x++)
+name:"Rusty Iron Sword",
+rarity:"Common"
+},
 
 {
-
-maze[x]=[];
-
-
-for(let z=0;z<mazeHeight;z++)
+name:"Broken Shield Fragment",
+rarity:"Common"
+},
 
 {
-
-maze[x][z]=1;
-
-}
-
-
-}
-
-
-
-
-
-// create rooms
-
-for(
-
-let x=1;
-
-x<mazeWidth-1;
-
-x+=2
-
-)
+name:"Dungeon Coin",
+rarity:"Common"
+},
 
 {
-
-
-for(
-
-let z=1;
-
-z<mazeHeight-1;
-
-z+=2
-
-)
+name:"Old Machine Gear",
+rarity:"Common"
+},
 
 {
-
-
-// room center
-
-maze[x][z]=0;
-
-
-let exits=0;
-
-
-
-
-// east opening
-
-if(x < mazeWidth-2)
+name:"Blue Crystal Shard",
+rarity:"Uncommon"
+},
 
 {
-
-maze[x+1][z]=0;
-
-exits++;
-
-}
-
-
-
-
-
-// west opening
-
-if(
-
-x>1 &&
-
-Math.random()<0.75
-
-)
+name:"Red Crystal Shard",
+rarity:"Uncommon"
+},
 
 {
-
-maze[x-1][z]=0;
-
-exits++;
-
-}
-
-
-
-
-
-// south opening
-
-if(z < mazeHeight-2)
+name:"Green Crystal Shard",
+rarity:"Uncommon"
+},
 
 {
-
-maze[x][z+1]=0;
-
-exits++;
-
-}
-
-
-
-
-
-// north opening
-
-if(
-
-z>1 &&
-
-Math.random()<0.75
-
-)
+name:"Lost Explorer Map",
+rarity:"Uncommon"
+},
 
 {
-
-maze[x][z-1]=0;
-
-exits++;
-
-}
-
-
-
-
-
-// emergency door
-
-if(exits==0)
+name:"Torch Battery Cell",
+rarity:"Uncommon"
+},
 
 {
-
-maze[x+1][z]=0;
-
-}
-
-
-}
-
-
-}
-
-
-
-
-
-// start room
-
-maze[1][1]=0;
-
-maze[2][1]=0;
-
-maze[1][2]=0;
-
-
-
-
-
-// final room opening
-
-maze[mazeWidth-2][mazeHeight-2]=0;
-
-maze[mazeWidth-3][mazeHeight-2]=0;
-
-
-
-console.log(
-
-"Open room maze generated"
-
-);
-
-
-
-}
-
-
-
-
-// =====================================
-// BUILD DUNGEON
-// =====================================
-
-export async function createDungeon()
+name:"Cyber Circuit",
+rarity:"Rare"
+},
 
 {
-
-
-generateMaze();
-
-
-
-console.log(
-
-"Generating RETRO WOLFENSTEIN DUNGEON..."
-
-);
-
-
-
-spawnDungeonCollectibles(
-    maze,
-    mazeWidth,
-    mazeHeight,
-    blockSize
-);
-
-
-let offsetX =
-
--(mazeWidth * blockSize)/2;
-
-
-
-let offsetZ =
-
--(mazeHeight * blockSize)/2;
-
-
-
-
-
-
-
-for(let x=0;x<mazeWidth;x++)
+name:"Golden Gear",
+rarity:"Rare"
+},
 
 {
-
-
-for(let z=0;z<mazeHeight;z++)
-
-{
-
-
-let worldX =
-
-(x * blockSize) + offsetX;
-
-
-
-let worldZ =
-
-(z * blockSize) + offsetZ;
-
-
-
-
-
-
-
-// ================================
-// WALL BLOCKS
-// ================================
-
-if(maze[x][z]==1)
+name:"Ancient Rune Stone",
+rarity:"Rare"
+},
 
 {
-
-
-cube(
-
-new Vector3(
-
-worldX,
-
-3,
-
-worldZ
-
-),
-
-
-new Vector3(
-
-blockSize,
-
-6,
-
-blockSize
-
-),
-
-
-wallColor(
-
-x,
-
-z
-
-)
-
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-// ================================
-// FLOOR BLOCKS
-// ================================
-
-else
+name:"Shadow Crystal",
+rarity:"Rare"
+},
 
 {
-
-
-cube(
-
-new Vector3(
-
-worldX,
-
-0,
-
-worldZ
-
-),
-
-
-new Vector3(
-
-blockSize,
-
-0.2,
-
-blockSize
-
-),
-
-
-floorColor(
-
-x,
-
-z
-
-)
-
-);
-
-
-
-
-
-
-
-
-// keep starting room clear
-
-if(
-
-!(x==1 && z==1)
-
-&&
-
-!(x==2 && z==1)
-
-&&
-
-!(x==1 && z==2)
-
-)
+name:"Demon Core Fragment",
+rarity:"Rare"
+},
 
 {
-
-
-spawnObjects(
-
-worldX,
-
-worldZ
-
-);
-
-
-}
-
-
-
-}
-
-
-}
-
-
-}
-
-
-
-
-
-
-
-
-// =================================
-// PLAYER SPAWN
-// =================================
-
-
-Player.position.set(
-
-new Vector3(
-
-offsetX + blockSize,
-
-1,
-
-offsetZ + blockSize
-
-)
-
-);
-
-
-
-
-
-
-
-console.log(
-
-"===================="
-
-);
-
-
-console.log(
-
-" DUNGEON READY "
-
-);
-
-
-console.log(
-
-" PLAYER SPAWNED "
-
-);
-
-
-console.log(
-
-"===================="
-
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// =====================================
-// SPAWN ENEMIES + CHESTS
-// =====================================
-
-function spawnObjects(
-
-x:number,
-
-z:number
-
-)
+name:"Knight Helmet",
+rarity:"Epic"
+},
 
 {
-
-
-let chance = Math.random();
-
-
-
-
-
-// =================================
-// ENEMIES
-// =================================
-
-
-if(chance < .12)
+name:"Dragon Scale",
+rarity:"Epic"
+},
 
 {
-
-
-let enemy = cube(
-
-new Vector3(
-
-x,
-
-1,
-
-z
-
-),
-
-
-new Vector3(
-
-1,
-
-2,
-
-1
-
-),
-
-
-new Color(
-
-1,
-
-0,
-
-0
-
-)
-
-);
-
-
-
-
-
-
-
-let data =
+name:"Void Crystal",
+rarity:"Epic"
+},
 
 {
-
-
-entity:enemy,
-
-
-name:getEnemyName(),
-
-
-hp:100,
-
-
-damage:10,
-
-
-alive:true
-
-
-
-};
-
-
-
-
-
-
-enemies.push(data);
-
-
-
-
-addEnemyAI(enemy);
-
-
-
-
-registerEnemyCombat(data);
-
-
-
-
-
-console.log(
-
-"Enemy spawned"
-
-);
-
-
-
-}
-
-
-
-
-
-
-
-// =================================
-// CHESTS
-// =================================
-
-
-else if(chance < .18)
+name:"Power Generator Core",
+rarity:"Epic"
+},
 
 {
-
-
-let chest = cube(
-
-new Vector3(
-
-x,
-
-1,
-
-z
-
-),
-
-
-new Vector3(
-
-1,
-
-1,
-
-1
-
-),
-
-
-new Color(
-
-1,
-
-.8,
-
-0
-
-)
-
-);
-
-
-
-
-
-chests.push(chest);
-
-
-
-
-
-console.log(
-
-"Chest spawned"
-
-);
-
-
-
-}
-
-
-
-}
-
-
-
-
-
-// =====================================
-// ENEMY NAME LIST
-// =====================================
-
-function getEnemyName()
-
-{
-
-
-let list =
-
-[
-
-"Goblin",
-
-"Skeleton",
-
-"Orc",
-
-"Shadow Beast",
-
-"Mutant Guard",
-
-"Cyber Demon"
+name:"Ancient Dungeon Crown",
+rarity:"Legendary"
+},
 
 ];
-
-
-
-
-
-return list[
-
-Math.floor(
-
-Math.random()*list.length
-
-)
-
-];
-
-
-
-}
-
-
-
-
-
-// =====================================
-// END OF DUNGEON SCRIPT
-// =====================================
