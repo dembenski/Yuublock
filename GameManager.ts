@@ -6,7 +6,7 @@ import { Events } from "./Yuu API/Events";
 import { registerStart } from "./Yuu API/RegisterStart";
 import { inWorldConsole } from "./Yuu API/Console";
 
-import { createRoom } from "./Dungeon";
+import { createDungeon } from "./Dungeon";
 import { createBoss } from "./Boss";
 import { player } from "./PlayerData";
 import { usePotion } from "./Loot";
@@ -21,13 +21,11 @@ registerStart(start);
 
 
 
+
 // =====================================
 // GAME STATE
 // =====================================
 
-let currentRoom = 0;
-
-let maxRooms = 10;
 
 let bossSpawned = false;
 
@@ -55,11 +53,13 @@ async function start()
 
     );
 
+
     console.log(
 
         " THE LOST DUNGEON VR "
 
     );
+
 
     console.log(
 
@@ -70,12 +70,8 @@ async function start()
 
 
 
+
     setupControls();
-
-
-
-
-    moveConsole();
 
 
 
@@ -83,7 +79,7 @@ async function start()
 
     console.log(
 
-        "Generating dungeon..."
+        "Generating Wolfenstein Maze..."
 
     );
 
@@ -91,26 +87,13 @@ async function start()
 
 
 
-    for(
-
-        let i=0;
-
-        i<maxRooms;
-
-        i++
-
-    )
-
-    {
+    await Async.wait(5);
 
 
-        await createRoom(i);
 
 
-        await Async.wait(20);
 
-
-    }
+    await createDungeon();
 
 
 
@@ -126,9 +109,11 @@ async function start()
 
     console.log(
 
-        "Find the boss!"
+        "Explore the maze!"
 
     );
+
+
 
 
 
@@ -146,6 +131,7 @@ async function start()
 // CONTROLS
 // =====================================
 
+
 function setupControls()
 
 {
@@ -162,7 +148,7 @@ function setupControls()
 
             console.log(
 
-                "Attack Trigger"
+                "⚔ Attack"
 
             );
 
@@ -170,6 +156,8 @@ function setupControls()
         }
 
     );
+
+
 
 
 
@@ -193,6 +181,15 @@ function setupControls()
 
 
 
+
+
+    console.log(
+
+        "Controls ready"
+
+    );
+
+
 }
 
 
@@ -202,9 +199,11 @@ function setupControls()
 
 
 
+
 // =====================================
-// CONSOLE FOLLOW PLAYER
+// MOVING WORLD CONSOLE
 // =====================================
+
 
 function moveConsole()
 
@@ -238,7 +237,6 @@ function moveConsole()
         -1
 
     );
-
 
 
 
@@ -281,63 +279,12 @@ function moveConsole()
 
 
 
-// =====================================
-// ROOM PROGRESSION
-// =====================================
-
-function nextRoom()
-
-{
-
-
-    currentRoom++;
-
-
-
-
-    console.log(
-
-        "Entering room "
-
-        +
-
-        currentRoom
-
-    );
-
-
-
-
-
-    if(
-
-        currentRoom >= maxRooms
-
-    )
-
-    {
-
-
-        spawnFinalBoss();
-
-
-    }
-
-
-
-}
-
-
-
-
-
-
-
 
 
 // =====================================
 // FINAL BOSS
 // =====================================
+
 
 function spawnFinalBoss()
 
@@ -361,9 +308,11 @@ function spawnFinalBoss()
 
     console.log(
 
-        "⚠ FINAL ROOM"
+        "👑 FINAL BOSS ROOM"
 
     );
+
+
 
 
 
@@ -384,6 +333,7 @@ function spawnFinalBoss()
 // PLAYER STATUS
 // =====================================
 
+
 function showPlayer()
 
 {
@@ -391,11 +341,14 @@ function showPlayer()
 
     console.log("");
 
+
+
     console.log(
 
         "PLAYER"
 
     );
+
 
 
     console.log(
@@ -409,6 +362,7 @@ function showPlayer()
     );
 
 
+
     console.log(
 
         "HP "
@@ -420,6 +374,7 @@ function showPlayer()
     );
 
 
+
     console.log(
 
         "Gold "
@@ -429,6 +384,7 @@ function showPlayer()
         player.gold
 
     );
+
 
 
     console.log(
@@ -451,9 +407,11 @@ function showPlayer()
 
 
 
+
 // =====================================
 // UPDATE LOOP
 // =====================================
+
 
 Events.onPhysicsUpdate(
 
@@ -461,9 +419,6 @@ Events.onPhysicsUpdate(
 
 
     moveConsole();
-
-
-    showPlayer();
 
 
 });
