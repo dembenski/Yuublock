@@ -22,7 +22,9 @@ const mazeHeight = 31;
 const blockSize = 8;
 
 
+
 let maze:number[][] = [];
+
 
 
 
@@ -35,12 +37,143 @@ export let chests:Entity[] = [];
 
 
 // =====================================
-// TORCH STORAGE
+// RETRO SYSTEM STORAGE
 // =====================================
+
 
 let torches:Entity[] = [];
 
+let generators:Entity[] = [];
+
+let warningLights:Entity[] = [];
+
+
 let torchTimer = 0;
+
+let soundTimer = 0;
+
+
+
+
+
+// =====================================
+// RETRO SOUND SYSTEM
+// MACHINE STYLE
+// =====================================
+
+
+function playRetroSound(
+
+name:string
+
+)
+
+{
+
+
+console.log(
+
+"[RETRO AUDIO] " + name
+
+);
+
+
+}
+
+
+
+
+
+function soundMachineHum()
+
+{
+
+playRetroSound(
+
+"deep computer hum"
+
+);
+
+}
+
+
+
+
+function soundGeneratorPulse()
+
+{
+
+playRetroSound(
+
+"generator power pulse"
+
+);
+
+}
+
+
+
+
+
+function soundMetalDoor()
+
+{
+
+playRetroSound(
+
+"heavy metal door"
+
+);
+
+}
+
+
+
+
+
+function soundEnemyAlert()
+
+{
+
+playRetroSound(
+
+"enemy alarm beep"
+
+);
+
+}
+
+
+
+
+
+function soundRobotStep()
+
+{
+
+playRetroSound(
+
+"robot footsteps"
+
+);
+
+}
+
+
+
+
+
+function soundTorchBuzz()
+
+{
+
+playRetroSound(
+
+"electric torch buzz"
+
+);
+
+}
 
 
 
@@ -50,6 +183,7 @@ let torchTimer = 0;
 // =====================================
 // CREATE CUBE
 // =====================================
+
 
 function cube(
 
@@ -67,6 +201,7 @@ color:Color
 return spawnPrimitive.cube(
 
 pos,
+
 
 scale,
 
@@ -88,11 +223,15 @@ new Vector3(
 
 color,
 
+
 1,
+
 
 true,
 
+
 "Static",
+
 
 undefined
 
@@ -106,10 +245,303 @@ undefined
 
 
 
+// =====================================
+// CREATE MACHINE BLOCK
+// =====================================
+
+
+function createMachine(
+
+x:number,
+
+z:number
+
+)
+
+{
+
+
+let machine=cube(
+
+new Vector3(
+
+x,
+
+1,
+
+z
+
+),
+
+
+new Vector3(
+
+2,
+
+2,
+
+1
+
+),
+
+
+new Color(
+
+0.08,
+
+0.08,
+
+0.12
+
+)
+
+);
+
+
+
+generators.push(machine);
+
+
+
+soundGeneratorPulse();
+
+
+
+}
+
+
+
+
+
+
 
 // =====================================
+// WARNING LIGHT
+// =====================================
+
+
+function createWarningLight(
+
+x:number,
+
+z:number
+
+)
+
+{
+
+
+let light=cube(
+
+new Vector3(
+
+x,
+
+3,
+
+z
+
+),
+
+
+new Vector3(
+
+0.4,
+
+0.4,
+
+0.4
+
+),
+
+
+new Color(
+
+1,
+
+0,
+
+0
+
+)
+
+);
+
+
+
+warningLights.push(light);
+
+
+
+}
+
+
+
+
+
+
+// =====================================
+// RANDOM MACHINE DECOR
+// =====================================
+
+
+function maybeCreateMachine(
+
+x:number,
+
+z:number
+
+)
+
+{
+
+
+let chance=Math.random();
+
+
+
+if(chance < 0.03)
+
+{
+
+
+createMachine(
+
+x,
+
+z
+
+);
+
+
+}
+
+
+
+if(chance < 0.06)
+
+{
+
+
+createWarningLight(
+
+x,
+
+z
+
+);
+
+
+}
+
+
+
+}
+
+
+
+
+
+// =====================================
+// TORCH CREATION
+// =====================================
+
+
+function createTorch(
+
+x:number,
+
+z:number
+
+)
+
+{
+
+
+let torch=cube(
+
+new Vector3(
+
+x,
+
+2,
+
+z
+
+),
+
+
+new Vector3(
+
+0.3,
+
+1,
+
+0.3
+
+),
+
+
+new Color(
+
+1,
+
+0.5,
+
+0.1
+
+)
+
+);
+
+
+
+torches.push(torch);
+
+
+
+soundTorchBuzz();
+
+
+}
+
+
+
+
+function maybeCreateTorch(
+
+x:number,
+
+z:number
+
+)
+
+{
+
+
+if(Math.random()<0.08)
+
+{
+
+
+createTorch(
+
+x,
+
+z
+
+);
+
+
+}
+
+
+
+}
+ 
+// =====================================
 // VOXEL ENEMY CREATOR
-// RETRO BLOCK PERSON
+// RETRO BLOCK PEOPLE
 // =====================================
 
 
@@ -137,6 +569,7 @@ let skin = new Color(
 );
 
 
+
 let armor = new Color(
 
 0.8,
@@ -148,41 +581,64 @@ let armor = new Color(
 );
 
 
+
 let boots = new Color(
 
-0.08,
+0.05,
 
-0.08,
+0.05,
 
-0.08
+0.05
 
 );
 
 
 
-// different enemy colors
+
+
+// ===============================
+// ENEMY VARIANTS
+// ===============================
 
 
 if(type=="Skeleton")
 
 {
 
-armor = new Color(
 
-0.85,
+skin = new Color(
 
-0.85,
+0.9,
+
+0.9,
 
 0.75
 
 );
 
+
+
+armor = new Color(
+
+0.55,
+
+0.55,
+
+0.5
+
+);
+
+
+
 }
+
+
 
 
 if(type=="Orc")
 
 {
+
 
 skin = new Color(
 
@@ -195,32 +651,86 @@ skin = new Color(
 );
 
 
+
 armor = new Color(
 
-0.15,
+0.1,
 
-0.4,
+0.45,
 
 0.1
 
 );
 
+
+
 }
+
+
 
 
 if(type=="Cyber Demon")
 
 {
 
+
+skin = new Color(
+
+0.15,
+
+0.15,
+
+0.2
+
+);
+
+
+
 armor = new Color(
 
-0.1,
+0.05,
 
-0.2,
+0.25,
 
 1
 
 );
+
+
+
+}
+
+
+
+
+if(type=="Mutant Guard")
+
+{
+
+
+skin = new Color(
+
+0.4,
+
+0.9,
+
+0.4
+
+);
+
+
+
+armor = new Color(
+
+0.5,
+
+0.1,
+
+0.1
+
+);
+
+
 
 }
 
@@ -228,9 +738,10 @@ armor = new Color(
 
 
 
+// ===============================
+// BODY
+// ===============================
 
-
-// MAIN BODY
 
 let body = cube(
 
@@ -265,7 +776,10 @@ armor
 
 
 
+// ===============================
 // HEAD
+// ===============================
+
 
 cube(
 
@@ -300,7 +814,10 @@ skin
 
 
 
+// ===============================
 // LEFT ARM
+// ===============================
+
 
 cube(
 
@@ -335,7 +852,10 @@ armor
 
 
 
+// ===============================
 // RIGHT ARM
+// ===============================
+
 
 cube(
 
@@ -371,7 +891,10 @@ armor
 
 
 
-// LEFT LEG
+// ===============================
+// LEGS
+// ===============================
+
 
 cube(
 
@@ -402,11 +925,6 @@ boots
 );
 
 
-
-
-
-
-// RIGHT LEG
 
 cube(
 
@@ -441,16 +959,437 @@ boots
 
 
 
+
+// ===============================
+// WEAPON / ROBOT CORE
+// ===============================
+
+
+if(type=="Cyber Demon")
+
+{
+
+
+cube(
+
+new Vector3(
+
+x,
+
+2.5,
+
+z-0.5
+
+),
+
+
+new Vector3(
+
+0.3,
+
+0.3,
+
+0.3
+
+),
+
+
+new Color(
+
+0,
+
+1,
+
+1
+
+)
+
+);
+
+
+
+}
+
+
+
 return body;
 
 
 }
 
 
+
+
+
+
+
+
+
 // =====================================
-// RETRO PIXEL WALL TEXTURE
-// PROCEDURAL COLORS ONLY
+// ENEMY NAME LIST
 // =====================================
+
+
+function getEnemyName()
+
+{
+
+
+let list =
+
+[
+
+"Goblin",
+
+"Skeleton",
+
+"Orc",
+
+"Shadow Beast",
+
+"Mutant Guard",
+
+"Cyber Demon",
+
+"Dungeon Knight",
+
+"Ancient Warrior"
+
+];
+
+
+
+
+
+return list[
+
+Math.floor(
+
+Math.random()*list.length
+
+)
+
+];
+
+}
+
+
+
+
+
+// =====================================
+// ENEMY SPAWN EFFECT
+// =====================================
+
+
+function enemySpawnEffect(
+
+x:number,
+
+z:number
+
+)
+
+{
+
+
+cube(
+
+new Vector3(
+
+x,
+
+0.2,
+
+z
+
+),
+
+
+new Vector3(
+
+1.5,
+
+0.05,
+
+1.5
+
+),
+
+
+new Color(
+
+0.8,
+
+0,
+
+0
+
+)
+
+);
+
+
+
+soundEnemyAlert();
+
+
+
+}
+
+
+
+
+
+
+// =====================================
+// ENEMY IDLE SOUND TIMER
+// =====================================
+
+
+function updateEnemySounds()
+
+{
+
+
+if(enemies.length==0)
+
+{
+
+return;
+
+}
+
+
+
+if(Math.random()<0.01)
+
+{
+
+
+soundRobotStep();
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+// =====================================
+// SPAWN OBJECTS
+// =====================================
+
+
+function spawnObjects(
+
+x:number,
+
+z:number
+
+)
+
+{
+
+
+if(!validSpawn(x,z))
+
+{
+
+return;
+
+}
+
+
+
+
+
+let chance=Math.random();
+
+
+
+
+
+// ================================
+// ENEMY
+// ================================
+
+
+if(chance < .12)
+
+{
+
+
+let enemyName=getEnemyName();
+
+
+
+
+
+let enemy=createVoxelEnemy(
+
+x,
+
+z,
+
+enemyName
+
+);
+
+
+
+
+
+
+let data =
+
+{
+
+entity:enemy,
+
+name:enemyName,
+
+hp:100,
+
+damage:10,
+
+alive:true
+
+};
+
+
+
+
+
+
+enemies.push(data);
+
+
+
+
+
+enemySpawnEffect(
+
+x,
+
+z
+
+);
+
+
+
+
+
+addEnemyAI(enemy);
+
+
+
+registerEnemyCombat(data);
+
+
+
+
+
+console.log(
+
+"Voxel enemy created: "
+
++
+
+enemyName
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+// ================================
+// CHEST
+// ================================
+
+
+else if(chance < .18)
+
+{
+
+
+let chest=cube(
+
+new Vector3(
+
+x,
+
+1,
+
+z
+
+),
+
+
+new Vector3(
+
+1,
+
+1,
+
+1
+
+),
+
+
+new Color(
+
+1,
+
+0.8,
+
+0
+
+)
+
+);
+
+
+
+
+
+chests.push(chest);
+
+
+
+
+console.log(
+
+"Treasure chest created"
+
+);
+
+
+
+}
+
+
+
+}
+
+
+// =====================================
+// RETRO WALL TEXTURE
+// PROCEDURAL PIXELS
+// =====================================
+
 
 function wallTexture(
 
@@ -463,9 +1402,7 @@ z:number
 {
 
 
-let pixel =
-
-(x * 17 + z * 11) % 8;
+let pixel=(x*17+z*11)%8;
 
 
 
@@ -570,6 +1507,7 @@ return new Color(
 );
 
 
+
 }
 
 
@@ -579,8 +1517,9 @@ return new Color(
 
 
 // =====================================
-// RETRO FLOOR TILE
+// RETRO FLOOR TEXTURE
 // =====================================
+
 
 function floorTexture(
 
@@ -622,6 +1561,7 @@ return new Color(
 );
 
 
+
 }
 
 
@@ -630,9 +1570,12 @@ return new Color(
 
 
 
+
+
 // =====================================
-// PIXEL DITHER COLORS
+// DITHER PIXEL COLORS
 // =====================================
+
 
 function ditherColor(
 
@@ -696,7 +1639,10 @@ return new Color(
 );
 
 
+
 }
+
+
 
 
 
@@ -706,8 +1652,9 @@ return new Color(
 
 // =====================================
 // GENERATE OPEN ROOM MAZE
-// NO TRAPPED ROOMS
+// EVERY ROOM HAS EXITS
 // =====================================
+
 
 function generateMaze()
 
@@ -733,6 +1680,7 @@ for(let z=0;z<mazeHeight;z++)
 
 
 maze[x][z]=1;
+
 
 
 }
@@ -772,14 +1720,12 @@ z+=2
 {
 
 
-// room center
 
 maze[x][z]=0;
 
 
 
 let exits=0;
-
 
 
 
@@ -796,7 +1742,6 @@ maze[x+1][z]=0;
 exits++;
 
 }
-
 
 
 
@@ -825,7 +1770,6 @@ exits++;
 
 
 
-
 // SOUTH
 
 if(z<mazeHeight-2)
@@ -837,8 +1781,6 @@ maze[x][z+1]=0;
 exits++;
 
 }
-
-
 
 
 
@@ -866,32 +1808,33 @@ exits++;
 
 
 
-
-
-// emergency opening
+// emergency door
 
 if(exits==0)
 
 {
 
+
 maze[x+1][z]=0;
 
-}
-
-
-
-}
 
 
 }
 
 
 
+}
+
+
+}
 
 
 
 
-// starting room
+
+
+// PLAYER START ROOM
+
 
 maze[1][1]=0;
 
@@ -905,7 +1848,8 @@ maze[1][2]=0;
 
 
 
-// final exit
+// FINAL EXIT ROOM
+
 
 maze[mazeWidth-2][mazeHeight-2]=0;
 
@@ -913,20 +1857,30 @@ maze[mazeWidth-3][mazeHeight-2]=0;
 
 
 
+
+
 console.log(
 
-"Open dungeon generated"
+"All rooms verified open"
 
 );
+
 
 
 }
 
 
 
+
+
+
+
+
+
 // =====================================
-// CREATE WALL PIXEL DETAILS
+// WALL DETAIL PIXELS
 // =====================================
+
 
 function createWallDetail(
 
@@ -944,6 +1898,7 @@ worldZ:number
 
 
 let pattern=(x+z)%4;
+
 
 
 
@@ -985,6 +1940,7 @@ z
 )
 
 );
+
 
 
 }
@@ -1033,10 +1989,14 @@ z
 );
 
 
+
 }
 
 
+
 }
+
+
 
 
 
@@ -1045,8 +2005,9 @@ z
 
 
 // =====================================
-// FLOOR PIXELS
+// FLOOR PIXEL DETAILS
 // =====================================
+
 
 function createFloorDetail(
 
@@ -1103,107 +2064,9 @@ z
 );
 
 
-}
-
 
 }
 
-
-
-
-
-
-
-// =====================================
-// TORCH CREATION
-// =====================================
-
-function createTorch(
-
-x:number,
-
-z:number
-
-)
-
-{
-
-
-let torch=cube(
-
-new Vector3(
-
-x,
-
-2,
-
-z
-
-),
-
-
-new Vector3(
-
-0.3,
-
-1,
-
-0.3
-
-),
-
-
-new Color(
-
-1,
-
-0.5,
-
-0.1
-
-)
-
-);
-
-
-
-torches.push(torch);
-
-
-}
-
-
-
-
-
-
-
-function maybeCreateTorch(
-
-x:number,
-
-z:number
-
-)
-
-{
-
-
-if(Math.random()<0.08)
-
-{
-
-
-createTorch(
-
-x,
-
-z
-
-);
-
-
-}
 
 
 }
@@ -1220,6 +2083,7 @@ z
 // BUILD DUNGEON
 // =====================================
 
+
 export async function createDungeon()
 
 {
@@ -1231,9 +2095,10 @@ generateMaze();
 
 console.log(
 
-"Generating RETRO VOXEL DUNGEON..."
+"Generating RETRO VOXEL MACHINE DUNGEON"
 
 );
+
 
 
 
@@ -1255,7 +2120,6 @@ let offsetZ=
 
 
 
-
 for(let x=0;x<mazeWidth;x++)
 
 {
@@ -1264,6 +2128,7 @@ for(let x=0;x<mazeWidth;x++)
 for(let z=0;z<mazeHeight;z++)
 
 {
+
 
 
 let worldX=
@@ -1283,9 +2148,10 @@ let worldZ=
 
 
 
-// ==============================
+// ===============================
 // WALLS
-// ==============================
+// ===============================
+
 
 if(maze[x][z]==1)
 
@@ -1354,9 +2220,10 @@ worldZ
 
 
 
-// ==============================
+// ===============================
 // FLOORS
-// ==============================
+// ===============================
+
 
 else
 
@@ -1401,7 +2268,6 @@ z
 
 
 
-
 createFloorDetail(
 
 x,
@@ -1430,20 +2296,29 @@ worldZ
 
 
 
+maybeCreateMachine(
 
-// leave spawn room clear
+worldX,
+
+worldZ
+
+);
+
+
+
+
 
 if(
 
-!(x==1 && z==1)
+!(x==1&&z==1)
 
 &&
 
-!(x==2 && z==1)
+!(x==2&&z==1)
 
 &&
 
-!(x==1 && z==2)
+!(x==1&&z==2)
 
 )
 
@@ -1459,6 +2334,11 @@ worldZ
 );
 
 
+
+}
+
+
+
 }
 
 
@@ -1466,8 +2346,6 @@ worldZ
 }
 
 
-}
-
 
 }
 
@@ -1478,9 +2356,7 @@ worldZ
 
 
 
-// =================================
-// PLAYER SPAWN
-// =================================
+// PLAYER START
 
 
 Player.position.set(
@@ -1502,386 +2378,15 @@ offsetZ+blockSize
 
 
 
-
-console.log(
-
-"======================"
-
-);
-
-
-console.log(
-
-" RETRO VOXEL DUNGEON READY "
-
-);
-
-
-console.log(
-
-" PLAYER SPAWNED "
-
-);
-
-
-console.log(
-
-"======================"
-
-);
-
-
-
-}
-
-
-// =====================================
-// CHECK VALID SPAWN
-// PREVENT BAD SPAWNS
-// =====================================
-
-function validSpawn(
-
-x:number,
-
-z:number
-
-)
-
-{
-
-
-let gx=Math.floor(
-
-(x+(mazeWidth*blockSize)/2)
-
-/blockSize
-
-);
-
-
-
-let gz=Math.floor(
-
-(z+(mazeHeight*blockSize)/2)
-
-/blockSize
-
-);
-
-
-
-
-
-
-if(
-
-gx<0 ||
-
-gz<0 ||
-
-gx>=mazeWidth ||
-
-gz>=mazeHeight
-
-)
-
-{
-
-return false;
-
-}
-
-
-
-
-
-
-return maze[gx][gz]==0;
-
-
-}
-
-
-
-
-
-
-
-
-
-// =====================================
-// SPAWN OBJECTS
-// VOXEL ENEMIES + CHESTS
-// =====================================
-
-function spawnObjects(
-
-x:number,
-
-z:number
-
-)
-
-{
-
-
-if(!validSpawn(x,z))
-
-{
-
-return;
-
-}
-
-
-
-
-
-
-let chance=Math.random();
-
-
-
-
-
-
-
-
-// =================================
-// VOXEL ENEMY
-// =================================
-
-if(chance < .12)
-
-{
-
-
-let enemyName=getEnemyName();
-
-
-
-
-
-let enemy=createVoxelEnemy(
-
-x,
-
-z,
-
-enemyName
-
-);
-
-
-
-
-
-
-
-
-let data=
-
-{
-
-
-entity:enemy,
-
-
-name:enemyName,
-
-
-hp:100,
-
-
-damage:10,
-
-
-alive:true
-
-
-
-};
-
-
-
-
-
-
-
-enemies.push(data);
-
-
-
-
-
-
-
-addEnemyAI(enemy);
-
-
-
-
-
-
-registerEnemyCombat(data);
-
-
-
-
+soundMetalDoor();
 
 
 
 console.log(
 
-"Voxel enemy spawned: "
-
-+
-
-enemyName
+"RETRO DUNGEON LOADED"
 
 );
-
-
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// =================================
-// CHEST
-// =================================
-
-else if(chance < .18)
-
-{
-
-
-let chest=cube(
-
-new Vector3(
-
-x,
-
-1,
-
-z
-
-),
-
-
-new Vector3(
-
-1,
-
-1,
-
-1
-
-),
-
-
-new Color(
-
-1,
-
-0.8,
-
-0
-
-)
-
-);
-
-
-
-
-
-
-chests.push(chest);
-
-
-
-
-
-
-
-console.log(
-
-"Treasure chest spawned"
-
-);
-
-
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// =====================================
-// ENEMY TYPES
-// =====================================
-
-function getEnemyName()
-
-{
-
-
-let list=
-
-[
-
-"Goblin",
-
-"Skeleton",
-
-"Orc",
-
-"Shadow Beast",
-
-"Mutant Guard",
-
-"Cyber Demon",
-
-"Dungeon Knight",
-
-"Ancient Warrior"
-
-];
-
-
-
-
-
-
-return list[
-
-Math.floor(
-
-Math.random()*list.length
-
-)
-
-];
 
 
 
@@ -1892,6 +2397,7 @@ Math.random()*list.length
 // TORCH FLICKER SYSTEM
 // OLD SCHOOL LIGHT EFFECT
 // =====================================
+
 
 function updateTorches()
 
@@ -1943,6 +2449,7 @@ torch.color=new Color(
 );
 
 
+
 }
 
 else
@@ -1961,11 +2468,117 @@ torch.color=new Color(
 );
 
 
+
+}
+
+
+
 }
 
 
 
 }
+
+
+
+
+
+
+
+
+
+// =====================================
+// MACHINE ANIMATION
+// OLD COMPUTER EFFECT
+// =====================================
+
+
+function updateMachines()
+
+{
+
+
+for(let light of warningLights)
+
+{
+
+
+if(!light)
+
+{
+
+continue;
+
+}
+
+
+
+
+
+let pulse=Math.random();
+
+
+
+
+
+if(pulse < .5)
+
+{
+
+
+light.color=new Color(
+
+1,
+
+0,
+
+0
+
+);
+
+
+
+}
+
+else
+
+{
+
+
+light.color=new Color(
+
+0.4,
+
+0,
+
+0
+
+);
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+if(Math.random()<0.01)
+
+{
+
+
+soundGeneratorPulse();
+
+
+
+}
+
 
 
 }
@@ -1980,7 +2593,9 @@ torch.color=new Color(
 
 // =====================================
 // RETRO WALL SIGNS
+// PIXEL ART DECALS
 // =====================================
+
 
 function createRetroSign(
 
@@ -2007,6 +2622,7 @@ return;
 
 
 // sign board
+
 
 cube(
 
@@ -2050,7 +2666,8 @@ new Color(
 
 
 
-// pixel lettering
+// pixel letters
+
 
 cube(
 
@@ -2133,15 +2750,6 @@ new Color(
 
 
 
-
-console.log(
-
-"Retro sign created"
-
-);
-
-
-
 }
 
 
@@ -2154,8 +2762,9 @@ console.log(
 
 // =====================================
 // WALL DAMAGE
-// PIXEL CRACK EFFECT
+// PIXEL CRACKS
 // =====================================
+
 
 function createWallDamage(
 
@@ -2228,8 +2837,6 @@ new Color(
 
 
 
-
-
 if(damage==1)
 
 {
@@ -2291,6 +2898,7 @@ new Color(
 // FLOOR RUBBLE
 // =====================================
 
+
 function createRubble(
 
 x:number,
@@ -2309,7 +2917,6 @@ if(Math.random()>0.08)
 return;
 
 }
-
 
 
 
@@ -2364,8 +2971,145 @@ new Color(
 
 
 // =====================================
+// MACHINE ROOM DECORATION
+// =====================================
+
+
+function createMachineRoom(
+
+x:number,
+
+z:number
+
+)
+
+{
+
+
+let chance=Math.random();
+
+
+
+
+
+if(chance>0.03)
+
+{
+
+return;
+
+}
+
+
+
+
+
+
+// large generator
+
+
+cube(
+
+new Vector3(
+
+x,
+
+2,
+
+z
+
+),
+
+
+new Vector3(
+
+3,
+
+3,
+
+2
+
+),
+
+
+new Color(
+
+0.05,
+
+0.08,
+
+0.12
+
+)
+
+);
+
+
+
+
+
+// glowing core
+
+
+cube(
+
+new Vector3(
+
+x,
+
+2,
+
+z-1.2
+
+),
+
+
+new Vector3(
+
+0.8,
+
+0.8,
+
+0.2
+
+),
+
+
+new Color(
+
+0,
+
+1,
+
+1
+
+)
+
+);
+
+
+
+
+
+
+soundGeneratorPulse();
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
 // FINAL DECORATION PASS
 // =====================================
+
 
 function decorateDungeon()
 
@@ -2374,7 +3118,7 @@ function decorateDungeon()
 
 console.log(
 
-"Adding retro voxel decorations..."
+"Adding retro decorations..."
 
 );
 
@@ -2392,6 +3136,7 @@ for(let x=1;x<mazeWidth-1;x++)
 for(let z=1;z<mazeHeight-1;z++)
 
 {
+
 
 
 if(maze[x][z]==0)
@@ -2424,6 +3169,7 @@ let worldZ=
 
 
 
+
 createRetroSign(
 
 worldX,
@@ -2431,6 +3177,7 @@ worldX,
 worldZ
 
 );
+
 
 
 
@@ -2448,7 +3195,21 @@ worldZ
 
 
 
-}
+
+
+
+
+
+createMachineRoom(
+
+worldX,
+
+worldZ
+
+);
+
+
+
 
 
 
@@ -2456,9 +3217,15 @@ worldZ
 
 
 
+
+
+
+
 }
 
 
+
+}
 
 
 
@@ -2466,7 +3233,7 @@ worldZ
 
 console.log(
 
-"Decoration complete"
+"Retro decoration complete"
 
 );
 
@@ -2483,9 +3250,624 @@ console.log(
 
 
 // =====================================
-// START DECORATIONS
-// CALL AFTER CREATE DUNGEON
+// CHECK VALID SPAWN
 // =====================================
+
+
+function validSpawn(
+
+x:number,
+
+z:number
+
+)
+
+{
+
+
+let gx=Math.floor(
+
+(x+(mazeWidth*blockSize)/2)
+
+/blockSize
+
+);
+
+
+
+
+
+let gz=Math.floor(
+
+(z+(mazeHeight*blockSize)/2)
+
+/blockSize
+
+);
+
+
+
+
+
+
+
+if(
+
+gx<0 ||
+
+gz<0 ||
+
+gx>=mazeWidth ||
+
+gz>=mazeHeight
+
+)
+
+{
+
+
+return false;
+
+
+
+}
+
+
+
+
+
+
+return maze[gx][gz]==0;
+
+
+
+}
+
+
+// =====================================
+// RETRO SOUND SYSTEM
+// MACHINE / DUNGEON EFFECTS
+// =====================================
+
+
+// Replace these with Yuu API audio calls
+// if your project has a sound module.
+// These functions are placeholders so the
+// dungeon system is ready for audio.
+
+
+function playRetroSound(name:string)
+
+{
+
+console.log(
+
+"PLAY SOUND:",
+
+name
+
+);
+
+
+}
+
+
+
+// =====================================
+// SOUND EVENTS
+// =====================================
+
+
+function soundMetalDoor()
+
+{
+
+playRetroSound(
+
+"metal_door_open"
+
+);
+
+}
+
+
+
+
+function soundGeneratorPulse()
+
+{
+
+playRetroSound(
+
+"generator_hum"
+
+);
+
+}
+
+
+
+
+
+function soundRobotStep()
+
+{
+
+playRetroSound(
+
+"robot_step"
+
+);
+
+}
+
+
+
+
+
+function soundEnemyAlert()
+
+{
+
+playRetroSound(
+
+"enemy_alert"
+
+);
+
+}
+
+
+
+
+
+function soundChest()
+
+{
+
+playRetroSound(
+
+"chest_open"
+
+);
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// CHEST OPEN EFFECT
+// =====================================
+
+
+export function openChest(
+
+chest:Entity
+
+)
+
+{
+
+
+soundChest();
+
+
+
+console.log(
+
+"Chest opened"
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// ENEMY SOUND UPDATE
+// =====================================
+
+
+function updateEnemySounds()
+
+{
+
+
+if(enemies.length==0)
+
+{
+
+return;
+
+}
+
+
+
+
+
+if(Math.random()<0.02)
+
+{
+
+
+soundRobotStep();
+
+
+
+}
+
+
+
+
+
+if(Math.random()<0.01)
+
+{
+
+
+soundEnemyAlert();
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// MACHINE LIGHT STORAGE
+// =====================================
+
+
+let warningLights:Entity[]=[];
+
+
+
+
+
+
+
+
+
+// =====================================
+// CREATE WARNING LIGHT
+// =====================================
+
+
+function createWarningLight(
+
+x:number,
+
+z:number
+
+)
+
+{
+
+
+let light=cube(
+
+new Vector3(
+
+x,
+
+4,
+
+z
+
+),
+
+
+new Vector3(
+
+0.3,
+
+0.3,
+
+0.3
+
+),
+
+
+new Color(
+
+1,
+
+0,
+
+0
+
+)
+
+);
+
+
+
+
+
+warningLights.push(light);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// CREATE TORCH
+// =====================================
+
+
+function createTorch(
+
+x:number,
+
+z:number
+
+)
+
+{
+
+
+let torch=cube(
+
+new Vector3(
+
+x,
+
+2,
+
+z
+
+),
+
+
+new Vector3(
+
+0.3,
+
+1,
+
+0.3
+
+),
+
+
+new Color(
+
+1,
+
+0.5,
+
+0.1
+
+)
+
+);
+
+
+
+
+
+torches.push(torch);
+
+
+
+}
+
+
+
+
+
+
+
+
+function maybeCreateTorch(
+
+x:number,
+
+z:number
+
+)
+
+{
+
+
+if(Math.random()<0.08)
+
+{
+
+
+createTorch(
+
+x,
+
+z
+
+);
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// CREATE MACHINES
+// =====================================
+
+
+function maybeCreateMachine(
+
+x:number,
+
+z:number
+
+)
+
+{
+
+
+if(Math.random()>0.04)
+
+{
+
+return;
+
+}
+
+
+
+
+
+
+cube(
+
+new Vector3(
+
+x,
+
+2,
+
+z
+
+),
+
+
+new Vector3(
+
+2,
+
+2,
+
+2
+
+),
+
+
+new Color(
+
+0.05,
+
+0.08,
+
+0.12
+
+)
+
+);
+
+
+
+
+
+
+createWarningLight(
+
+x,
+
+4,
+
+z
+
+);
+
+
+
+console.log(
+
+"Machine room created"
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// GAME UPDATE LOOP
+// =====================================
+
+
+Events.onPhysicsUpdate(
+
+()=>{
+
+
+updateTorches();
+
+
+
+updateMachines();
+
+
+
+updateEnemySounds();
+
+
+
+});
+
+
+
+
+
+
+
+
+
+// =====================================
+// FINISH DUNGEON
+// CALL AFTER CREATE
+// =====================================
+
 
 export function finishDungeon()
 
@@ -2498,10 +3880,9 @@ decorateDungeon();
 
 
 
-
 console.log(
 
-"=============================="
+"================================"
 
 );
 
@@ -2517,7 +3898,7 @@ console.log(
 
 console.log(
 
-" TEXTURES ACTIVE "
+" PROCEDURAL TEXTURES ACTIVE "
 
 );
 
@@ -2533,7 +3914,7 @@ console.log(
 
 console.log(
 
-" TORCHES ACTIVE "
+" MACHINE ROOMS ACTIVE "
 
 );
 
@@ -2541,7 +3922,23 @@ console.log(
 
 console.log(
 
-"=============================="
+" RETRO SOUNDS ACTIVE "
+
+);
+
+
+
+console.log(
+
+" TORCH SYSTEM ACTIVE "
+
+);
+
+
+
+console.log(
+
+" ================================="
 
 );
 
@@ -2558,27 +3955,5 @@ console.log(
 
 
 // =====================================
-// GAME LOOP
-// =====================================
-
-Events.onPhysicsUpdate(
-
-()=>{
-
-
-updateTorches();
-
-
-
-});
-
-
-
-
-
-
-
-
-// =====================================
-// END OF DUNGEON SYSTEM
+// END OF RETRO VOXEL DUNGEON SYSTEM
 // =====================================
