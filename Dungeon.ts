@@ -8,7 +8,6 @@ import { spawnPrimitive } from "./Yuu API/SpawnPrimitive";
 import { addEnemyAI } from "./EnemyAI";
 import { registerEnemyCombat } from "./Combat";
 import { spawnDungeonCollectibles } from "./DungeonCollectibles";
-import { spawnDungeonCollectibles } from "./DungeonCollectibles";
 
 
 
