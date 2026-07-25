@@ -33,6 +33,7 @@ export let chests:Entity[] = [];
 
 
 
+
 // =====================================
 // TORCH STORAGE
 // =====================================
@@ -107,8 +108,348 @@ undefined
 
 
 // =====================================
+// VOXEL ENEMY CREATOR
+// RETRO BLOCK PERSON
+// =====================================
+
+
+function createVoxelEnemy(
+
+x:number,
+
+z:number,
+
+type:string
+
+):Entity
+
+{
+
+
+let skin = new Color(
+
+0.75,
+
+0.55,
+
+0.35
+
+);
+
+
+let armor = new Color(
+
+0.8,
+
+0.05,
+
+0.05
+
+);
+
+
+let boots = new Color(
+
+0.08,
+
+0.08,
+
+0.08
+
+);
+
+
+
+// different enemy colors
+
+
+if(type=="Skeleton")
+
+{
+
+armor = new Color(
+
+0.85,
+
+0.85,
+
+0.75
+
+);
+
+}
+
+
+if(type=="Orc")
+
+{
+
+skin = new Color(
+
+0.2,
+
+0.8,
+
+0.25
+
+);
+
+
+armor = new Color(
+
+0.15,
+
+0.4,
+
+0.1
+
+);
+
+}
+
+
+if(type=="Cyber Demon")
+
+{
+
+armor = new Color(
+
+0.1,
+
+0.2,
+
+1
+
+);
+
+}
+
+
+
+
+
+
+
+// MAIN BODY
+
+let body = cube(
+
+new Vector3(
+
+x,
+
+2,
+
+z
+
+),
+
+
+new Vector3(
+
+1.2,
+
+1.5,
+
+0.8
+
+),
+
+
+armor
+
+);
+
+
+
+
+
+
+// HEAD
+
+cube(
+
+new Vector3(
+
+x,
+
+3.7,
+
+z
+
+),
+
+
+new Vector3(
+
+1,
+
+1,
+
+1
+
+),
+
+
+skin
+
+);
+
+
+
+
+
+
+// LEFT ARM
+
+cube(
+
+new Vector3(
+
+x-0.9,
+
+2,
+
+z
+
+),
+
+
+new Vector3(
+
+0.3,
+
+1.1,
+
+0.3
+
+),
+
+
+armor
+
+);
+
+
+
+
+
+
+// RIGHT ARM
+
+cube(
+
+new Vector3(
+
+x+0.9,
+
+2,
+
+z
+
+),
+
+
+new Vector3(
+
+0.3,
+
+1.1,
+
+0.3
+
+),
+
+
+armor
+
+);
+
+
+
+
+
+
+
+// LEFT LEG
+
+cube(
+
+new Vector3(
+
+x-0.35,
+
+0.8,
+
+z
+
+),
+
+
+new Vector3(
+
+0.35,
+
+1,
+
+0.35
+
+),
+
+
+boots
+
+);
+
+
+
+
+
+
+// RIGHT LEG
+
+cube(
+
+new Vector3(
+
+x+0.35,
+
+0.8,
+
+z
+
+),
+
+
+new Vector3(
+
+0.35,
+
+1,
+
+0.35
+
+),
+
+
+boots
+
+);
+
+
+
+
+
+
+return body;
+
+
+}
+
+
+// =====================================
 // RETRO PIXEL WALL TEXTURE
-// NO IMAGE USED
+// PROCEDURAL COLORS ONLY
 // =====================================
 
 function wallTexture(
@@ -124,8 +465,7 @@ z:number
 
 let pixel =
 
-(x*17 + z*11)%8;
-
+(x * 17 + z * 11) % 8;
 
 
 
@@ -135,11 +475,11 @@ if(pixel==0)
 
 return new Color(
 
-.65,
+0.65,
 
-.45,
+0.45,
 
-.25
+0.25
 
 );
 
@@ -153,11 +493,11 @@ if(pixel==1)
 
 return new Color(
 
-.50,
+0.50,
 
-.32,
+0.32,
 
-.18
+0.18
 
 );
 
@@ -171,11 +511,11 @@ if(pixel==2)
 
 return new Color(
 
-.35,
+0.35,
 
-.25,
+0.25,
 
-.18
+0.18
 
 );
 
@@ -189,11 +529,11 @@ if(pixel==3)
 
 return new Color(
 
-.75,
+0.75,
 
-.55,
+0.55,
 
-.30
+0.30
 
 );
 
@@ -207,11 +547,11 @@ if(pixel==4)
 
 return new Color(
 
-.25,
+0.25,
 
-.20,
+0.20,
 
-.15
+0.15
 
 );
 
@@ -219,17 +559,15 @@ return new Color(
 
 
 
-
 return new Color(
 
-.42,
+0.42,
 
-.30,
+0.30,
 
-.20
+0.20
 
 );
-
 
 
 }
@@ -255,25 +593,19 @@ z:number
 {
 
 
-let tile=(x+z)%2;
-
-
-
-if(tile==0)
+if((x+z)%2==0)
 
 {
 
-
 return new Color(
 
-.22,
+0.22,
 
-.18,
+0.18,
 
-.14
+0.14
 
 );
-
 
 }
 
@@ -281,17 +613,17 @@ return new Color(
 
 return new Color(
 
-.12,
+0.12,
 
-.10,
+0.10,
 
-.08
+0.08
 
 );
 
 
-
 }
+
 
 
 
@@ -299,7 +631,7 @@ return new Color(
 
 
 // =====================================
-// DITHER PATTERN
+// PIXEL DITHER COLORS
 // =====================================
 
 function ditherColor(
@@ -323,11 +655,11 @@ if(pattern==0)
 
 return new Color(
 
-.8,
+0.8,
 
-.6,
+0.6,
 
-.35
+0.35
 
 );
 
@@ -341,11 +673,11 @@ if(pattern==1)
 
 return new Color(
 
-.35,
+0.35,
 
-.25,
+0.25,
 
-.15
+0.15
 
 );
 
@@ -355,22 +687,26 @@ return new Color(
 
 return new Color(
 
-.15,
+0.15,
 
-.12,
+0.12,
 
-.08
+0.08
 
 );
-
 
 
 }
 
 
+
+
+
+
+
 // =====================================
 // GENERATE OPEN ROOM MAZE
-// EVERY ROOM GETS EXITS
+// NO TRAPPED ROOMS
 // =====================================
 
 function generateMaze()
@@ -381,8 +717,6 @@ function generateMaze()
 maze=[];
 
 
-
-// fill everything with walls
 
 for(let x=0;x<mazeWidth;x++)
 
@@ -411,7 +745,6 @@ maze[x][z]=1;
 
 
 
-// create rooms
 
 for(
 
@@ -451,7 +784,8 @@ let exits=0;
 
 
 
-// east door
+
+// EAST
 
 if(x<mazeWidth-2)
 
@@ -468,7 +802,7 @@ exits++;
 
 
 
-// west door
+// WEST
 
 if(
 
@@ -492,7 +826,7 @@ exits++;
 
 
 
-// south door
+// SOUTH
 
 if(z<mazeHeight-2)
 
@@ -510,7 +844,7 @@ exits++;
 
 
 
-// north door
+// NORTH
 
 if(
 
@@ -557,7 +891,6 @@ maze[x+1][z]=0;
 
 
 
-
 // starting room
 
 maze[1][1]=0;
@@ -565,6 +898,8 @@ maze[1][1]=0;
 maze[2][1]=0;
 
 maze[1][2]=0;
+
+
 
 
 
@@ -580,23 +915,17 @@ maze[mazeWidth-3][mazeHeight-2]=0;
 
 console.log(
 
-"All rooms have openings"
+"Open dungeon generated"
 
 );
-
 
 
 }
 
 
 
-
-
-
-
-
 // =====================================
-// CREATE RETRO WALL DETAILS
+// CREATE WALL PIXEL DETAILS
 // =====================================
 
 function createWallDetail(
@@ -618,8 +947,6 @@ let pattern=(x+z)%4;
 
 
 
-// brick highlight
-
 if(pattern==0)
 
 {
@@ -633,7 +960,7 @@ worldX,
 
 5,
 
-worldZ-3.9
+worldZ-4
 
 ),
 
@@ -666,8 +993,6 @@ z
 
 
 
-// second brick
-
 if(pattern==1)
 
 {
@@ -681,7 +1006,7 @@ worldX+2,
 
 3,
 
-worldZ-3.9
+worldZ-4
 
 ),
 
@@ -711,8 +1036,6 @@ z
 }
 
 
-
-
 }
 
 
@@ -721,10 +1044,8 @@ z
 
 
 
-
-
 // =====================================
-// CREATE FLOOR PIXELS
+// FLOOR PIXELS
 // =====================================
 
 function createFloorDetail(
@@ -785,7 +1106,6 @@ z
 }
 
 
-
 }
 
 
@@ -794,9 +1114,8 @@ z
 
 
 
-
 // =====================================
-// CREATE TORCH
+// TORCH CREATION
 // =====================================
 
 function createTorch(
@@ -851,16 +1170,13 @@ new Color(
 torches.push(torch);
 
 
-
 }
 
 
 
 
 
-// =====================================
-// RANDOM TORCH PLACEMENT
-// =====================================
+
 
 function maybeCreateTorch(
 
@@ -877,6 +1193,7 @@ if(Math.random()<0.08)
 
 {
 
+
 createTorch(
 
 x,
@@ -889,8 +1206,14 @@ z
 }
 
 
-
 }
+
+
+
+
+
+
+
 
 
 // =====================================
@@ -908,7 +1231,7 @@ generateMaze();
 
 console.log(
 
-"Generating RETRO WOLFENSTEIN DUNGEON..."
+"Generating RETRO VOXEL DUNGEON..."
 
 );
 
@@ -916,15 +1239,15 @@ console.log(
 
 
 
-let offsetX =
+let offsetX=
 
--(mazeWidth * blockSize)/2;
+-(mazeWidth*blockSize)/2;
 
 
 
-let offsetZ =
+let offsetZ=
 
--(mazeHeight * blockSize)/2;
+-(mazeHeight*blockSize)/2;
 
 
 
@@ -943,25 +1266,26 @@ for(let z=0;z<mazeHeight;z++)
 {
 
 
-let worldX =
+let worldX=
 
-(x * blockSize) + offsetX;
-
-
-
-let worldZ =
-
-(z * blockSize) + offsetZ;
+(x*blockSize)+offsetX;
 
 
+
+let worldZ=
+
+(z*blockSize)+offsetZ;
 
 
 
 
 
-// =================================
+
+
+
+// ==============================
 // WALLS
-// =================================
+// ==============================
 
 if(maze[x][z]==1)
 
@@ -1006,8 +1330,6 @@ z
 
 
 
-// add pixel wall panels
-
 createWallDetail(
 
 x,
@@ -1031,9 +1353,10 @@ worldZ
 
 
 
-// =================================
+
+// ==============================
 // FLOORS
-// =================================
+// ==============================
 
 else
 
@@ -1078,7 +1401,6 @@ z
 
 
 
-// floor pixels
 
 createFloorDetail(
 
@@ -1096,9 +1418,6 @@ worldZ
 
 
 
-
-// add torches
-
 maybeCreateTorch(
 
 worldX,
@@ -1112,8 +1431,7 @@ worldZ
 
 
 
-
-// don't spawn beside player
+// leave spawn room clear
 
 if(
 
@@ -1161,18 +1479,19 @@ worldZ
 
 
 // =================================
-// PLAYER START
+// PLAYER SPAWN
 // =================================
+
 
 Player.position.set(
 
 new Vector3(
 
-offsetX + blockSize,
+offsetX+blockSize,
 
 1,
 
-offsetZ + blockSize
+offsetZ+blockSize
 
 )
 
@@ -1186,14 +1505,14 @@ offsetZ + blockSize
 
 console.log(
 
-"===================="
+"======================"
 
 );
 
 
 console.log(
 
-" RETRO DUNGEON READY "
+" RETRO VOXEL DUNGEON READY "
 
 );
 
@@ -1207,7 +1526,7 @@ console.log(
 
 console.log(
 
-"===================="
+"======================"
 
 );
 
@@ -1216,13 +1535,8 @@ console.log(
 }
 
 
-
-
-
-
-
 // =====================================
-// CHECK OPEN SPACE
+// CHECK VALID SPAWN
 // PREVENT BAD SPAWNS
 // =====================================
 
@@ -1259,6 +1573,7 @@ let gz=Math.floor(
 
 
 
+
 if(
 
 gx<0 ||
@@ -1281,8 +1596,8 @@ return false;
 
 
 
-return maze[gx][gz]==0;
 
+return maze[gx][gz]==0;
 
 
 }
@@ -1293,8 +1608,11 @@ return maze[gx][gz]==0;
 
 
 
+
+
 // =====================================
 // SPAWN OBJECTS
+// VOXEL ENEMIES + CHESTS
 // =====================================
 
 function spawnObjects(
@@ -1319,6 +1637,8 @@ return;
 
 
 
+
+
 let chance=Math.random();
 
 
@@ -1326,8 +1646,10 @@ let chance=Math.random();
 
 
 
+
+
 // =================================
-// ENEMIES
+// VOXEL ENEMY
 // =================================
 
 if(chance < .12)
@@ -1335,41 +1657,22 @@ if(chance < .12)
 {
 
 
-let enemy=cube(
+let enemyName=getEnemyName();
 
-new Vector3(
+
+
+
+
+let enemy=createVoxelEnemy(
 
 x,
 
-1,
+z,
 
-z
-
-),
-
-
-new Vector3(
-
-1,
-
-2,
-
-1
-
-),
-
-
-new Color(
-
-1,
-
-0,
-
-0
-
-)
+enemyName
 
 );
+
 
 
 
@@ -1385,7 +1688,7 @@ let data=
 entity:enemy,
 
 
-name:getEnemyName(),
+name:enemyName,
 
 
 hp:100,
@@ -1405,11 +1708,19 @@ alive:true
 
 
 
+
 enemies.push(data);
 
 
 
+
+
+
+
 addEnemyAI(enemy);
+
+
+
 
 
 
@@ -1419,11 +1730,19 @@ registerEnemyCombat(data);
 
 
 
+
+
 console.log(
 
-"Enemy spawned"
+"Voxel enemy spawned: "
+
++
+
+enemyName
 
 );
+
+
 
 
 
@@ -1435,8 +1754,10 @@ console.log(
 
 
 
+
+
 // =================================
-// CHESTS
+// CHEST
 // =================================
 
 else if(chance < .18)
@@ -1489,15 +1810,78 @@ chests.push(chest);
 
 
 
+
+
+
+
 console.log(
 
-"Chest spawned"
+"Treasure chest spawned"
 
 );
 
 
 
+
 }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// ENEMY TYPES
+// =====================================
+
+function getEnemyName()
+
+{
+
+
+let list=
+
+[
+
+"Goblin",
+
+"Skeleton",
+
+"Orc",
+
+"Shadow Beast",
+
+"Mutant Guard",
+
+"Cyber Demon",
+
+"Dungeon Knight",
+
+"Ancient Warrior"
+
+];
+
+
+
+
+
+
+return list[
+
+Math.floor(
+
+Math.random()*list.length
+
+)
+
+];
 
 
 
@@ -1519,6 +1903,7 @@ torchTimer += 0.05;
 
 
 
+
 for(let torch of torches)
 
 {
@@ -1536,9 +1921,7 @@ continue;
 
 
 
-let flicker =
-
-Math.random();
+let flicker=Math.random();
 
 
 
@@ -1549,7 +1932,7 @@ if(flicker < 0.5)
 {
 
 
-torch.color = new Color(
+torch.color=new Color(
 
 1,
 
@@ -1560,7 +1943,6 @@ torch.color = new Color(
 );
 
 
-
 }
 
 else
@@ -1568,7 +1950,7 @@ else
 {
 
 
-torch.color = new Color(
+torch.color=new Color(
 
 1,
 
@@ -1579,7 +1961,6 @@ torch.color = new Color(
 );
 
 
-
 }
 
 
@@ -1587,8 +1968,9 @@ torch.color = new Color(
 }
 
 
-
 }
+
+
 
 
 
@@ -1597,8 +1979,7 @@ torch.color = new Color(
 
 
 // =====================================
-// RETRO SIGN / WALL DECALS
-// MADE WITH CUBES
+// RETRO WALL SIGNS
 // =====================================
 
 function createRetroSign(
@@ -1612,17 +1993,14 @@ z:number
 {
 
 
-let chance=Math.random();
-
-
-
-if(chance>0.05)
+if(Math.random()>0.05)
 
 {
 
 return;
 
 }
+
 
 
 
@@ -1656,7 +2034,7 @@ new Vector3(
 
 new Color(
 
-0.15,
+0.12,
 
 0.05,
 
@@ -1672,7 +2050,7 @@ new Color(
 
 
 
-// pixel letters
+// pixel lettering
 
 cube(
 
@@ -1709,6 +2087,9 @@ new Color(
 )
 
 );
+
+
+
 
 
 
@@ -1750,6 +2131,9 @@ new Color(
 
 
 
+
+
+
 console.log(
 
 "Retro sign created"
@@ -1766,9 +2150,11 @@ console.log(
 
 
 
+
+
 // =====================================
-// EXTRA WALL DAMAGE
-// PIXEL ART CRACKS
+// WALL DAMAGE
+// PIXEL CRACK EFFECT
 // =====================================
 
 function createWallDamage(
@@ -1787,6 +2173,8 @@ worldZ:number
 
 
 let damage=(x*z)%6;
+
+
 
 
 
@@ -1834,6 +2222,9 @@ new Color(
 
 
 }
+
+
+
 
 
 
@@ -1894,6 +2285,8 @@ new Color(
 
 
 
+
+
 // =====================================
 // FLOOR RUBBLE
 // =====================================
@@ -1916,6 +2309,8 @@ if(Math.random()>0.08)
 return;
 
 }
+
+
 
 
 
@@ -1966,9 +2361,10 @@ new Color(
 
 
 
+
+
 // =====================================
-// APPLY DECORATIONS
-// CALL AFTER BUILDING
+// FINAL DECORATION PASS
 // =====================================
 
 function decorateDungeon()
@@ -1978,9 +2374,13 @@ function decorateDungeon()
 
 console.log(
 
-"Adding retro decorations..."
+"Adding retro voxel decorations..."
 
 );
+
+
+
+
 
 
 
@@ -1999,19 +2399,26 @@ if(maze[x][z]==0)
 {
 
 
-let worldX =
+let worldX=
 
-(x*blockSize)-
+(x*blockSize)
+
+-
 
 (mazeWidth*blockSize)/2;
 
 
 
-let worldZ =
 
-(z*blockSize)-
+
+let worldZ=
+
+(z*blockSize)
+
+-
 
 (mazeHeight*blockSize)/2;
+
 
 
 
@@ -2024,6 +2431,9 @@ worldX,
 worldZ
 
 );
+
+
+
 
 
 
@@ -2050,6 +2460,10 @@ worldZ
 
 
 
+
+
+
+
 console.log(
 
 "Decoration complete"
@@ -2066,55 +2480,55 @@ console.log(
 
 
 
-// =====================================
-// UPDATE LOOP
-// TORCH ANIMATION
-// =====================================
-
-Events.onPhysicsUpdate(
-
-()=>{
-
-
-updateTorches();
-
-
-}
-
-);
 
 
 // =====================================
-// FINAL DUNGEON DECORATION START
+// START DECORATIONS
+// CALL AFTER CREATE DUNGEON
 // =====================================
 
 export function finishDungeon()
 
 {
 
+
 decorateDungeon();
 
 
 
-console.log(
 
-"================================"
-
-);
 
 
 console.log(
 
-" RETRO DUNGEON COMPLETE "
+"=============================="
 
 );
+
 
 
 console.log(
 
-" TEXTURES READY "
+" RETRO VOXEL DUNGEON COMPLETE "
 
 );
+
+
+
+console.log(
+
+" TEXTURES ACTIVE "
+
+);
+
+
+
+console.log(
+
+" VOXEL ENEMIES ACTIVE "
+
+);
+
 
 
 console.log(
@@ -2124,16 +2538,10 @@ console.log(
 );
 
 
-console.log(
-
-" ENEMIES READY "
-
-);
-
 
 console.log(
 
-"================================"
+"=============================="
 
 );
 
@@ -2147,63 +2555,10 @@ console.log(
 
 
 
-// =====================================
-// ENEMY NAME LIST
-// =====================================
-
-function getEnemyName()
-
-{
-
-
-let list =
-
-[
-
-"Goblin",
-
-"Skeleton",
-
-"Orc",
-
-"Shadow Beast",
-
-"Mutant Guard",
-
-"Cyber Demon",
-
-"Dungeon Knight",
-
-"Ancient Warrior"
-
-];
-
-
-
-
-
-return list[
-
-Math.floor(
-
-Math.random()*list.length
-
-)
-
-];
-
-
-
-}
-
-
-
-
-
 
 
 // =====================================
-// AUTO FINISH AFTER LOAD
+// GAME LOOP
 // =====================================
 
 Events.onPhysicsUpdate(
@@ -2211,21 +2566,7 @@ Events.onPhysicsUpdate(
 ()=>{
 
 
-// small chance prevents running decoration repeatedly
-
-if(
-
-torches.length > 0
-
-)
-
-{
-
-
-return;
-
-
-}
+updateTorches();
 
 
 
@@ -2237,6 +2578,7 @@ return;
 
 
 
+
 // =====================================
-// END OF RETRO DUNGEON SYSTEM
+// END OF DUNGEON SYSTEM
 // =====================================
