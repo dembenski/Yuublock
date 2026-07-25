@@ -11,8 +11,18 @@ import { registerEnemyCombat } from "./Combat";
 
 
 // =====================================
-// STORAGE
+// MAZE SIZE
 // =====================================
+
+const mazeWidth = 15;
+
+const mazeHeight = 15;
+
+
+
+let maze:number[][] = [];
+
+
 
 export let enemies:any[] = [];
 
@@ -22,15 +32,13 @@ export let chests:Entity[] = [];
 
 
 
-
-
 // =====================================
-// SPAWN CUBE
+// CREATE BLOCK
 // =====================================
 
 function cube(
 
-position:Vector3,
+pos:Vector3,
 
 scale:Vector3,
 
@@ -41,41 +49,358 @@ color:Color
 {
 
 
-    return spawnPrimitive.cube(
+return spawnPrimitive.cube(
+
+pos,
+
+scale,
+
+Quaternion.fromEuler(
+
+new Vector3(
+
+0,
+
+0,
+
+0
+
+)
+
+),
+
+color,
+
+1,
+
+true,
+
+"Static",
+
+undefined
+
+);
 
 
-        position,
+}
 
 
-        scale,
 
 
-        Quaternion.fromEuler(
 
-            new Vector3(
 
-                0,
 
-                0,
+// =====================================
+// GENERATE MAZE
+// =====================================
 
-                0
+function generateMaze()
+
+{
+
+
+    maze=[];
+
+
+
+    for(let x=0;x<mazeWidth;x++)
+
+    {
+
+        maze[x]=[];
+
+
+        for(let z=0;z<mazeHeight;z++)
+
+        {
+
+
+            maze[x][z]=1;
+
+
+        }
+
+    }
+
+
+
+
+
+
+
+    // carve paths
+
+    function carve(x:number,z:number)
+
+    {
+
+
+        maze[x][z]=0;
+
+
+
+        let dirs =
+
+        [
+
+            [2,0],
+
+            [-2,0],
+
+            [0,2],
+
+            [0,-2]
+
+        ];
+
+
+
+        dirs.sort(()=>Math.random()-0.5);
+
+
+
+
+
+        for(let d of dirs)
+
+        {
+
+
+            let nx=x+d[0];
+
+            let nz=z+d[1];
+
+
+
+
+
+            if(
+
+                nx>0 &&
+
+                nz>0 &&
+
+                nx<mazeWidth-1 &&
+
+                nz<mazeHeight-1 &&
+
+                maze[nx][nz]==1
 
             )
 
-        ),
+            {
+
+
+                maze[
+
+                    x+d[0]/2
+
+                ]
+
+                [
+
+                    z+d[1]/2
+
+                ]=0;
 
 
 
-        color,
 
-        1,
+                carve(nx,nz);
 
-        true,
 
-        "Static",
+            }
 
-        undefined
 
+        }
+
+
+    }
+
+
+
+
+
+    carve(1,1);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// BUILD MAZE
+// =====================================
+
+export async function createDungeon()
+
+{
+
+
+    generateMaze();
+
+
+
+
+    console.log(
+
+        "Generating Wolfenstein maze..."
+
+    );
+
+
+
+
+
+    for(let x=0;x<mazeWidth;x++)
+
+    {
+
+
+        for(let z=0;z<mazeHeight;z++)
+
+        {
+
+
+            let worldX = x*8;
+
+            let worldZ = z*8;
+
+
+
+
+
+
+            // WALL
+
+            if(maze[x][z]==1)
+
+            {
+
+
+                cube(
+
+                    new Vector3(
+
+                        worldX,
+
+                        3,
+
+                        worldZ
+
+                    ),
+
+
+
+                    new Vector3(
+
+                        8,
+
+                        6,
+
+                        8
+
+                    ),
+
+
+
+                    new Color(
+
+                        .45,
+
+                        .45,
+
+                        .45
+
+                    )
+
+                );
+
+
+            }
+
+
+
+
+            // FLOOR
+
+            else
+
+            {
+
+
+                cube(
+
+                    new Vector3(
+
+                        worldX,
+
+                        0,
+
+                        worldZ
+
+                    ),
+
+
+
+                    new Vector3(
+
+                        8,
+
+                        .2,
+
+                        8
+
+                    ),
+
+
+
+                    new Color(
+
+                        .15,
+
+                        .15,
+
+                        .15
+
+                    )
+
+                );
+
+
+
+
+
+                spawnObjects(
+
+                    worldX,
+
+                    worldZ
+
+                );
+
+
+            }
+
+
+        }
+
+    }
+
+
+
+
+
+    console.log(
+
+        "Maze complete"
 
     );
 
@@ -89,323 +414,44 @@ color:Color
 
 
 
+
 // =====================================
-// CREATE ROOM
+// PLACE ENEMIES / CHESTS
 // =====================================
 
-export async function createRoom(room:number)
+function spawnObjects(
+
+x:number,
+
+z:number
+
+)
 
 {
 
 
-    let offset = room * 14;
-
-
-
-
-    console.log(
-
-        "Creating room "
-
-        +
-
-        room
-
-    );
+    let chance=Math.random();
 
 
 
 
 
+    // enemies 25%
 
-
-    // FLOOR
-
-    for(let x=-6;x<=6;x++)
+    if(chance < .25)
 
     {
 
 
-        for(let z=-6;z<=6;z++)
-
-        {
-
-
-            cube(
-
-                new Vector3(
-
-                    offset+x,
-
-                    0,
-
-                    z
-
-                ),
-
-
-
-                new Vector3(
-
-                    1,
-
-                    .2,
-
-                    1
-
-                ),
-
-
-
-                new Color(
-
-                    .2,
-
-                    .2,
-
-                    .2
-
-                )
-
-            );
-
-
-        }
-
-    }
-
-
-
-
-
-
-
-
-    // WALLS
-
-    for(let x=-6;x<=6;x++)
-
-    {
-
-
-        cube(
+        let enemy=cube(
 
             new Vector3(
 
-                offset+x,
-
-                3,
-
-                -6
-
-            ),
-
-
-            new Vector3(
+                x,
 
                 1,
 
-                6,
-
-                1
-
-            ),
-
-
-            new Color(
-
-                .5,
-
-                .5,
-
-                .5
-
-            )
-
-        );
-
-
-
-
-
-        cube(
-
-            new Vector3(
-
-                offset+x,
-
-                3,
-
-                6
-
-            ),
-
-
-            new Vector3(
-
-                1,
-
-                6,
-
-                1
-
-            ),
-
-
-            new Color(
-
-                .5,
-
-                .5,
-
-                .5
-
-            )
-
-        );
-
-
-    }
-
-
-
-
-
-
-
-
-    // DOOR
-
-    cube(
-
-        new Vector3(
-
-            offset+6,
-
-            2,
-
-            0
-
-        ),
-
-
-        new Vector3(
-
-            .5,
-
-            4,
-
-            2
-
-        ),
-
-
-
-        new Color(
-
-            .4,
-
-            .2,
-
-            0
-
-        )
-
-    );
-
-
-
-
-
-
-
-
-
-    // CHEST CHANCE
-
-    if(Math.random()<0.5)
-
-    {
-
-
-        let chest = cube(
-
-            new Vector3(
-
-                offset-3,
-
-                1,
-
-                0
-
-            ),
-
-
-
-            new Vector3(
-
-                1,
-
-                1,
-
-                1
-
-            ),
-
-
-
-            new Color(
-
-                1,
-
-                .8,
-
-                0
-
-            )
-
-        );
-
-
-
-
-        chests.push(chest);
-
-
-
-        console.log(
-
-            "📦 Chest created"
-
-        );
-
-
-    }
-
-
-
-
-
-
-
-
-
-    // ENEMY CHANCE
-
-    if(Math.random()<0.8)
-
-    {
-
-
-        let enemy = cube(
-
-            new Vector3(
-
-                offset+2,
-
-                1,
-
-                2
+                z
 
             ),
 
@@ -439,16 +485,14 @@ export async function createRoom(room:number)
 
 
 
-        let data =
+        let data=
 
         {
 
             entity:enemy,
 
 
-            name:
-
-            randomEnemy(),
+            name:getEnemyName(),
 
 
             hp:100,
@@ -470,8 +514,6 @@ export async function createRoom(room:number)
 
 
 
-
-
         addEnemyAI(enemy);
 
 
@@ -480,11 +522,9 @@ export async function createRoom(room:number)
 
 
 
-
-
         console.log(
 
-            "👹 Enemy created"
+            "Enemy placed"
 
         );
 
@@ -493,6 +533,61 @@ export async function createRoom(room:number)
 
 
 
+
+
+
+
+    // treasure 10%
+
+    else if(chance < .35)
+
+    {
+
+
+        let chest=cube(
+
+            new Vector3(
+
+                x,
+
+                1,
+
+                z
+
+            ),
+
+
+
+            new Vector3(
+
+                1,
+
+                1,
+
+                1
+
+            ),
+
+
+
+            new Color(
+
+                1,
+
+                .8,
+
+                0
+
+            )
+
+        );
+
+
+
+        chests.push(chest);
+
+
+    }
 
 
 }
@@ -504,43 +599,35 @@ export async function createRoom(room:number)
 
 
 
-// =====================================
-// RANDOM ENEMY NAME
-// =====================================
 
-function randomEnemy()
+function getEnemyName()
 
 {
 
+let list=
 
-    let list =
+[
 
-    [
+"Goblin",
 
-        "Goblin",
+"Skeleton",
 
-        "Skeleton",
+"Orc",
 
-        "Orc",
+"Shadow Beast"
 
-        "Shadow Beast"
-
-    ];
-
+];
 
 
-    return list[
+return list[
 
-        Math.floor(
+Math.floor(
 
-            Math.random()
+Math.random()*list.length
 
-            *
+)
 
-            list.length
+];
 
-        )
-
-    ];
 
 }
