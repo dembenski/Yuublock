@@ -1,33 +1,30 @@
 // =====================================
-// GENERATE CONNECTED MAZE
-// EVERY ROOM HAS OPENINGS
+// GENERATE MAZE
+// GUARANTEED OPEN ROOMS
 // =====================================
 
 function generateMaze()
 
 {
 
-
 maze=[];
 
 
-
-// Fill everything with walls
+// fill walls
 
 for(let x=0;x<mazeWidth;x++)
 
 {
 
-    maze[x]=[];
+maze[x]=[];
 
+for(let z=0;z<mazeHeight;z++)
 
-    for(let z=0;z<mazeHeight;z++)
+{
 
-    {
+maze[x][z]=1;
 
-        maze[x][z]=1;
-
-    }
+}
 
 }
 
@@ -35,97 +32,80 @@ for(let x=0;x<mazeWidth;x++)
 
 
 
-// =================================
-// CARVE CONNECTED PATHS
-// =================================
+// carve connected maze
 
 function carve(x:number,z:number)
 
 {
 
 
-    maze[x][z]=0;
+maze[x][z]=0;
 
 
 
-    let dirs =
+let dirs =
 
-    [
+[
 
-        [2,0],
+[2,0],
 
-        [-2,0],
+[-2,0],
 
-        [0,2],
+[0,2],
 
-        [0,-2]
+[0,-2]
 
-    ];
-
-
+];
 
 
 
-    dirs.sort(()=>Math.random()-0.5);
+dirs.sort(()=>Math.random()-0.5);
 
 
 
+for(let d of dirs)
+
+{
+
+
+let nx=x+d[0];
+
+let nz=z+d[1];
 
 
 
-    for(let d of dirs)
+if(
 
-    {
+nx>0 &&
 
+nz>0 &&
 
-        let nx=x+d[0];
+nx<mazeWidth-1 &&
 
-        let nz=z+d[1];
+nz<mazeHeight-1 &&
 
+maze[nx][nz]==1
 
+)
 
-
-
-        if(
-
-            nx>0 &&
-
-            nz>0 &&
-
-            nx<mazeWidth-1 &&
-
-            nz<mazeHeight-1 &&
-
-            maze[nx][nz]==1
-
-        )
-
-        {
+{
 
 
-            // open wall between cells
-
-            maze[x+d[0]/2][z+d[1]/2]=0;
+maze[x+d[0]/2][z+d[1]/2]=0;
 
 
-
-            carve(nx,nz);
-
-
-        }
-
-
-    }
+carve(nx,nz);
 
 
 }
 
 
+}
 
 
+}
 
 
-// create main maze
 
 carve(1,1);
 
@@ -134,125 +114,113 @@ carve(1,1);
 
 
 
+// =====================================
+// ADD EXTRA DOORS
+// PREVENT SEALED ROOMS
+// =====================================
 
-// =================================
-// ADD EXTRA DOORWAYS
-// STOP SEALED ROOMS
-// =================================
 
 for(let x=1;x<mazeWidth-1;x++)
 
 {
 
 
-    for(let z=1;z<mazeHeight-1;z++)
+for(let z=1;z<mazeHeight-1;z++)
 
-    {
+{
 
 
-        if(maze[x][z]==0)
+if(maze[x][z]==0)
 
-        {
+{
 
 
-            let exits = 0;
+let openings=0;
 
 
 
-            if(maze[x+1][z]==0)
-                exits++;
+if(maze[x+1][z]==0)
+openings++;
 
 
-            if(maze[x-1][z]==0)
-                exits++;
+if(maze[x-1][z]==0)
+openings++;
 
 
-            if(maze[x][z+1]==0)
-                exits++;
+if(maze[x][z+1]==0)
+openings++;
 
 
-            if(maze[x][z-1]==0)
-                exits++;
+if(maze[x][z-1]==0)
+openings++;
 
 
 
 
 
-            // create another exit if trapped
 
-            if(exits <= 1)
+// if room has only one entrance,
+// add another exit
 
-            {
+if(openings<=1)
 
+{
 
-                let possible =
 
-                [
+let side=Math.floor(Math.random()*4);
 
-                    [1,0],
 
-                    [-1,0],
 
-                    [0,1],
+if(side==0 && x<mazeWidth-2)
 
-                    [0,-1]
+{
 
-                ];
+maze[x+1][z]=0;
 
+}
 
 
 
+if(side==1 && x>1)
 
-                let choice = possible[
+{
 
-                    Math.floor(
+maze[x-1][z]=0;
 
-                        Math.random()*possible.length
+}
 
-                    )
 
-                ];
 
+if(side==2 && z<mazeHeight-2)
 
+{
 
+maze[x][z+1]=0;
 
+}
 
-                let nx=x+choice[0];
 
-                let nz=z+choice[1];
 
+if(side==3 && z>1)
 
+{
 
+maze[x][z-1]=0;
 
+}
 
-                if(
 
-                    nx>0 &&
 
-                    nz>0 &&
+}
 
-                    nx<mazeWidth-1 &&
 
-                    nz<mazeHeight-1
 
-                )
+}
 
-                {
 
 
-                    maze[nx][nz]=0;
+}
 
-
-                }
-
-
-            }
-
-
-        }
-
-
-    }
 
 
 }
@@ -263,15 +231,35 @@ for(let x=1;x<mazeWidth-1;x++)
 
 
 
-// =================================
-// GUARANTEED START + EXIT
-// =================================
+// =====================================
+// GUARANTEED START ROOM EXIT
+// =====================================
+
 
 maze[1][1]=0;
+
+maze[2][1]=0;
+
+maze[1][2]=0;
+
+
+
+
+
+
+// =====================================
+// GUARANTEED FINAL EXIT
+// =====================================
 
 
 maze[mazeWidth-2][mazeHeight-2]=0;
 
+maze[mazeWidth-3][mazeHeight-2]=0;
 
+maze[mazeWidth-2][mazeHeight-3]=0;
+
+
+
+console.log("Maze rooms opened");
 
 }
