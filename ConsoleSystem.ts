@@ -2,67 +2,86 @@ import { Vector3 } from "./Yuu API/Basic Types/Vector3";
 import { inWorldConsole } from "./Yuu API/Console";
 import { Player } from "./Yuu API/Player";
 import { Events } from "./Yuu API/Events";
-import { registerStart } from "./Yuu API/RegisterStart";
 
-registerStart(start);
+
 
 // =====================================
-// START
+// START CONSOLE
 // =====================================
 
-function start()
+export function startConsole()
 {
-    console.log("Console Follow Test");
 
-    // Show the console immediately
+    console.log(
+
+        "VR Console Started"
+
+    );
+
+
     updateConsolePosition();
+
 }
 
+
+
 // =====================================
-// MOVE CONSOLE
+// MOVE CONSOLE IN FRONT OF PLAYER
 // =====================================
 
 function updateConsolePosition()
 {
-    // Player head position
+
+
     let headPosition =
 
-        Player.position.get()
+    Player.position.get()
 
-        ??
+    ??
 
-        Vector3.zero;
+    Vector3.zero;
 
-    // Direction player is looking
+
+
+
     let forward =
 
-        Player.forward.get()
+    Player.forward.get()
 
-        ??
+    ??
 
-        new Vector3(
+    new Vector3(
 
-            0,
+        0,
 
-            0,
+        0,
 
-            -1
+        -1
 
-        );
+    );
 
-    // Position console 2 metres ahead
+
+
+
+
     let consolePosition =
 
-        headPosition.add(
+    headPosition.add(
 
-            forward.multiply(2)
+        forward.multiply(2)
 
-        );
+    );
 
-    // Raise console to eye level
+
+
+
+
     consolePosition.y += 1.2;
 
-    // Show console
+
+
+
+
     inWorldConsole.visible(
 
         true,
@@ -70,20 +89,24 @@ function updateConsolePosition()
         consolePosition
 
     );
+
+
 }
 
+
+
 // =====================================
-// UPDATE EVERY PHYSICS FRAME
+// UPDATE EVERY FRAME
 // =====================================
 
 Events.onPhysicsUpdate(
 
-    () =>
+()=>{
 
-    {
 
-        updateConsolePosition();
+    updateConsolePosition();
 
-    }
+
+}
 
 );
