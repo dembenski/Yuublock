@@ -15,9 +15,9 @@ import { registerEnemyCombat } from "./Combat";
 // MAZE SIZE
 // =====================================
 
-const mazeWidth = 25;
+const mazeWidth = 31;
 
-const mazeHeight = 25;
+const mazeHeight = 31;
 
 
 const blockSize = 8;
@@ -30,6 +30,8 @@ let maze:number[][] = [];
 export let enemies:any[] = [];
 
 export let chests:Entity[] = [];
+
+
 
 
 
@@ -51,11 +53,13 @@ color:Color
 
 {
 
+
 return spawnPrimitive.cube(
 
 pos,
 
 scale,
+
 
 Quaternion.fromEuler(
 
@@ -71,6 +75,7 @@ new Vector3(
 
 ),
 
+
 color,
 
 1,
@@ -83,21 +88,29 @@ undefined
 
 );
 
+
 }
 
 
 
 
 
+
+
+
+
 // =====================================
-// GENERATE MAZE
+// GENERATE ROOM MAZE
+// EVERY ROOM HAS EXITS
 // =====================================
 
 function generateMaze()
 
 {
 
+
 maze=[];
+
 
 
 for(let x=0;x<mazeWidth;x++)
@@ -115,66 +128,113 @@ maze[x][z]=1;
 
 }
 
+
 }
 
 
 
 
-function carve(x:number,z:number)
-
-{
-
-maze[x][z]=0;
-
-
-let dirs =
-
-[
-
-[2,0],
-
-[-2,0],
-
-[0,2],
-
-[0,-2]
-
-];
-
-
-dirs.sort(()=>Math.random()-0.5);
 
 
 
-for(let d of dirs)
+// create rooms
 
-{
+for(
 
-let nx=x+d[0];
+let x=1;
 
-let nz=z+d[1];
+x<mazeWidth-1;
 
-
-if(
-
-nx>0 &&
-
-nz>0 &&
-
-nx<mazeWidth-1 &&
-
-nz<mazeHeight-1 &&
-
-maze[nx][nz]==1
+x+=2
 
 )
 
 {
 
-maze[x+d[0]/2][z+d[1]/2]=0;
+
+for(
+
+let z=1;
+
+z<mazeHeight-1;
+
+z+=2
+
+)
+
+{
 
 
-carve(nx,nz);
+// room center
+
+maze[x][z]=0;
+
+
+
+
+
+// east opening
+
+if(x < mazeWidth-2)
+
+{
+
+maze[x+1][z]=0;
+
+}
+
+
+
+
+
+// south opening
+
+if(z < mazeHeight-2)
+
+{
+
+maze[x][z+1]=0;
+
+}
+
+
+
+
+
+
+// extra random openings
+
+if(Math.random()<0.6)
+
+{
+
+if(x>1)
+
+{
+
+maze[x-1][z]=0;
+
+}
+
+}
+
+
+
+if(Math.random()<0.6)
+
+{
+
+if(z>1)
+
+{
+
+maze[x][z-1]=0;
+
+}
+
+}
+
+
 
 }
 
@@ -182,14 +242,29 @@ carve(nx,nz);
 }
 
 
+
+
+
+
+
+// guaranteed start room
+
+maze[1][1]=0;
+
+
+
+// guaranteed exit
+
+maze[mazeWidth-2][mazeHeight-2]=0;
+
+
+
+
 }
 
 
 
-carve(1,1);
 
-
-}
 
 
 
@@ -210,18 +285,28 @@ generateMaze();
 
 console.log(
 
-"Generating LARGE Wolfenstein maze..."
+"Generating LARGE WOLFENSTEIN DUNGEON..."
 
 );
 
 
 
 
-// CENTER OFFSET
 
-let offsetX = -(mazeWidth * blockSize)/2;
 
-let offsetZ = -(mazeHeight * blockSize)/2;
+
+let offsetX =
+
+-(mazeWidth * blockSize)/2;
+
+
+
+let offsetZ =
+
+-(mazeHeight * blockSize)/2;
+
+
+
 
 
 
@@ -239,12 +324,14 @@ for(let z=0;z<mazeHeight;z++)
 
 let worldX =
 
-(x * blockSize)+offsetX;
+(x*blockSize)+offsetX;
+
 
 
 let worldZ =
 
-(z * blockSize)+offsetZ;
+(z*blockSize)+offsetZ;
+
 
 
 
@@ -270,6 +357,7 @@ worldZ
 
 ),
 
+
 new Vector3(
 
 blockSize,
@@ -279,6 +367,7 @@ blockSize,
 blockSize
 
 ),
+
 
 new Color(
 
@@ -293,7 +382,10 @@ new Color(
 );
 
 
+
 }
+
+
 
 
 
@@ -320,6 +412,7 @@ worldZ
 
 ),
 
+
 new Vector3(
 
 blockSize,
@@ -329,6 +422,7 @@ blockSize,
 blockSize
 
 ),
+
 
 new Color(
 
@@ -346,11 +440,18 @@ new Color(
 
 
 
-// don't spawn at start
 
-if(!(x==1 && z==1))
+
+// don't spawn beside player
+
+if(
+
+!(x==1 && z==1)
+
+)
 
 {
+
 
 spawnObjects(
 
@@ -360,12 +461,6 @@ worldZ
 
 );
 
-}
-
-
-
-}
-
 
 }
 
@@ -375,8 +470,21 @@ worldZ
 
 
 
+}
 
-// MOVE PLAYER INTO START ROOM
+
+
+}
+
+
+
+
+
+
+
+
+
+// PLAYER START
 
 Player.position.set(
 
@@ -394,18 +502,22 @@ offsetZ + blockSize
 
 
 
+
+
+
 console.log(
 
-"Maze complete"
+"MAZE COMPLETE"
 
 );
 
 
 console.log(
 
-"Player placed inside dungeon"
+"PLAYER INSIDE START ROOM"
 
 );
+
 
 
 }
@@ -416,8 +528,12 @@ console.log(
 
 
 
+
+
+
+
 // =====================================
-// SPAWN ENEMIES / CHESTS
+// SPAWN OBJECTS
 // =====================================
 
 function spawnObjects(
@@ -436,9 +552,10 @@ let chance=Math.random();
 
 
 
-// MORE SPREAD OUT ENEMIES
 
-if(chance < .18)
+// enemies spread out
+
+if(chance < .12)
 
 {
 
@@ -455,6 +572,7 @@ z
 
 ),
 
+
 new Vector3(
 
 1,
@@ -464,6 +582,7 @@ new Vector3(
 1
 
 ),
+
 
 new Color(
 
@@ -476,6 +595,9 @@ new Color(
 )
 
 );
+
+
+
 
 
 
@@ -498,10 +620,15 @@ alive:true
 
 
 
+
+
+
 enemies.push(data);
 
 
+
 addEnemyAI(enemy);
+
 
 
 registerEnemyCombat(data);
@@ -510,9 +637,10 @@ registerEnemyCombat(data);
 
 console.log(
 
-"Enemy placed"
+"Enemy spawned"
 
 );
+
 
 
 }
@@ -522,7 +650,10 @@ console.log(
 
 
 
-else if(chance < .25)
+
+// treasure
+
+else if(chance < .18)
 
 {
 
@@ -539,6 +670,7 @@ z
 
 ),
 
+
 new Vector3(
 
 1,
@@ -548,6 +680,7 @@ new Vector3(
 1
 
 ),
+
 
 new Color(
 
@@ -563,10 +696,16 @@ new Color(
 
 
 
+
 chests.push(chest);
 
 
-}
+
+console.log(
+
+"Chest spawned"
+
+);
 
 
 
@@ -575,14 +714,28 @@ chests.push(chest);
 
 
 
+}
 
 
+
+
+
+
+
+
+
+
+
+// =====================================
+// ENEMY NAMES
+// =====================================
 
 function getEnemyName()
 
 {
 
-let list=
+
+let list =
 
 [
 
@@ -597,6 +750,8 @@ let list=
 ];
 
 
+
+
 return list[
 
 Math.floor(
@@ -606,6 +761,7 @@ Math.random()*list.length
 )
 
 ];
+
 
 
 }
