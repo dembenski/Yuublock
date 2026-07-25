@@ -7,7 +7,7 @@ import { spawnPrimitive } from "./Yuu API/SpawnPrimitive";
 
 import { addEnemyAI } from "./EnemyAI";
 import { registerEnemyCombat } from "./Combat";
-import { spawnDungeonCollectibles } from "./DungeonCollectibles";
+
 
 
 
@@ -454,12 +454,7 @@ console.log(
 
 
 
-spawnDungeonCollectibles(
-    maze,
-    mazeWidth,
-    mazeHeight,
-    blockSize
-);
+
 
 
 let offsetX =
