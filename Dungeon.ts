@@ -25,6 +25,12 @@ let maze:number[][] = [];
 
 
 
+
+// =====================================
+// GAME STORAGE
+// =====================================
+
+
 export let enemies:any[] = [];
 
 export let chests:Entity[] = [];
@@ -32,10 +38,115 @@ export let chests:Entity[] = [];
 
 
 
+// =====================================
+// CHEST LOOT STORAGE
+// =====================================
+
+
+export let collectedItems:string[] = [];
+
+
+
+interface LootItem
+
+{
+
+name:string;
+
+rarity:string;
+
+}
+
+
+
+
+// =====================================
+// 120 CHEST ITEMS
+// =====================================
+
+
+const lootTable:LootItem[] =
+
+[
+
+
+// COMMON
+
+{name:"Ancient Bronze Coin",rarity:"Common"},
+{name:"Rusty Iron Key",rarity:"Common"},
+{name:"Broken Sword",rarity:"Common"},
+{name:"Old Dungeon Map",rarity:"Common"},
+{name:"Leather Armor Piece",rarity:"Common"},
+{name:"Torch Oil",rarity:"Common"},
+{name:"Iron Scrap",rarity:"Common"},
+{name:"Old Helmet",rarity:"Common"},
+{name:"Dungeon Bread",rarity:"Common"},
+{name:"Small Healing Potion",rarity:"Common"},
+
+
+
+// UNCOMMON
+
+{name:"Silver Coin Pouch",rarity:"Uncommon"},
+{name:"Magic Herb",rarity:"Uncommon"},
+{name:"Crystal Fragment",rarity:"Uncommon"},
+{name:"Ancient Scroll",rarity:"Uncommon"},
+{name:"Warrior Badge",rarity:"Uncommon"},
+{name:"Machine Gear",rarity:"Uncommon"},
+{name:"Power Cell",rarity:"Uncommon"},
+{name:"Bone Charm",rarity:"Uncommon"},
+{name:"Lost Ring",rarity:"Uncommon"},
+{name:"Explorer Badge",rarity:"Uncommon"},
+
+
+
+// RARE
+
+{name:"Cyber Circuit",rarity:"Rare"},
+{name:"Golden Gear",rarity:"Rare"},
+{name:"Ancient Rune Stone",rarity:"Rare"},
+{name:"Shadow Crystal",rarity:"Rare"},
+{name:"Demon Core Fragment",rarity:"Rare"},
+{name:"Void Battery",rarity:"Rare"},
+{name:"Titan Alloy",rarity:"Rare"},
+{name:"Dragon Bone",rarity:"Rare"},
+{name:"Quantum Chip",rarity:"Rare"},
+{name:"Energy Core",rarity:"Rare"},
+
+
+
+// EPIC
+
+{name:"Knight Helmet",rarity:"Epic"},
+{name:"Dragon Scale",rarity:"Epic"},
+{name:"Void Crystal",rarity:"Epic"},
+{name:"Power Generator Core",rarity:"Epic"},
+{name:"Ancient Armor Plate",rarity:"Epic"},
+{name:"Demon Horn",rarity:"Epic"},
+{name:"Phoenix Feather",rarity:"Epic"},
+{name:"Star Fragment",rarity:"Epic"},
+{name:"Time Crystal",rarity:"Epic"},
+{name:"Legend Blade Shard",rarity:"Epic"},
+
+
+
+// LEGENDARY
+
+{name:"Ancient Dungeon Crown",rarity:"Legendary"},
+{name:"King Slayer Sword",rarity:"Legendary"},
+{name:"Dragon Heart",rarity:"Legendary"},
+{name:"Infinity Crystal",rarity:"Legendary"},
+{name:"God Core",rarity:"Legendary"}
+
+];
+
+
+
 
 // =====================================
 // CREATE CUBE
 // =====================================
+
 
 function cube(
 
@@ -86,10 +197,6 @@ undefined
 
 }
 
-
-
-
-
 // =====================================
 // RETRO WALL COLORS
 // =====================================
@@ -98,91 +205,34 @@ function wallColor(x:number,z:number):Color
 
 {
 
-let pattern = (x+z)%5;
+let pattern=(x+z)%5;
 
 
 if(pattern==0)
 
-{
-
-return new Color(
-
-.55,
-
-.45,
-
-.35
-
-);
-
-}
+return new Color(.55,.45,.35);
 
 
 if(pattern==1)
 
-{
-
-return new Color(
-
-.42,
-
-.35,
-
-.28
-
-);
-
-}
+return new Color(.42,.35,.28);
 
 
 if(pattern==2)
 
-{
-
-return new Color(
-
-.32,
-
-.30,
-
-.28
-
-);
-
-}
+return new Color(.32,.30,.28);
 
 
 if(pattern==3)
 
-{
-
-return new Color(
-
-.25,
-
-.22,
-
-.18
-
-);
-
-}
+return new Color(.25,.22,.18);
 
 
 
-return new Color(
-
-.48,
-
-.38,
-
-.30
-
-);
+return new Color(.48,.38,.30);
 
 
 }
-
 
 
 
@@ -197,31 +247,10 @@ function floorColor(x:number,z:number):Color
 
 if((x+z)%2==0)
 
-{
-
-return new Color(
-
-.18,
-
-.15,
-
-.12
-
-);
-
-}
+return new Color(.18,.15,.12);
 
 
-return new Color(
-
-.10,
-
-.10,
-
-.08
-
-);
-
+return new Color(.10,.10,.08);
 
 }
 
@@ -237,12 +266,9 @@ function generateMaze()
 
 {
 
-
 maze=[];
 
 
-
-// fill walls
 
 for(let x=0;x<mazeWidth;x++)
 
@@ -259,14 +285,10 @@ maze[x][z]=1;
 
 }
 
-
 }
 
 
 
-
-
-// create rooms
 
 for(
 
@@ -279,7 +301,6 @@ x+=2
 )
 
 {
-
 
 for(
 
@@ -294,8 +315,6 @@ z+=2
 {
 
 
-// room center
-
 maze[x][z]=0;
 
 
@@ -303,10 +322,7 @@ let exits=0;
 
 
 
-
-// east opening
-
-if(x < mazeWidth-2)
+if(x<mazeWidth-2)
 
 {
 
@@ -319,16 +335,7 @@ exits++;
 
 
 
-
-// west opening
-
-if(
-
-x>1 &&
-
-Math.random()<0.75
-
-)
+if(x>1 && Math.random()<0.75)
 
 {
 
@@ -341,10 +348,7 @@ exits++;
 
 
 
-
-// south opening
-
-if(z < mazeHeight-2)
+if(z<mazeHeight-2)
 
 {
 
@@ -357,16 +361,7 @@ exits++;
 
 
 
-
-// north opening
-
-if(
-
-z>1 &&
-
-Math.random()<0.75
-
-)
+if(z>1 && Math.random()<0.75)
 
 {
 
@@ -379,9 +374,6 @@ exits++;
 
 
 
-
-// emergency door
-
 if(exits==0)
 
 {
@@ -393,9 +385,7 @@ maze[x+1][z]=0;
 
 }
 
-
 }
-
 
 
 
@@ -411,8 +401,7 @@ maze[1][2]=0;
 
 
 
-
-// final room opening
+// final room
 
 maze[mazeWidth-2][mazeHeight-2]=0;
 
@@ -420,15 +409,16 @@ maze[mazeWidth-3][mazeHeight-2]=0;
 
 
 
+
 console.log(
-
 "Open room maze generated"
-
 );
 
 
-
 }
+
+
+
 
 
 
@@ -447,27 +437,20 @@ generateMaze();
 
 
 console.log(
-
 "Generating RETRO WOLFENSTEIN DUNGEON..."
-
 );
 
 
 
+let offsetX=
+
+-(mazeWidth*blockSize)/2;
 
 
 
-let offsetX =
+let offsetZ=
 
--(mazeWidth * blockSize)/2;
-
-
-
-let offsetZ =
-
--(mazeHeight * blockSize)/2;
-
-
+-(mazeHeight*blockSize)/2;
 
 
 
@@ -477,31 +460,24 @@ for(let x=0;x<mazeWidth;x++)
 
 {
 
-
 for(let z=0;z<mazeHeight;z++)
 
 {
 
 
-let worldX =
+let worldX=
 
-(x * blockSize) + offsetX;
-
-
-
-let worldZ =
-
-(z * blockSize) + offsetZ;
+(x*blockSize)+offsetX;
 
 
+
+let worldZ=
+
+(z*blockSize)+offsetZ;
 
 
 
 
-
-// ================================
-// WALL BLOCKS
-// ================================
 
 if(maze[x][z]==1)
 
@@ -532,30 +508,12 @@ blockSize
 ),
 
 
-wallColor(
-
-x,
-
-z
-
-)
+wallColor(x,z)
 
 );
 
 
-
 }
-
-
-
-
-
-
-
-
-// ================================
-// FLOOR BLOCKS
-// ================================
 
 else
 
@@ -586,24 +544,13 @@ blockSize
 ),
 
 
-floorColor(
-
-x,
-
-z
-
-)
+floorColor(x,z)
 
 );
 
 
 
 
-
-
-
-
-// keep starting room clear
 
 if(
 
@@ -640,30 +587,22 @@ worldZ
 
 }
 
-
 }
 
 
 
 
-
-
-
-
-// =================================
 // PLAYER SPAWN
-// =================================
-
 
 Player.position.set(
 
 new Vector3(
 
-offsetX + blockSize,
+offsetX+blockSize,
 
 1,
 
-offsetZ + blockSize
+offsetZ+blockSize
 
 )
 
@@ -671,48 +610,12 @@ offsetZ + blockSize
 
 
 
-
-
-
-
-console.log(
-
-"===================="
-
-);
-
-
-console.log(
-
-" DUNGEON READY "
-
-);
-
-
-console.log(
-
-" PLAYER SPAWNED "
-
-);
-
-
-console.log(
-
-"===================="
-
-);
-
-
+console.log("====================");
+console.log(" DUNGEON READY ");
+console.log(" PLAYER SPAWNED ");
+console.log("====================");
 
 }
-
-
-
-
-
-
-
-
 
 // =====================================
 // SPAWN ENEMIES + CHESTS
@@ -728,17 +631,14 @@ z:number
 
 {
 
-
-let chance = Math.random();
-
+let chance=Math.random();
 
 
 
 
-// =================================
-// ENEMIES
-// =================================
-
+// =====================================
+// ENEMY SPAWN
+// =====================================
 
 if(chance < .12)
 
@@ -785,31 +685,21 @@ new Color(
 
 
 
-
-
 let data =
 
 {
 
-
 entity:enemy,
-
 
 name:getEnemyName(),
 
-
 hp:100,
-
 
 damage:10,
 
-
 alive:true
 
-
-
 };
-
 
 
 
@@ -819,21 +709,20 @@ enemies.push(data);
 
 
 
-
 addEnemyAI(enemy);
-
-
 
 
 registerEnemyCombat(data);
 
 
 
-
-
 console.log(
 
-"Enemy spawned"
+"Enemy spawned: "
+
++
+
+data.name
 
 );
 
@@ -846,11 +735,9 @@ console.log(
 
 
 
-
-// =================================
-// CHESTS
-// =================================
-
+// =====================================
+// CHEST SPAWN
+// =====================================
 
 else if(chance < .18)
 
@@ -885,7 +772,7 @@ new Color(
 
 1,
 
-.8,
+0.8,
 
 0
 
@@ -901,11 +788,17 @@ chests.push(chest);
 
 
 
+// ENABLE CHEST LOOT
+
+attachChestLoot(chest);
+
+
+
 
 
 console.log(
 
-"Chest spawned"
+"Treasure chest spawned"
 
 );
 
@@ -921,6 +814,7 @@ console.log(
 
 
 
+
 // =====================================
 // ENEMY NAME LIST
 // =====================================
@@ -929,8 +823,7 @@ function getEnemyName()
 
 {
 
-
-let list =
+let list=
 
 [
 
@@ -950,8 +843,6 @@ let list =
 
 
 
-
-
 return list[
 
 Math.floor(
@@ -963,6 +854,94 @@ Math.random()*list.length
 ];
 
 
+}
+
+
+
+
+
+
+// =====================================
+// CHEST LOOT INTERACTION
+// =====================================
+
+
+function attachChestLoot(
+
+chest:Entity
+
+)
+
+{
+
+
+let opened=false;
+
+
+
+chest.trigger.initialize(
+
+1,
+
+2,
+
+[
+
+"Left Hand",
+
+"Right Hand"
+
+],
+
+undefined
+
+);
+
+
+
+
+
+chest.trigger.setOccupiedFunction(()=>{
+
+
+if(opened)
+
+return;
+
+
+
+
+let distance =
+
+Player.position.distanceTo(
+
+chest.pos
+
+);
+
+
+
+
+
+if(distance < 3)
+
+{
+
+
+opened=true;
+
+
+openChest(chest);
+
+
+
+}
+
+
+
+});
+
+
 
 }
 
@@ -970,6 +949,199 @@ Math.random()*list.length
 
 
 
+
 // =====================================
-// END OF DUNGEON SCRIPT
+// OPEN CHEST
 // =====================================
+
+
+function openChest(
+
+chest:Entity
+
+)
+
+{
+
+
+console.log("====================");
+
+console.log("CHEST OPENED");
+
+
+
+let amount =
+
+1 +
+
+Math.floor(
+
+Math.random()*5
+
+);
+
+
+
+
+
+for(let i=0;i<amount;i++)
+
+{
+
+
+let item =
+
+lootTable[
+
+Math.floor(
+
+Math.random()*lootTable.length
+
+)
+
+];
+
+
+
+
+
+collectedItems.push(item.name);
+
+
+
+
+console.log(
+
+"+ "
+
++
+
+item.name
+
++
+
+" | "
+
++
+
+item.rarity
+
+);
+
+
+
+}
+
+
+
+
+
+console.log(
+
+"TOTAL ITEMS FOUND: "
+
++
+
+collectedItems.length
+
+);
+
+
+
+console.log("====================");
+
+
+
+
+
+chest.destroy();
+
+
+
+}
+
+// =====================================
+// SHOW LOOT INVENTORY
+// =====================================
+
+
+export function showLootInventory()
+
+{
+
+
+console.log(
+
+"========== INVENTORY =========="
+
+);
+
+
+
+if(collectedItems.length==0)
+
+{
+
+
+console.log(
+
+"No items collected"
+
+);
+
+
+console.log(
+
+"=============================="
+
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+for(let item of collectedItems)
+
+{
+
+
+console.log(
+
+item
+
+);
+
+
+}
+
+
+
+
+
+console.log(
+
+"TOTAL ITEMS: "
+
++
+
+collectedItems.length
+
+);
+
+
+
+console.log(
+
+"=============================="
+
+);
+
+
+
+}
