@@ -12,7 +12,7 @@ import { registerEnemyCombat } from "./Combat";
 
 
 // =====================================
-// MAZE SIZE
+// DUNGEON SIZE
 // =====================================
 
 const mazeWidth = 31;
@@ -48,7 +48,6 @@ color:Color
 ):Entity
 
 {
-
 
 return spawnPrimitive.cube(
 
@@ -91,8 +90,6 @@ undefined
 
 
 
-
-
 // =====================================
 // RETRO WALL COLORS
 // =====================================
@@ -101,61 +98,90 @@ function wallColor(x:number,z:number):Color
 
 {
 
-
-let pattern=(x+z)%5;
-
+let pattern = (x+z)%5;
 
 
 if(pattern==0)
+
 {
+
 return new Color(
+
 .55,
+
 .45,
+
 .35
+
 );
+
 }
 
 
 if(pattern==1)
+
 {
+
 return new Color(
+
 .42,
+
 .35,
+
 .28
+
 );
+
 }
 
 
 if(pattern==2)
+
 {
+
 return new Color(
+
 .32,
+
 .30,
+
 .28
+
 );
+
 }
 
 
 if(pattern==3)
+
 {
+
 return new Color(
+
 .25,
+
 .22,
+
 .18
+
 );
+
 }
+
 
 
 return new Color(
+
 .48,
+
 .38,
+
 .30
+
 );
 
 
 }
-
-
 
 
 
@@ -168,7 +194,6 @@ return new Color(
 function floorColor(x:number,z:number):Color
 
 {
-
 
 if((x+z)%2==0)
 
@@ -204,10 +229,8 @@ return new Color(
 
 
 
-
-
 // =====================================
-// GENERATE SAFE MAZE
+// GENERATE OPEN ROOM MAZE
 // =====================================
 
 function generateMaze()
@@ -218,6 +241,8 @@ function generateMaze()
 maze=[];
 
 
+
+// fill walls
 
 for(let x=0;x<mazeWidth;x++)
 
@@ -241,167 +266,132 @@ maze[x][z]=1;
 
 
 
-function carve(x:number,z:number)
+// create rooms
 
-{
+for(
 
+let x=1;
 
-maze[x][z]=0;
+x<mazeWidth-1;
 
-
-
-let dirs=[
-
-[2,0],
-
-[-2,0],
-
-[0,2],
-
-[0,-2]
-
-];
-
-
-
-dirs.sort(()=>Math.random()-0.5);
-
-
-
-for(let d of dirs)
-
-{
-
-
-let nx=x+d[0];
-
-let nz=z+d[1];
-
-
-
-if(
-
-nx>0 &&
-
-nz>0 &&
-
-nx<mazeWidth-1 &&
-
-nz<mazeHeight-1 &&
-
-maze[nx][nz]==1
+x+=2
 
 )
 
 {
 
 
-maze[x+d[0]/2][z+d[1]/2]=0;
+for(
 
+let z=1;
 
-carve(nx,nz);
+z<mazeHeight-1;
 
+z+=2
 
-}
-
-
-
-}
-
-
-
-}
-
-
-
-carve(1,1);
-
-
-
-
-
-// =====================================
-// FIX CLOSED ROOMS
-// =====================================
-
-
-for(let x=1;x<mazeWidth-1;x++)
-
-{
-
-for(let z=1;z<mazeHeight-1;z++)
+)
 
 {
 
 
-if(maze[x][z]==0)
+// room center
 
-{
+maze[x][z]=0;
 
 
 let exits=0;
 
 
-if(maze[x+1][z]==0)
+
+
+// east opening
+
+if(x < mazeWidth-2)
+
+{
+
+maze[x+1][z]=0;
+
 exits++;
 
-if(maze[x-1][z]==0)
+}
+
+
+
+
+
+// west opening
+
+if(
+
+x>1 &&
+
+Math.random()<0.75
+
+)
+
+{
+
+maze[x-1][z]=0;
+
 exits++;
 
-if(maze[x][z+1]==0)
+}
+
+
+
+
+
+// south opening
+
+if(z < mazeHeight-2)
+
+{
+
+maze[x][z+1]=0;
+
 exits++;
 
-if(maze[x][z-1]==0)
+}
+
+
+
+
+
+// north opening
+
+if(
+
+z>1 &&
+
+Math.random()<0.75
+
+)
+
+{
+
+maze[x][z-1]=0;
+
 exits++;
 
+}
 
 
+
+
+
+// emergency door
 
 if(exits==0)
 
 {
 
-
-let openings=[
-
-[1,0],
-
-[-1,0],
-
-[0,1],
-
-[0,-1]
-
-];
-
-
-
-let o=openings[
-
-Math.floor(
-
-Math.random()*openings.length
-
-)
-
-];
-
-
-
-maze[x+o[0]][z+o[1]]=0;
-
-
+maze[x+1][z]=0;
 
 }
 
 
-
 }
-
-
-
-}
-
 
 
 }
@@ -410,9 +400,7 @@ maze[x+o[0]][z+o[1]]=0;
 
 
 
-
-
-// START ROOM
+// start room
 
 maze[1][1]=0;
 
@@ -424,17 +412,26 @@ maze[1][2]=0;
 
 
 
-// EXIT ROOM
+// final room opening
 
 maze[mazeWidth-2][mazeHeight-2]=0;
 
 maze[mazeWidth-3][mazeHeight-2]=0;
 
-maze[mazeWidth-2][mazeHeight-3]=0;
+
+
+console.log(
+
+"Open room maze generated"
+
+);
 
 
 
 }
+
+
+
 
 // =====================================
 // BUILD DUNGEON
@@ -454,6 +451,7 @@ console.log(
 "Generating RETRO WOLFENSTEIN DUNGEON..."
 
 );
+
 
 
 
@@ -487,13 +485,13 @@ for(let z=0;z<mazeHeight;z++)
 
 let worldX =
 
-(x * blockSize)+offsetX;
+(x * blockSize) + offsetX;
 
 
 
 let worldZ =
 
-(z * blockSize)+offsetZ;
+(z * blockSize) + offsetZ;
 
 
 
@@ -501,9 +499,9 @@ let worldZ =
 
 
 
-// =================================
-// WALLS
-// =================================
+// ================================
+// WALL BLOCKS
+// ================================
 
 if(maze[x][z]==1)
 
@@ -534,9 +532,16 @@ blockSize
 ),
 
 
-wallColor(x,z)
+wallColor(
+
+x,
+
+z
+
+)
 
 );
+
 
 
 }
@@ -547,9 +552,10 @@ wallColor(x,z)
 
 
 
-// =================================
-// FLOORS
-// =================================
+
+// ================================
+// FLOOR BLOCKS
+// ================================
 
 else
 
@@ -573,14 +579,20 @@ new Vector3(
 
 blockSize,
 
-.2,
+0.2,
 
 blockSize
 
 ),
 
 
-floorColor(x,z)
+floorColor(
+
+x,
+
+z
+
+)
 
 );
 
@@ -589,13 +601,19 @@ floorColor(x,z)
 
 
 
-// keep spawn area empty
+
+
+// keep starting room clear
 
 if(
 
-!(x==1 && z==1) &&
+!(x==1 && z==1)
 
-!(x==2 && z==1) &&
+&&
+
+!(x==2 && z==1)
+
+&&
 
 !(x==1 && z==2)
 
@@ -620,12 +638,11 @@ worldZ
 }
 
 
-
 }
 
 
-
 }
+
 
 
 
@@ -634,7 +651,7 @@ worldZ
 
 
 // =================================
-// PLAYER START
+// PLAYER SPAWN
 // =================================
 
 
@@ -657,30 +674,31 @@ offsetZ + blockSize
 
 
 
+
 console.log(
 
-"========================"
+"===================="
 
 );
 
 
 console.log(
 
-"RETRO MAZE COMPLETE"
+" DUNGEON READY "
 
 );
 
 
 console.log(
 
-"PLAYER SPAWNED SAFELY"
+" PLAYER SPAWNED "
 
 );
 
 
 console.log(
 
-"========================"
+"===================="
 
 );
 
@@ -697,7 +715,7 @@ console.log(
 
 
 // =====================================
-// SPAWN ENEMIES / CHESTS
+// SPAWN ENEMIES + CHESTS
 // =====================================
 
 function spawnObjects(
@@ -711,22 +729,23 @@ z:number
 {
 
 
-let chance=Math.random();
+let chance = Math.random();
 
 
 
 
 
 // =================================
-// ENEMY SPAWN
+// ENEMIES
 // =================================
+
 
 if(chance < .12)
 
 {
 
 
-let enemy=cube(
+let enemy = cube(
 
 new Vector3(
 
@@ -766,21 +785,31 @@ new Color(
 
 
 
-let data=
+
+
+let data =
 
 {
 
+
 entity:enemy,
+
 
 name:getEnemyName(),
 
+
 hp:100,
+
 
 damage:10,
 
+
 alive:true
 
+
+
 };
+
 
 
 
@@ -790,11 +819,14 @@ enemies.push(data);
 
 
 
+
 addEnemyAI(enemy);
 
 
 
+
 registerEnemyCombat(data);
+
 
 
 
@@ -815,17 +847,17 @@ console.log(
 
 
 
+// =================================
+// CHESTS
+// =================================
 
-// =================================
-// CHEST SPAWN
-// =================================
 
 else if(chance < .18)
 
 {
 
 
-let chest=cube(
+let chest = cube(
 
 new Vector3(
 
@@ -864,7 +896,10 @@ new Color(
 
 
 
+
 chests.push(chest);
+
+
 
 
 
@@ -886,12 +921,8 @@ console.log(
 
 
 
-
-
-
-
 // =====================================
-// ENEMY TYPES
+// ENEMY NAME LIST
 // =====================================
 
 function getEnemyName()
@@ -899,7 +930,7 @@ function getEnemyName()
 {
 
 
-let list=
+let list =
 
 [
 
@@ -909,7 +940,11 @@ let list=
 
 "Orc",
 
-"Shadow Beast"
+"Shadow Beast",
+
+"Mutant Guard",
+
+"Cyber Demon"
 
 ];
 
@@ -928,203 +963,13 @@ Math.random()*list.length
 ];
 
 
-}
-
-// =====================================
-// SAFETY CHECK
-// MAKES SURE PLAYER IS NEVER TRAPPED
-// =====================================
-
-function checkRoomOpenings()
-
-{
-
-for(let x=1;x<mazeWidth-1;x++)
-
-{
-
-for(let z=1;z<mazeHeight-1;z++)
-
-{
-
-
-if(maze[x][z]==0)
-
-{
-
-
-let exits = 0;
-
-
-
-if(maze[x+1][z]==0)
-
-{
-
-exits++;
 
 }
-
-
-if(maze[x-1][z]==0)
-
-{
-
-exits++;
-
-}
-
-
-if(maze[x][z+1]==0)
-
-{
-
-exits++;
-
-}
-
-
-if(maze[x][z-1]==0)
-
-{
-
-exits++;
-
-}
-
-
-
-
-
-// if room has no exit, cut one open
-
-if(exits==0)
-
-{
-
-
-let side=Math.floor(Math.random()*4);
-
-
-
-if(side==0)
-
-{
-
-maze[x+1][z]=0;
-
-}
-
-
-
-if(side==1)
-
-{
-
-maze[x-1][z]=0;
-
-}
-
-
-
-if(side==2)
-
-{
-
-maze[x][z+1]=0;
-
-}
-
-
-
-if(side==3)
-
-{
-
-maze[x][z-1]=0;
-
-}
-
-
-
-console.log(
-
-"Emergency exit created"
-
-);
-
-
-
-}
-
-
-
-}
-
-
-
-}
-
-
-
-}
-
-
-
-}
-
-
-
-
 
 
 
 
 
 // =====================================
-// BETTER ENEMY SPACING
+// END OF DUNGEON SCRIPT
 // =====================================
-
-function safeEnemySpawn(x:number,z:number)
-
-{
-
-
-// keep enemies away from start
-
-let distance = Math.sqrt(
-
-(x*x)+(z*z)
-
-);
-
-
-
-if(distance < 5)
-
-{
-
-return false;
-
-}
-
-
-
-
-// random spacing
-
-if(Math.random()<0.5)
-
-{
-
-return true;
-
-}
-
-
-
-return false;
-
-
-
-}
