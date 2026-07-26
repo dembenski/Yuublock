@@ -1,6 +1,6 @@
 // =====================================
 // RETRO VOXEL DUNGEON SYSTEM
-// DYNAMIC ENEMY MOVEMENT FIX
+// DYNAMIC ENEMY MOVEMENT FIXED VERSION
 // =====================================
 
 
@@ -22,32 +22,24 @@ import { spawnPrimitive } from "./Yuu API/SpawnPrimitive";
 
 let inventoryReady=false;
 
-
 let inventoryFunction:any=null;
 
 
 
-export function connectInventory(
-
-func:any
-
-)
-
+export function connectInventory(func:any)
 {
 
-inventoryFunction=func;
+    inventoryFunction=func;
 
-inventoryReady=true;
+    inventoryReady=true;
 
 
-console.log(
-
-"Inventory connected"
-
-);
-
+    console.log(
+        "Inventory connected"
+    );
 
 }
+
 
 
 
@@ -72,6 +64,7 @@ let maze:number[][]=[];
 
 
 
+
 // =====================================
 // GAME STORAGE
 // =====================================
@@ -79,8 +72,8 @@ let maze:number[][]=[];
 
 export let enemies:any[]=[];
 
-
 export let chests:Entity[]=[];
+
 
 
 
@@ -91,78 +84,12 @@ export let chests:Entity[]=[];
 // =====================================
 
 
-const enemySpeed = 0.8;
-
+const enemySpeed = 0.05;
 
 const enemyAttackDistance = 2.5;
 
+const enemySpawnChance = 0.35;
 
-
-
-
-// =====================================
-// CREATE CUBE
-// STATIC OR DYNAMIC
-// =====================================
-
-
-function cube(
-
-pos:Vector3,
-
-scale:Vector3,
-
-color:Color,
-
-bodyType:any = "Static"
-
-):Entity
-
-{
-
-
-return spawnPrimitive.cube(
-
-pos,
-
-
-scale,
-
-
-Quaternion.fromEuler(
-
-new Vector3(
-
-0,
-
-0,
-
-0
-
-)
-
-),
-
-
-color,
-
-
-1,
-
-
-true,
-
-
-bodyType,
-
-
-undefined
-
-
-);
-
-
-}
 
 
 
@@ -199,13 +126,11 @@ const lootTable:LootItem[] =
 
 [
 
-
 {
 name:"Ancient Bronze Coin",
 rarity:"Common",
 sellValue:10
 },
-
 
 {
 name:"Rusty Iron Key",
@@ -213,13 +138,11 @@ rarity:"Common",
 sellValue:15
 },
 
-
 {
 name:"Broken Sword",
 rarity:"Common",
 sellValue:20
 },
-
 
 {
 name:"Old Dungeon Map",
@@ -227,13 +150,11 @@ rarity:"Common",
 sellValue:25
 },
 
-
 {
 name:"Leather Armor Piece",
 rarity:"Common",
 sellValue:30
 },
-
 
 {
 name:"Small Healing Potion",
@@ -241,13 +162,11 @@ rarity:"Common",
 sellValue:30
 },
 
-
 {
 name:"Silver Coin Pouch",
 rarity:"Uncommon",
 sellValue:75
 },
-
 
 {
 name:"Magic Herb",
@@ -255,13 +174,11 @@ rarity:"Uncommon",
 sellValue:90
 },
 
-
 {
 name:"Crystal Fragment",
 rarity:"Uncommon",
 sellValue:100
 },
-
 
 {
 name:"Ancient Scroll",
@@ -269,13 +186,11 @@ rarity:"Uncommon",
 sellValue:120
 },
 
-
 {
 name:"Cyber Circuit",
 rarity:"Rare",
 sellValue:300
 },
-
 
 {
 name:"Golden Gear",
@@ -283,13 +198,11 @@ rarity:"Rare",
 sellValue:350
 },
 
-
 {
 name:"Ancient Rune Stone",
 rarity:"Rare",
 sellValue:400
 },
-
 
 {
 name:"Shadow Crystal",
@@ -297,13 +210,11 @@ rarity:"Rare",
 sellValue:450
 },
 
-
 {
 name:"Knight Helmet",
 rarity:"Epic",
 sellValue:1000
 },
-
 
 {
 name:"Dragon Scale",
@@ -311,13 +222,11 @@ rarity:"Epic",
 sellValue:1200
 },
 
-
 {
 name:"Void Crystal",
 rarity:"Epic",
 sellValue:1400
 },
-
 
 {
 name:"Ancient Dungeon Crown",
@@ -325,13 +234,11 @@ rarity:"Legendary",
 sellValue:5000
 },
 
-
 {
 name:"Dragon Heart",
 rarity:"Legendary",
 sellValue:7500
 },
-
 
 {
 name:"God Core",
@@ -339,8 +246,8 @@ rarity:"Legendary",
 sellValue:10000
 }
 
-
 ];
+
 
 
 
@@ -349,6 +256,75 @@ console.log(
 "DYNAMIC RETRO DUNGEON LOADED"
 
 );
+
+
+
+
+
+// =====================================
+// CREATE CUBE
+// =====================================
+
+
+function cube(
+
+pos:Vector3,
+
+scale:Vector3,
+
+color:Color,
+
+bodyType:any="Static"
+
+):Entity
+
+{
+
+
+return spawnPrimitive.cube(
+
+pos,
+
+
+scale,
+
+
+Quaternion.fromEuler(
+
+new Vector3(
+
+0,
+
+0,
+
+0
+
+)
+
+),
+
+
+
+color,
+
+
+1,
+
+
+true,
+
+
+bodyType,
+
+
+undefined
+
+
+);
+
+
+
+}
 
 // =====================================
 // WALL COLORS
@@ -370,7 +346,6 @@ let pattern=(x+z)%5;
 
 
 
-
 if(pattern==0)
 
 return new Color(
@@ -382,7 +357,6 @@ return new Color(
 0.35
 
 );
-
 
 
 
@@ -402,7 +376,6 @@ return new Color(
 
 
 
-
 if(pattern==2)
 
 return new Color(
@@ -414,7 +387,6 @@ return new Color(
 0.28
 
 );
-
 
 
 
@@ -434,8 +406,6 @@ return new Color(
 
 
 
-
-
 return new Color(
 
 0.48,
@@ -445,7 +415,6 @@ return new Color(
 0.30
 
 );
-
 
 
 }
@@ -476,7 +445,6 @@ if((x+z)%2==0)
 
 {
 
-
 return new Color(
 
 0.18,
@@ -487,11 +455,7 @@ return new Color(
 
 );
 
-
-
 }
-
-
 
 
 
@@ -506,8 +470,8 @@ return new Color(
 );
 
 
-
 }
+
 
 
 
@@ -529,16 +493,12 @@ maze=[];
 
 
 
-
-
 for(let x=0;x<mazeWidth;x++)
 
 {
 
 
 maze[x]=[];
-
-
 
 
 
@@ -550,14 +510,10 @@ for(let z=0;z<mazeHeight;z++)
 maze[x][z]=1;
 
 
-
 }
 
 
-
 }
-
-
 
 
 
@@ -600,6 +556,8 @@ let exits=0;
 
 
 
+// EAST
+
 if(x<mazeWidth-2)
 
 {
@@ -610,15 +568,13 @@ maze[x+1][z]=0;
 exits++;
 
 
-
 }
 
 
 
 
 
-
-
+// WEST
 
 if(
 
@@ -636,7 +592,6 @@ maze[x-1][z]=0;
 exits++;
 
 
-
 }
 
 
@@ -644,7 +599,7 @@ exits++;
 
 
 
-
+// SOUTH
 
 if(z<mazeHeight-2)
 
@@ -656,7 +611,6 @@ maze[x][z+1]=0;
 exits++;
 
 
-
 }
 
 
@@ -665,6 +619,7 @@ exits++;
 
 
 
+// NORTH
 
 if(
 
@@ -682,9 +637,7 @@ maze[x][z-1]=0;
 exits++;
 
 
-
 }
-
 
 
 
@@ -699,7 +652,6 @@ if(exits==0)
 maze[x+1][z]=0;
 
 
-
 }
 
 
@@ -707,9 +659,7 @@ maze[x+1][z]=0;
 }
 
 
-
 }
-
 
 
 
@@ -717,7 +667,6 @@ maze[x+1][z]=0;
 
 
 // START ROOM
-
 
 maze[1][1]=0;
 
@@ -730,15 +679,11 @@ maze[1][2]=0;
 
 
 
-
 // END ROOM
-
 
 maze[mazeWidth-2][mazeHeight-2]=0;
 
 maze[mazeWidth-3][mazeHeight-2]=0;
-
-
 
 
 
@@ -751,8 +696,8 @@ console.log(
 );
 
 
-
 }
+
 
 
 
@@ -789,7 +734,6 @@ console.log(
 let offsetX=
 
 -(mazeWidth * blockSize)/2;
-
 
 
 
@@ -830,7 +774,10 @@ let worldZ=
 
 
 
+
+// ===============================
 // WALLS
+// ===============================
 
 
 if(maze[x][z]==1)
@@ -851,6 +798,7 @@ worldZ
 ),
 
 
+
 new Vector3(
 
 blockSize,
@@ -862,6 +810,7 @@ blockSize
 ),
 
 
+
 wallColor(
 
 x,
@@ -871,11 +820,11 @@ z
 ),
 
 
+
 "Static"
 
 
 );
-
 
 
 }
@@ -886,7 +835,9 @@ z
 
 
 
+// ===============================
 // FLOORS
+// ===============================
 
 
 else
@@ -907,6 +858,7 @@ worldZ
 ),
 
 
+
 new Vector3(
 
 blockSize,
@@ -918,6 +870,7 @@ blockSize
 ),
 
 
+
 floorColor(
 
 x,
@@ -925,6 +878,7 @@ x,
 z
 
 ),
+
 
 
 "Static"
@@ -938,6 +892,8 @@ z
 
 
 
+
+// don't spawn inside start room
 
 if(
 
@@ -965,7 +921,6 @@ worldZ
 );
 
 
-
 }
 
 
@@ -979,7 +934,6 @@ worldZ
 
 
 }
-
 
 
 
@@ -999,7 +953,6 @@ offsetZ + blockSize
 )
 
 );
-
 
 
 
@@ -1038,11 +991,11 @@ console.log(
 }
 
 // =====================================
-// CREATE DYNAMIC ENEMY CUBE
+// CREATE DYNAMIC ENEMY
 // =====================================
 
 
-function createEnemyCube(
+function createEnemy(
 
 pos:Vector3
 
@@ -1104,6 +1057,9 @@ true,
 
 
 
+// IMPORTANT:
+// Dynamic physics body
+
 "Dynamic",
 
 
@@ -1111,12 +1067,13 @@ true,
 undefined
 
 
-
 );
 
 
 
 }
+
+
 
 
 
@@ -1147,19 +1104,17 @@ let chance=Math.random();
 
 
 
-
-
 // =====================================
 // ENEMY SPAWN
 // =====================================
 
 
-if(chance < 0.12)
+if(chance < enemySpawnChance)
 
 {
 
 
-let enemy=createEnemyCube(
+let enemy=createEnemy(
 
 new Vector3(
 
@@ -1179,8 +1134,7 @@ z
 
 
 
-
-let data =
+let data=
 
 {
 
@@ -1206,8 +1160,8 @@ speed:enemySpeed,
 attackCooldown:0
 
 
-
 };
+
 
 
 
@@ -1221,14 +1175,25 @@ enemies.push(data);
 
 
 
-
 console.log(
 
-"ENEMY SPAWNED: "
+"👹 ENEMY SPAWNED: "
 
 +
 
 data.name
+
+);
+
+
+
+console.log(
+
+"TOTAL ENEMIES: "
+
++
+
+enemies.length
 
 );
 
@@ -1247,7 +1212,7 @@ data.name
 // =====================================
 
 
-else if(chance < 0.20)
+else if(chance < 0.50)
 
 {
 
@@ -1286,7 +1251,11 @@ new Color(
 
 0
 
-)
+),
+
+
+
+"Static"
 
 
 
@@ -1310,7 +1279,7 @@ attachChestLoot(chest);
 
 console.log(
 
-"TREASURE CHEST SPAWNED"
+"🟨 TREASURE CHEST SPAWNED"
 
 );
 
@@ -1328,6 +1297,8 @@ console.log(
 
 
 
+
+
 // =====================================
 // ENEMY NAMES
 // =====================================
@@ -1338,7 +1309,7 @@ function getEnemyName()
 {
 
 
-let list =
+let list=
 
 [
 
@@ -1365,7 +1336,6 @@ let list =
 
 
 "Ancient Warrior"
-
 
 
 ];
@@ -1395,8 +1365,10 @@ Math.random()*list.length
 
 
 
+
+
 // =====================================
-// DYNAMIC ENEMY AI
+// ENEMY MOVEMENT AI
 // =====================================
 
 
@@ -1411,6 +1383,8 @@ let playerPos = Player.position;
 
 
 
+
+
 for(let enemyData of enemies)
 
 {
@@ -1419,6 +1393,8 @@ for(let enemyData of enemies)
 if(!enemyData.alive)
 
 continue;
+
+
 
 
 
@@ -1446,6 +1422,8 @@ let pos = enemy.pos;
 
 
 
+
+
 let dx =
 
 playerPos.x -
@@ -1456,11 +1434,13 @@ pos.x;
 
 
 
+
 let dz =
 
 playerPos.z -
 
 pos.z;
+
 
 
 
@@ -1484,12 +1464,17 @@ let distance = Math.sqrt(
 
 
 
+
+
+// ================================
 // CHASE PLAYER
+// ================================
 
 
-if(distance < 40)
+if(distance < 50 && distance > enemyAttackDistance)
 
 {
+
 
 
 let moveX =
@@ -1498,11 +1483,9 @@ let moveX =
 
 *
 
-enemyData.speed
+enemyData.speed;
 
-*
 
-0.016;
 
 
 
@@ -1512,11 +1495,7 @@ let moveZ =
 
 *
 
-enemyData.speed
-
-*
-
-0.016;
+enemyData.speed;
 
 
 
@@ -1524,39 +1503,22 @@ enemyData.speed
 
 
 
-enemy.velocity = new Vector3(
 
-moveX,
-
-enemy.velocity.y,
-
-moveZ
-
-);
+// DIRECT POSITION MOVEMENT
+// works even if physics ignores velocity
 
 
+enemy.pos = new Vector3(
 
-}
+pos.x + moveX,
 
+pos.y,
 
-
-
-
-
-else
-
-{
-
-
-enemy.velocity = new Vector3(
-
-0,
-
-enemy.velocity.y,
-
-0
+pos.z + moveZ
 
 );
+
+
 
 
 
@@ -1568,26 +1530,37 @@ enemy.velocity.y,
 
 
 
-// ATTACK RANGE
 
 
-if(distance < enemyAttackDistance)
+// ================================
+// ATTACK
+// ================================
+
+
+if(distance <= enemyAttackDistance)
 
 {
 
 
-if(enemyData.attackCooldown <=0)
+if(enemyData.attackCooldown <= 0)
 
 {
 
 
 console.log(
 
-enemyData.name +
+"⚔️ "
 
-" attacks!"
++
+
+enemyData.name
+
++
+
+" attacks player"
 
 );
+
 
 
 
@@ -1615,15 +1588,18 @@ if(enemyData.attackCooldown>0)
 
 enemyData.attackCooldown--;
 
-}
-
-
 
 }
 
 
 
 }
+
+
+
+}
+
+
 
 
 
@@ -1632,7 +1608,7 @@ enemyData.attackCooldown--;
 
 
 // =====================================
-// START ENEMY PHYSICS LOOP
+// ENEMY UPDATE LOOP
 // =====================================
 
 
@@ -1646,6 +1622,7 @@ updateEnemies();
 
 
 });
+
 
 // =====================================
 // CHEST INTERACTION
@@ -1674,7 +1651,6 @@ console.log(
 
 
 return;
-
 
 
 }
@@ -1710,11 +1686,13 @@ chest.trigger.initialize(
 ],
 
 
+
 undefined
 
 
 
 );
+
 
 
 
@@ -1729,6 +1707,7 @@ chest.trigger.setOccupiedFunction(()=>{
 if(opened)
 
 return;
+
 
 
 
@@ -1766,11 +1745,14 @@ openChest(chest);
 
 
 
+
 });
 
 
 
 }
+
+
 
 
 
@@ -1801,13 +1783,12 @@ console.log(
 );
 
 
+
 console.log(
 
-"CHEST OPENED"
+"🟨 CHEST OPENED"
 
 );
-
-
 
 
 
@@ -1830,15 +1811,13 @@ Math.random()*5
 
 
 
-
 for(let i=0;i<amount;i++)
 
 {
 
 
-let item =
 
-lootTable[
+let item = lootTable[
 
 Math.floor(
 
@@ -1883,7 +1862,15 @@ sellPrice:item.sellValue
 
 
 
-if(inventoryReady && inventoryFunction)
+// SEND TO INVENTORY
+
+if(
+
+inventoryReady &&
+
+inventoryFunction
+
+)
 
 {
 
@@ -1905,13 +1892,14 @@ else
 
 console.log(
 
-"Inventory not connected yet"
+"Inventory not connected"
 
 );
 
 
 
 }
+
 
 
 
@@ -1931,6 +1919,7 @@ item.name
 );
 
 
+
 console.log(
 
 "RARITY: "
@@ -1940,6 +1929,7 @@ console.log(
 item.rarity
 
 );
+
 
 
 console.log(
@@ -1958,7 +1948,9 @@ item.sellValue
 
 
 
+
 }
+
 
 
 
@@ -1975,7 +1967,6 @@ console.log(
 
 
 
-
 console.log(
 
 "===================="
@@ -1988,11 +1979,15 @@ console.log(
 
 
 
+
 chest.destroy();
 
 
 
 }
+
+
+
 
 
 
@@ -2025,6 +2020,8 @@ return lootTable;
 
 
 
+
+
 // =====================================
 // CONNECT INVENTORY SYSTEM
 // =====================================
@@ -2042,7 +2039,10 @@ inventoryAddFunction:any
 inventoryFunction = inventoryAddFunction;
 
 
-inventoryReady = true;
+
+inventoryReady=true;
+
+
 
 
 
@@ -2103,6 +2103,8 @@ lootTable.length
 
 
 
+
+
 // =====================================
 // DEBUG INFO
 // =====================================
@@ -2120,6 +2122,7 @@ let stats = getDungeonStats();
 
 
 
+
 console.log(
 
 "===================="
@@ -2128,11 +2131,9 @@ console.log(
 
 
 
-
-
 console.log(
 
-"RETRO DUNGEON STATUS"
+"🗡️ RETRO DUNGEON STATUS"
 
 );
 
@@ -2186,6 +2187,7 @@ stats.loot
 
 
 
+
 console.log(
 
 "===================="
@@ -2206,8 +2208,9 @@ console.log(
 
 
 
+
 // =====================================
-// RESET DATA
+// RESET DUNGEON DATA
 // =====================================
 
 
@@ -2216,10 +2219,65 @@ export function resetDungeonData()
 {
 
 
+for(let enemy of enemies)
+
+{
+
+
+if(enemy.entity)
+
+{
+
+
+enemy.entity.destroy();
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+for(let chest of chests)
+
+{
+
+
+if(chest)
+
+{
+
+
+chest.destroy();
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
 enemies=[];
 
 
+
 chests=[];
+
 
 
 
@@ -2261,7 +2319,6 @@ let dungeonStarted=false;
 
 
 
-
 export function startDungeonSystem()
 
 {
@@ -2269,7 +2326,23 @@ export function startDungeonSystem()
 
 if(dungeonStarted)
 
+{
+
+
+console.log(
+
+"Dungeon already running"
+
+);
+
+
 return;
+
+
+
+}
+
+
 
 
 
@@ -2283,11 +2356,171 @@ dungeonStarted=true;
 
 
 
+
 console.log(
 
-"DUNGEON SYSTEM STARTED"
+"===================="
 
 );
+
+
+
+console.log(
+
+"⚔️ DUNGEON SYSTEM STARTED"
+
+);
+
+
+
+console.log(
+
+"Dynamic enemies enabled"
+
+);
+
+
+
+console.log(
+
+"Physics enemies enabled"
+
+);
+
+
+
+console.log(
+
+"===================="
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// =====================================
+// TEST SPAWN ENEMY
+// DEBUG COMMAND
+// =====================================
+
+
+export function spawnTestEnemy()
+
+{
+
+
+let playerPos = Player.position;
+
+
+
+
+
+
+
+let enemy=createEnemy(
+
+new Vector3(
+
+playerPos.x + 10,
+
+2,
+
+playerPos.z + 10
+
+)
+
+);
+
+
+
+
+
+
+
+let data=
+
+{
+
+
+entity:enemy,
+
+
+name:"TEST ENEMY",
+
+
+hp:100,
+
+
+damage:10,
+
+
+alive:true,
+
+
+speed:enemySpeed,
+
+
+attackCooldown:0
+
+
+
+};
+
+
+
+
+
+
+
+enemies.push(data);
+
+
+
+
+
+
+
+console.log(
+
+"TEST ENEMY CREATED"
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// EXPORT ENEMY LIST
+// =====================================
+
+
+export function getEnemies()
+
+{
+
+
+return enemies;
 
 
 
