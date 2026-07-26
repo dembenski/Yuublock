@@ -1,6 +1,6 @@
 // =====================================
 // RETRO VOXEL DUNGEON SYSTEM
-// FIXED ENEMY MOVEMENT VERSION
+// DYNAMIC ENEMY MOVEMENT FIX
 // =====================================
 
 
@@ -15,9 +15,8 @@ import { spawnPrimitive } from "./Yuu API/SpawnPrimitive";
 
 
 
-
 // =====================================
-// SAFE INVENTORY CONNECTOR
+// INVENTORY CONNECTOR
 // =====================================
 
 
@@ -54,8 +53,6 @@ console.log(
 
 
 
-
-
 // =====================================
 // DUNGEON SIZE
 // =====================================
@@ -70,8 +67,6 @@ const blockSize = 8;
 
 
 let maze:number[][]=[];
-
-
 
 
 
@@ -96,10 +91,78 @@ export let chests:Entity[]=[];
 // =====================================
 
 
-const enemySpeed = 2.5;
+const enemySpeed = 0.8;
 
 
 const enemyAttackDistance = 2.5;
+
+
+
+
+
+// =====================================
+// CREATE CUBE
+// STATIC OR DYNAMIC
+// =====================================
+
+
+function cube(
+
+pos:Vector3,
+
+scale:Vector3,
+
+color:Color,
+
+bodyType:any = "Static"
+
+):Entity
+
+{
+
+
+return spawnPrimitive.cube(
+
+pos,
+
+
+scale,
+
+
+Quaternion.fromEuler(
+
+new Vector3(
+
+0,
+
+0,
+
+0
+
+)
+
+),
+
+
+color,
+
+
+1,
+
+
+true,
+
+
+bodyType,
+
+
+undefined
+
+
+);
+
+
+}
 
 
 
@@ -122,9 +185,6 @@ rarity:string;
 sellValue:number;
 
 }
-
-
-
 
 
 
@@ -284,86 +344,11 @@ sellValue:10000
 
 
 
-
-
 console.log(
 
-"FIXED RETRO DUNGEON LOADED"
+"DYNAMIC RETRO DUNGEON LOADED"
 
 );
-
-
-
-
-
-// =====================================
-// CREATE CUBE
-// =====================================
-
-
-function cube(
-
-pos:Vector3,
-
-scale:Vector3,
-
-color:Color
-
-):Entity
-
-{
-
-
-return spawnPrimitive.cube(
-
-pos,
-
-
-scale,
-
-
-
-Quaternion.fromEuler(
-
-new Vector3(
-
-0,
-
-0,
-
-0
-
-)
-
-),
-
-
-
-color,
-
-
-
-1,
-
-
-
-true,
-
-
-
-"Static",
-
-
-
-undefined
-
-
-
-);
-
-
-
-}
 
 // =====================================
 // WALL COLORS
@@ -401,6 +386,7 @@ return new Color(
 
 
 
+
 if(pattern==1)
 
 return new Color(
@@ -416,6 +402,7 @@ return new Color(
 
 
 
+
 if(pattern==2)
 
 return new Color(
@@ -427,6 +414,7 @@ return new Color(
 0.28
 
 );
+
 
 
 
@@ -447,6 +435,7 @@ return new Color(
 
 
 
+
 return new Color(
 
 0.48,
@@ -460,8 +449,6 @@ return new Color(
 
 
 }
-
-
 
 
 
@@ -508,8 +495,6 @@ return new Color(
 
 
 
-
-
 return new Color(
 
 0.10,
@@ -523,8 +508,6 @@ return new Color(
 
 
 }
-
-
 
 
 
@@ -580,8 +563,6 @@ maze[x][z]=1;
 
 
 
-
-
 for(
 
 let x=1;
@@ -619,7 +600,6 @@ let exits=0;
 
 
 
-
 if(x<mazeWidth-2)
 
 {
@@ -627,13 +607,11 @@ if(x<mazeWidth-2)
 
 maze[x+1][z]=0;
 
-
 exits++;
 
 
 
 }
-
 
 
 
@@ -655,13 +633,11 @@ Math.random()<0.75
 
 maze[x-1][z]=0;
 
-
 exits++;
 
 
 
 }
-
 
 
 
@@ -677,13 +653,11 @@ if(z<mazeHeight-2)
 
 maze[x][z+1]=0;
 
-
 exits++;
 
 
 
 }
-
 
 
 
@@ -705,14 +679,11 @@ Math.random()<0.75
 
 maze[x][z-1]=0;
 
-
 exits++;
 
 
 
 }
-
-
 
 
 
@@ -745,6 +716,7 @@ maze[x+1][z]=0;
 
 
 
+// START ROOM
 
 
 maze[1][1]=0;
@@ -757,6 +729,9 @@ maze[1][2]=0;
 
 
 
+
+
+// END ROOM
 
 
 maze[mazeWidth-2][mazeHeight-2]=0;
@@ -786,7 +761,6 @@ console.log(
 
 
 
-
 // =====================================
 // BUILD DUNGEON WORLD
 // =====================================
@@ -802,7 +776,6 @@ generateMaze();
 
 
 
-
 console.log(
 
 "GENERATING RETRO VOXEL DUNGEON..."
@@ -813,19 +786,16 @@ console.log(
 
 
 
+let offsetX=
 
-let offsetX =
-
--(mazeWidth * blockSize) / 2;
-
+-(mazeWidth * blockSize)/2;
 
 
 
 
-let offsetZ =
+let offsetZ=
 
--(mazeHeight * blockSize) / 2;
-
+-(mazeHeight * blockSize)/2;
 
 
 
@@ -843,23 +813,24 @@ for(let z=0;z<mazeHeight;z++)
 {
 
 
-let worldX =
+let worldX=
 
-(x * blockSize) + offsetX;
-
-
+(x * blockSize)+offsetX;
 
 
-let worldZ =
 
-(z * blockSize) + offsetZ;
+let worldZ=
 
+(z * blockSize)+offsetZ;
 
 
 
 
 
 
+
+
+// WALLS
 
 
 if(maze[x][z]==1)
@@ -880,7 +851,6 @@ worldZ
 ),
 
 
-
 new Vector3(
 
 blockSize,
@@ -892,15 +862,16 @@ blockSize
 ),
 
 
-
 wallColor(
 
 x,
 
 z
 
-)
+),
 
+
+"Static"
 
 
 );
@@ -915,6 +886,7 @@ z
 
 
 
+// FLOORS
 
 
 else
@@ -935,7 +907,6 @@ worldZ
 ),
 
 
-
 new Vector3(
 
 blockSize,
@@ -947,15 +918,16 @@ blockSize
 ),
 
 
-
 floorColor(
 
 x,
 
 z
 
-)
+),
 
+
+"Static"
 
 
 );
@@ -1066,6 +1038,93 @@ console.log(
 }
 
 // =====================================
+// CREATE DYNAMIC ENEMY CUBE
+// =====================================
+
+
+function createEnemyCube(
+
+pos:Vector3
+
+):Entity
+
+{
+
+
+return spawnPrimitive.cube(
+
+pos,
+
+
+new Vector3(
+
+1,
+
+2,
+
+1
+
+),
+
+
+
+Quaternion.fromEuler(
+
+new Vector3(
+
+0,
+
+0,
+
+0
+
+)
+
+),
+
+
+
+new Color(
+
+1,
+
+0,
+
+0
+
+),
+
+
+
+1,
+
+
+
+true,
+
+
+
+"Dynamic",
+
+
+
+undefined
+
+
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+// =====================================
 // SPAWN OBJECTS
 // ENEMIES + CHESTS
 // =====================================
@@ -1100,46 +1159,19 @@ if(chance < 0.12)
 {
 
 
-let enemy=cube(
+let enemy=createEnemyCube(
 
 new Vector3(
 
 x,
 
-1,
+2,
 
 z
 
-),
-
-
-
-new Vector3(
-
-1,
-
-2,
-
-1
-
-),
-
-
-
-new Color(
-
-1,
-
-0,
-
-0
-
 )
 
-
-
 );
-
 
 
 
@@ -1168,7 +1200,10 @@ damage:10,
 alive:true,
 
 
-attacking:false
+speed:enemySpeed,
+
+
+attackCooldown:0
 
 
 
@@ -1179,8 +1214,8 @@ attacking:false
 
 
 
-
 enemies.push(data);
+
 
 
 
@@ -1200,8 +1235,6 @@ data.name
 
 
 }
-
-
 
 
 
@@ -1264,16 +1297,11 @@ new Color(
 
 
 
-
 chests.push(chest);
 
 
 
-
-
-
 attachChestLoot(chest);
-
 
 
 
@@ -1293,8 +1321,6 @@ console.log(
 
 
 }
-
-
 
 
 
@@ -1349,8 +1375,6 @@ let list =
 
 
 
-
-
 return list[
 
 Math.floor(
@@ -1371,10 +1395,8 @@ Math.random()*list.length
 
 
 
-
-
 // =====================================
-// ENEMY MOVEMENT AI
+// DYNAMIC ENEMY AI
 // =====================================
 
 
@@ -1383,14 +1405,15 @@ function updateEnemies()
 {
 
 
-for(let i=0;i<enemies.length;i++)
+let playerPos = Player.position;
+
+
+
+
+
+for(let enemyData of enemies)
 
 {
-
-
-let enemyData=enemies[i];
-
-
 
 
 if(!enemyData.alive)
@@ -1401,7 +1424,8 @@ continue;
 
 
 
-let enemy=enemyData.entity;
+let enemy = enemyData.entity;
+
 
 
 
@@ -1416,12 +1440,7 @@ continue;
 
 
 
-let enemyPos=enemy.pos;
-
-
-let playerPos=Player.position;
-
-
+let pos = enemy.pos;
 
 
 
@@ -1431,7 +1450,9 @@ let dx =
 
 playerPos.x -
 
-enemyPos.x;
+pos.x;
+
+
 
 
 
@@ -1439,9 +1460,7 @@ let dz =
 
 playerPos.z -
 
-enemyPos.z;
-
-
+pos.z;
 
 
 
@@ -1465,21 +1484,39 @@ let distance = Math.sqrt(
 
 
 
-if(distance > enemyAttackDistance)
+// CHASE PLAYER
+
+
+if(distance < 40)
 
 {
 
 
-
 let moveX =
 
-dx / distance;
+(dx / distance)
+
+*
+
+enemyData.speed
+
+*
+
+0.016;
 
 
 
 let moveZ =
 
-dz / distance;
+(dz / distance)
+
+*
+
+enemyData.speed
+
+*
+
+0.016;
 
 
 
@@ -1487,30 +1524,19 @@ dz / distance;
 
 
 
-enemy.pos = new Vector3(
+enemy.velocity = new Vector3(
 
-enemyPos.x +
+moveX,
 
-(moveX * enemySpeed * 0.016),
+enemy.velocity.y,
 
-
-
-enemyPos.y,
-
-
-
-enemyPos.z +
-
-(moveZ * enemySpeed * 0.016)
-
-
+moveZ
 
 );
 
 
 
 }
-
 
 
 
@@ -1522,20 +1548,13 @@ else
 {
 
 
-if(!enemyData.attacking)
+enemy.velocity = new Vector3(
 
-{
+0,
 
+enemy.velocity.y,
 
-enemyData.attacking=true;
-
-
-
-console.log(
-
-enemyData.name +
-
-" attacking player"
+0
 
 );
 
@@ -1545,7 +1564,34 @@ enemyData.name +
 
 
 
-}
+
+
+
+
+// ATTACK RANGE
+
+
+if(distance < enemyAttackDistance)
+
+{
+
+
+if(enemyData.attackCooldown <=0)
+
+{
+
+
+console.log(
+
+enemyData.name +
+
+" attacks!"
+
+);
+
+
+
+enemyData.attackCooldown=120;
 
 
 
@@ -1556,6 +1602,28 @@ enemyData.name +
 }
 
 
+
+
+
+
+
+
+if(enemyData.attackCooldown>0)
+
+{
+
+
+enemyData.attackCooldown--;
+
+}
+
+
+
+}
+
+
+
+}
 
 
 
@@ -1564,7 +1632,7 @@ enemyData.name +
 
 
 // =====================================
-// ENEMY UPDATE LOOP
+// START ENEMY PHYSICS LOOP
 // =====================================
 
 
@@ -1642,13 +1710,11 @@ chest.trigger.initialize(
 ],
 
 
-
 undefined
 
 
 
 );
-
 
 
 
@@ -1663,7 +1729,6 @@ chest.trigger.setOccupiedFunction(()=>{
 if(opened)
 
 return;
-
 
 
 
@@ -1702,9 +1767,6 @@ openChest(chest);
 
 
 });
-
-
-
 
 
 
@@ -1752,7 +1814,6 @@ console.log(
 
 
 
-
 let amount =
 
 1 +
@@ -1775,7 +1836,9 @@ for(let i=0;i<amount;i++)
 {
 
 
-let item = lootTable[
+let item =
+
+lootTable[
 
 Math.floor(
 
@@ -1784,7 +1847,6 @@ Math.random()*lootTable.length
 )
 
 ];
-
 
 
 
@@ -1858,7 +1920,6 @@ console.log(
 
 
 
-
 console.log(
 
 "+ FOUND "
@@ -1870,7 +1931,6 @@ item.name
 );
 
 
-
 console.log(
 
 "RARITY: "
@@ -1880,7 +1940,6 @@ console.log(
 item.rarity
 
 );
-
 
 
 console.log(
@@ -1908,12 +1967,13 @@ item.sellValue
 
 
 
-
 console.log(
 
 "CHEST LOOT COMPLETE"
 
 );
+
+
 
 
 console.log(
@@ -1941,9 +2001,6 @@ chest.destroy();
 
 
 
-
-
-
 // =====================================
 // LOOT DATABASE EXPORT
 // =====================================
@@ -1959,8 +2016,6 @@ return lootTable;
 
 
 }
-
-
 
 
 
@@ -2002,14 +2057,6 @@ console.log(
 
 
 }
-
-
-
-
-
-
-
-
 
 // =====================================
 // DUNGEON STATUS
@@ -2066,9 +2113,7 @@ export function showDungeonInfo()
 {
 
 
-let stats=getDungeonStats();
-
-
+let stats = getDungeonStats();
 
 
 
@@ -2083,12 +2128,13 @@ console.log(
 
 
 
+
+
 console.log(
 
 "RETRO DUNGEON STATUS"
 
 );
-
 
 
 
@@ -2110,7 +2156,6 @@ stats.enemies
 
 
 
-
 console.log(
 
 "Chests: "
@@ -2120,7 +2165,6 @@ console.log(
 stats.chests
 
 );
-
 
 
 
@@ -2142,10 +2186,106 @@ stats.loot
 
 
 
-
 console.log(
 
 "===================="
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+// =====================================
+// RESET DATA
+// =====================================
+
+
+export function resetDungeonData()
+
+{
+
+
+enemies=[];
+
+
+chests=[];
+
+
+
+
+
+
+console.log(
+
+"DUNGEON DATA RESET"
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// =====================================
+// START SYSTEM
+// =====================================
+
+
+let dungeonStarted=false;
+
+
+
+
+
+
+
+
+
+export function startDungeonSystem()
+
+{
+
+
+if(dungeonStarted)
+
+return;
+
+
+
+
+
+
+dungeonStarted=true;
+
+
+
+
+
+
+console.log(
+
+"DUNGEON SYSTEM STARTED"
 
 );
 
