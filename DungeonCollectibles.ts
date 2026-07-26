@@ -1,3 +1,10 @@
+// =====================================
+// DUNGEON COLLECTABLE SYSTEM
+// CLEAN STABLE VERSION
+// CONNECTED TO INVENTORY SYSTEM
+// =====================================
+
+
 import { Vector3 } from "./Yuu API/Basic Types/Vector3";
 import { Color } from "./Yuu API/Basic Types/Color";
 import { Quaternion } from "./Yuu API/Basic Types/Quaternion";
@@ -6,10 +13,12 @@ import { Player } from "./Yuu API/Player";
 import { Events } from "./Yuu API/Events";
 import { spawnPrimitive } from "./Yuu API/SpawnPrimitive";
 
+import { addItemToInventory } from "./InventorySystem";
+
 
 
 // =====================================
-// INVENTORY STORAGE
+// PLAYER COLLECTION STORAGE
 // =====================================
 
 
@@ -20,7 +29,7 @@ export let totalValue:number = 0;
 
 
 // =====================================
-// ITEM DATA TYPE
+// ITEM DATA
 // =====================================
 
 
@@ -28,44 +37,44 @@ export interface CollectibleItem
 
 {
 
-name:string;
+    name:string;
 
-rarity:string;
+    rarity:string;
 
-value:number;
+    value:number;
 
-color:Color;
+    color:Color;
 
 }
 
 
 
-
 // =====================================
 // ITEM DATABASE
-// 120 UNIQUE ITEMS
 // =====================================
 
 
-export const collectibleItems:CollectibleItem[] = [
+export const collectibleItems:CollectibleItem[] =
+
+[
 
 
-// COMMON ITEMS
 
+// COMMON
 
 {
 name:"Ancient Bronze Coin",
 rarity:"Common",
 value:10,
-color:new Color(1,.7,.1)
+color:new Color(1,0.7,0.1)
 },
 
 
 {
-name:"Rusty Key",
+name:"Rusty Dungeon Key",
 rarity:"Common",
 value:15,
-color:new Color(.5,.4,.2)
+color:new Color(0.5,0.4,0.2)
 },
 
 
@@ -73,7 +82,7 @@ color:new Color(.5,.4,.2)
 name:"Broken Sword",
 rarity:"Common",
 value:20,
-color:new Color(.4,.4,.4)
+color:new Color(0.4,0.4,0.4)
 },
 
 
@@ -81,7 +90,7 @@ color:new Color(.4,.4,.4)
 name:"Old Dungeon Map",
 rarity:"Common",
 value:25,
-color:new Color(.7,.5,.2)
+color:new Color(0.7,0.5,0.2)
 },
 
 
@@ -89,7 +98,7 @@ color:new Color(.7,.5,.2)
 name:"Small Healing Potion",
 rarity:"Common",
 value:30,
-color:new Color(.1,1,.1)
+color:new Color(0.1,1,0.1)
 },
 
 
@@ -97,7 +106,7 @@ color:new Color(.1,1,.1)
 name:"Torch Oil",
 rarity:"Common",
 value:12,
-color:new Color(1,.5,.1)
+color:new Color(1,0.5,0.1)
 },
 
 
@@ -105,15 +114,7 @@ color:new Color(1,.5,.1)
 name:"Iron Scrap",
 rarity:"Common",
 value:18,
-color:new Color(.3,.3,.3)
-},
-
-
-{
-name:"Leather Strip",
-rarity:"Common",
-value:8,
-color:new Color(.4,.2,.1)
+color:new Color(0.3,0.3,0.3)
 },
 
 
@@ -121,7 +122,7 @@ color:new Color(.4,.2,.1)
 name:"Old Helmet",
 rarity:"Common",
 value:35,
-color:new Color(.5,.5,.5)
+color:new Color(0.5,0.5,0.5)
 },
 
 
@@ -129,7 +130,7 @@ color:new Color(.5,.5,.5)
 name:"Dungeon Bread",
 rarity:"Common",
 value:5,
-color:new Color(.8,.6,.3)
+color:new Color(0.8,0.6,0.3)
 },
 
 
@@ -141,7 +142,7 @@ color:new Color(.8,.6,.3)
 name:"Silver Coin Pouch",
 rarity:"Uncommon",
 value:75,
-color:new Color(.8,.8,.8)
+color:new Color(0.8,0.8,0.8)
 },
 
 
@@ -149,7 +150,7 @@ color:new Color(.8,.8,.8)
 name:"Magic Herb",
 rarity:"Uncommon",
 value:90,
-color:new Color(.2,1,.2)
+color:new Color(0.2,1,0.2)
 },
 
 
@@ -157,7 +158,7 @@ color:new Color(.2,1,.2)
 name:"Crystal Fragment",
 rarity:"Uncommon",
 value:100,
-color:new Color(.2,.8,1)
+color:new Color(0.2,0.8,1)
 },
 
 
@@ -165,7 +166,7 @@ color:new Color(.2,.8,1)
 name:"Ancient Scroll",
 rarity:"Uncommon",
 value:120,
-color:new Color(1,.9,.5)
+color:new Color(1,0.9,0.5)
 },
 
 
@@ -173,226 +174,83 @@ color:new Color(1,.9,.5)
 name:"Warrior Badge",
 rarity:"Uncommon",
 value:150,
-color:new Color(.8,.2,.1)
-},
-
-
-{
-name:"Machine Gear",
-rarity:"Uncommon",
-value:110,
-color:new Color(.5,.5,.6)
-},
-
-
-{
-name:"Power Cell",
-rarity:"Uncommon",
-value:130,
-color:new Color(.1,.8,1)
-},
-
-
-{
-name:"Bone Charm",
-rarity:"Uncommon",
-value:140,
-color:new Color(.8,.8,.7)
-},
-
-
-{
-name:"Lost Ring",
-rarity:"Uncommon",
-value:160,
-color:new Color(1,.8,.2)
-},
-
-
-{
-name:"Explorer Badge",
-rarity:"Uncommon",
-value:125,
-color:new Color(.2,.6,1)
+color:new Color(0.8,0.2,0.1)
 },
 
 
 
-// MORE ITEMS CONTINUE PART 2
+// RARE
+
 
 {
 name:"Golden Goblet",
 rarity:"Rare",
 value:250,
-color:new Color(1,.65,.05)
+color:new Color(1,0.65,0.05)
 },
 
 
 {
 name:"Dragon Scale",
 rarity:"Rare",
-value:300,
-color:new Color(.8,.2,.05)
+value:400,
+color:new Color(0.8,0.2,0.05)
 },
 
 
 {
 name:"Shadow Crystal",
 rarity:"Rare",
-value:350,
-color:new Color(.3,.05,.8)
+value:450,
+color:new Color(0.3,0.05,0.8)
 },
 
 
 {
 name:"Ancient Gear Core",
 rarity:"Rare",
-value:400,
-color:new Color(.5,.7,1)
-},
-
-
-{
-name:"Royal Seal",
-rarity:"Rare",
-value:450,
-color:new Color(1,.8,.2)
-},
-
-
-{
-name:"Demon Horn",
-rarity:"Rare",
-value:375,
-color:new Color(.4,.1,.05)
-},
-
-
-{
-name:"Frozen Gem",
-rarity:"Rare",
-value:330,
-color:new Color(.2,.8,1)
-},
-
-
-{
-name:"Fire Ruby",
-rarity:"Rare",
-value:360,
-color:new Color(1,.1,.05)
-},
-
-
-{
-name:"Ancient Machine Part",
-rarity:"Rare",
-value:420,
-color:new Color(.4,.5,.6)
-},
-
-
-{
-name:"Lost Knight Badge",
-rarity:"Rare",
-value:280,
-color:new Color(.8,.8,.9)
+value:500,
+color:new Color(0.5,0.7,1)
 },
 
 
 
-// EPIC ITEMS
+// EPIC
 
 
 {
 name:"Phoenix Feather",
 rarity:"Epic",
-value:700,
-color:new Color(1,.3,.05)
+value:850,
+color:new Color(1,0.3,0.05)
 },
 
 
 {
 name:"Void Crystal",
 rarity:"Epic",
-value:900,
-color:new Color(.2,0,1)
-},
-
-
-{
-name:"Titanium Core",
-rarity:"Epic",
-value:850,
-color:new Color(.4,.8,1)
-},
-
-
-{
-name:"Ancient Power Stone",
-rarity:"Epic",
-value:1000,
-color:new Color(1,.9,.1)
+value:1200,
+color:new Color(0.2,0,1)
 },
 
 
 {
 name:"Cyber Reactor",
 rarity:"Epic",
-value:1200,
-color:new Color(.1,1,1)
-},
-
-
-{
-name:"Shadow Blade Fragment",
-rarity:"Epic",
-value:950,
-color:new Color(.1,.05,.2)
-},
-
-
-{
-name:"Dragon Eye",
-rarity:"Epic",
 value:1500,
-color:new Color(1,.2,.2)
-},
-
-
-{
-name:"Lost Wizard Orb",
-rarity:"Epic",
-value:1100,
-color:new Color(.5,.1,1)
-},
-
-
-{
-name:"Ancient AI Chip",
-rarity:"Epic",
-value:1300,
-color:new Color(.1,.7,1)
-},
-
-
-{
-name:"Royal Energy Core",
-rarity:"Epic",
-value:1400,
-color:new Color(1,.7,.1)
+color:new Color(0,1,1)
 },
 
 
 
-// LEGENDARY ITEMS
+// LEGENDARY
 
 
 {
 name:"Crown of the Forgotten King",
 rarity:"Legendary",
 value:5000,
-color:new Color(1,.85,0)
+color:new Color(1,0.85,0)
 },
 
 
@@ -400,7 +258,7 @@ color:new Color(1,.85,0)
 name:"Sword of the Dungeon Lord",
 rarity:"Legendary",
 value:6000,
-color:new Color(.8,.8,1)
+color:new Color(0.8,0.8,1)
 },
 
 
@@ -408,7 +266,7 @@ color:new Color(.8,.8,1)
 name:"Ancient Dragon Heart",
 rarity:"Legendary",
 value:7500,
-color:new Color(1,.1,.05)
+color:new Color(1,0.1,0.05)
 },
 
 
@@ -416,47 +274,7 @@ color:new Color(1,.1,.05)
 name:"Galaxy Core",
 rarity:"Legendary",
 value:9000,
-color:new Color(.2,.3,1)
-},
-
-
-{
-name:"Time Machine Fragment",
-rarity:"Legendary",
-value:10000,
-color:new Color(.1,1,.8)
-},
-
-
-{
-name:"Void Portal Key",
-rarity:"Legendary",
-value:12000,
-color:new Color(.4,0,1)
-},
-
-
-{
-name:"Master Dungeon Key",
-rarity:"Legendary",
-value:15000,
-color:new Color(1,.9,.2)
-},
-
-
-{
-name:"Ancient Civilization Chip",
-rarity:"Legendary",
-value:13000,
-color:new Color(.5,1,.5)
-},
-
-
-{
-name:"Immortal Stone",
-rarity:"Legendary",
-value:20000,
-color:new Color(1,1,1)
+color:new Color(0.2,0.3,1)
 },
 
 
@@ -464,16 +282,21 @@ color:new Color(1,1,1)
 name:"The Final Relic",
 rarity:"Legendary",
 value:50000,
-color:new Color(1,.2,.8)
+color:new Color(1,0.2,0.8)
 }
-
 
 
 ];
 
 
 
-
+console.log(
+"DUNGEON COLLECTABLE DATABASE LOADED:"
++
+collectibleItems.length
++
+" ITEMS"
+);
 
 // =====================================
 // ACTIVE WORLD ITEMS
@@ -481,7 +304,6 @@ color:new Color(1,.2,.8)
 
 
 let activeCollectibles:Entity[]=[];
-
 
 
 
@@ -494,13 +316,13 @@ interface FloatingItem
 
 {
 
-entity:Entity;
+    entity:Entity;
 
-baseY:number;
+    baseY:number;
 
-offset:number;
+    offset:number;
 
-speed:number;
+    speed:number;
 
 }
 
@@ -510,8 +332,9 @@ let floatingItems:FloatingItem[]=[];
 
 
 
+
 // =====================================
-// CREATE ITEM OBJECT
+// CREATE WORLD ITEM OBJECT
 // =====================================
 
 
@@ -571,6 +394,7 @@ false,
 
 undefined
 
+
 );
 
 
@@ -586,8 +410,54 @@ return entity;
 
 
 
+
+
 // =====================================
-// RANDOM ITEM SELECTOR
+// REGISTER FLOATING EFFECT
+// =====================================
+
+
+function registerFloatingItem(
+
+entity:Entity
+
+)
+
+{
+
+
+floatingItems.push(
+
+{
+
+
+entity:entity,
+
+
+baseY:entity.pos.y,
+
+
+offset:Math.random()*Math.PI*2,
+
+
+speed:0.04 + Math.random()*0.05
+
+
+}
+
+
+);
+
+
+
+}
+
+
+
+
+
+// =====================================
+// RANDOM ITEM PICK
 // =====================================
 
 
@@ -613,47 +483,11 @@ Math.random()*collectibleItems.length
 
 
 
-// CONTINUE PART 3...
-
-
-// =====================================
-// REGISTER FLOATING ANIMATION
-// =====================================
-
-
-function registerFloatingItem(
-
-entity:Entity
-
-)
-
-{
-
-floatingItems.push(
-
-{
-
-entity:entity,
-
-baseY:entity.pos.y,
-
-offset:Math.random()*Math.PI*2,
-
-speed:0.04 + Math.random()*0.05
-
-}
-
-);
-
-
-}
-
-
 
 
 
 // =====================================
-// SPAWN LOOSE ITEMS
+// SPAWN DUNGEON COLLECTIBLES
 // =====================================
 
 
@@ -681,7 +515,7 @@ console.log(
 
 console.log(
 
-"SPAWNING 120+ DUNGEON COLLECTIBLES"
+"SPAWNING DUNGEON TREASURES"
 
 );
 
@@ -697,16 +531,14 @@ console.log(
 let amount = 120;
 
 
-
 let offsetX =
 
--(mazeWidth * blockSize)/2;
-
+-(mazeWidth * blockSize) / 2;
 
 
 let offsetZ =
 
--(mazeHeight * blockSize)/2;
+-(mazeHeight * blockSize) / 2;
 
 
 
@@ -738,6 +570,8 @@ Math.random()*mazeHeight
 
 
 
+// only spawn inside rooms
+
 if(maze[x][z] != 0)
 
 {
@@ -750,13 +584,17 @@ continue;
 
 
 
-// keep spawn room safe
+// protect player starting room
 
 if(
 
-(x==1 && z==1) ||
+(x==1 && z==1)
 
-(x==2 && z==1) ||
+||
+
+(x==2 && z==1)
+
+||
 
 (x==1 && z==2)
 
@@ -771,15 +609,17 @@ continue;
 
 
 
+
 let worldX =
 
-(x*blockSize)+offsetX;
+(x * blockSize)+offsetX;
 
 
 
 let worldZ =
 
-(z*blockSize)+offsetZ;
+(z * blockSize)+offsetZ;
+
 
 
 
@@ -802,6 +642,7 @@ worldZ
 
 ),
 
+
 item
 
 );
@@ -821,6 +662,7 @@ item
 
 
 
+
 activeCollectibles.push(entity);
 
 
@@ -833,7 +675,7 @@ spawned++;
 
 console.log(
 
-"Placed item: "
+"ITEM SPAWNED: "
 
 +
 
@@ -841,11 +683,15 @@ item.name
 
 +
 
-" | "
+" ["
 
 +
 
 item.rarity
+
++
+
+"]"
 
 );
 
@@ -855,10 +701,9 @@ item.rarity
 
 
 
-
 console.log(
 
-"TOTAL WORLD ITEMS: "
+"TOTAL ITEMS SPAWNED: "
 
 +
 
@@ -867,17 +712,11 @@ spawned
 );
 
 
+
 }
-
-
-
-
-
-
 
 // =====================================
 // ITEM PICKUP SYSTEM
-// CLICK / TOUCH / GRAB
 // =====================================
 
 
@@ -893,6 +732,7 @@ item:CollectibleItem
 
 
 let collected=false;
+
 
 
 
@@ -922,7 +762,7 @@ undefined
 
 entity.trigger.setOccupiedFunction(
 
-(payload)=>{
+()=>{
 
 
 if(collected)
@@ -936,7 +776,8 @@ return;
 
 
 
-let playerDistance =
+
+let distance =
 
 Player.position.distanceTo(
 
@@ -948,7 +789,7 @@ entity.pos
 
 
 
-if(playerDistance < 4)
+if(distance < 4)
 
 {
 
@@ -974,14 +815,11 @@ item
 }
 
 
-
 );
 
 
 
 }
-
-
 
 
 
@@ -1007,23 +845,19 @@ item:CollectibleItem
 
 console.log(
 
-"================================"
+"=============================="
 
 );
 
 
 console.log(
 
-" ITEM FOUND "
+"ITEM COLLECTED"
 
 );
 
 
 console.log(
-
-" NAME: "
-
-+
 
 item.name
 
@@ -1032,7 +866,7 @@ item.name
 
 console.log(
 
-" RARITY: "
+"RARITY: "
 
 +
 
@@ -1043,7 +877,7 @@ item.rarity
 
 console.log(
 
-" VALUE: "
+"VALUE: "
 
 +
 
@@ -1052,9 +886,10 @@ item.value
 );
 
 
+
 console.log(
 
-"================================"
+"=============================="
 
 );
 
@@ -1062,7 +897,45 @@ console.log(
 
 
 
+
+// local storage
+
 collectedItems.push(item);
+
+
+
+totalValue += item.value;
+
+
+
+
+
+
+
+// send to inventory system
+
+addItemToInventory(
+
+{
+
+
+name:item.name,
+
+
+rarity:item.rarity,
+
+
+amount:1,
+
+
+sellPrice:item.value
+
+
+}
+
+
+);
+
 
 
 
@@ -1081,125 +954,8 @@ entity.destroy();
 
 
 
-
 // =====================================
-// INVENTORY DISPLAY
-// =====================================
-
-
-export function showInventory()
-
-{
-
-
-console.log(
-
-"========== PLAYER INVENTORY =========="
-
-);
-
-
-
-let totalValue=0;
-
-
-
-
-if(collectedItems.length==0)
-
-{
-
-console.log(
-
-"EMPTY"
-
-);
-
-return;
-
-}
-
-
-
-
-
-for(let item of collectedItems)
-
-{
-
-
-console.log(
-
-item.name
-
-+
-
-" ["
-
-+
-
-item.rarity
-
-+
-
-"]"
-
-);
-
-
-
-totalValue += item.value;
-
-
-}
-
-
-
-
-
-console.log(
-
-"ITEM COUNT: "
-
-+
-
-collectedItems.length
-
-);
-
-
-
-console.log(
-
-"TOTAL VALUE: "
-
-+
-
-totalValue
-
-);
-
-
-
-console.log(
-
-"======================================"
-
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-// =====================================
-// ITEM FLOAT + ROTATION EFFECT
+// ITEM FLOAT ANIMATION
 // =====================================
 
 
@@ -1230,13 +986,12 @@ item.offset += item.speed;
 
 
 
+
 item.entity.pos.y =
 
 item.baseY +
 
 Math.sin(item.offset)*0.15;
-
-
 
 
 
@@ -1260,85 +1015,28 @@ item.offset,
 
 
 
-
-
 }
 
 
 
-});
-
-
-
-
-
-
-// =====================================
-// RESET WORLD ITEMS
-// =====================================
-
-
-export function clearCollectibles()
-
-{
-
-
-for(let item of activeCollectibles)
-
-{
-
-
-if(item)
-
-{
-
-item.destroy();
-
 }
-
-
-}
-
-
-
-activeCollectibles=[];
-
-
-
-floatingItems=[];
-
-
-
-console.log(
-
-"All loose collectibles removed"
 
 );
 
 
 
-}
-
-
-
 
 
 
 
 // =====================================
-// CHEST ITEM REWARD SYSTEM
+// INVENTORY DISPLAY
 // =====================================
 
 
-export function openChestReward()
+export function showInventory()
 
 {
-
-
-let rewardCount =
-
-3 + Math.floor(Math.random()*5);
-
 
 
 console.log(
@@ -1350,18 +1048,7 @@ console.log(
 
 console.log(
 
-"CHEST OPENED"
-
-);
-
-
-console.log(
-
-"ITEMS INSIDE: "
-
-+
-
-rewardCount
+"DUNGEON INVENTORY"
 
 );
 
@@ -1374,28 +1061,37 @@ console.log(
 
 
 
-
-
-for(let i=0;i<rewardCount;i++)
+if(collectedItems.length==0)
 
 {
 
 
-let item=getRandomItem();
+console.log(
+
+"EMPTY"
+
+);
+
+
+return;
+
+
+}
 
 
 
-collectedItems.push(item);
+
+let value = 0;
 
 
 
+
+for(let item of collectedItems)
+
+{
 
 
 console.log(
-
-"CHEST ITEM: "
-
-+
 
 item.name
 
@@ -1411,84 +1107,159 @@ item.rarity
 
 
 
+value += item.value;
+
+
+
 }
 
 
 
 
+console.log(
+
+"------------------------------"
+
+);
+
+
+console.log(
+
+"ITEM COUNT: "
+
++
+
+collectedItems.length
+
+);
+
+
+
+console.log(
+
+"TOTAL VALUE: "
+
++
+
+value
+
+);
+
+
+
+console.log(
+
+"=============================="
+
+);
+
+
+
 }
 
 
+
+
+
+
+
 // =====================================
-// RARITY SYSTEM
+// COUNT ITEM
 // =====================================
 
 
-function getRarityMultiplier(
+export function countItem(
 
-rarity:string
+name:string
 
 )
 
 {
 
 
-if(rarity=="Common")
+let count = 0;
+
+
+
+
+for(let item of collectedItems)
 
 {
 
-return 1;
 
-}
-
-
-
-if(rarity=="Uncommon")
+if(item.name == name)
 
 {
 
-return 2;
+count++;
 
 }
 
 
 
-if(rarity=="Rare")
+}
+
+
+
+
+return count;
+
+
+}
+
+// =====================================
+// CHEST LOOT GENERATOR
+// =====================================
+
+
+export function generateChestLoot()
+
+:CollectibleItem[]
 
 {
 
-return 5;
 
-}
-
+let loot:CollectibleItem[]=[];
 
 
-if(rarity=="Epic")
+
+let amount =
+
+3 +
+
+Math.floor(
+
+Math.random()*5
+
+);
+
+
+
+
+
+for(let i=0;i<amount;i++)
 
 {
 
-return 10;
+
+loot.push(
+
+getRandomItemAdvanced()
+
+);
+
+
 
 }
 
 
 
-if(rarity=="Legendary")
 
-{
+return loot;
 
-return 25;
-
-}
-
-
-
-
-return 1;
 
 
 }
-
 
 
 
@@ -1497,7 +1268,7 @@ return 1;
 
 
 // =====================================
-// ADVANCED RANDOM ITEM PICK
+// ADVANCED RANDOM LOOT
 // =====================================
 
 
@@ -1512,64 +1283,57 @@ let roll=Math.random();
 
 
 
-let pool:CollectibleItem[]=[];
+let rarity:string;
 
 
 
-for(let item of collectibleItems)
-
-{
-
-
-let chance=1;
-
-
-
-if(item.rarity=="Common")
+if(roll < 0.60)
 
 {
 
-chance=.60;
+
+rarity="Common";
+
 
 }
 
-
-
-if(item.rarity=="Uncommon")
+else if(roll < 0.85)
 
 {
 
-chance=.25;
+
+rarity="Uncommon";
+
 
 }
 
-
-
-if(item.rarity=="Rare")
+else if(roll < 0.95)
 
 {
 
-chance=.10;
+
+rarity="Rare";
+
 
 }
 
-
-
-if(item.rarity=="Epic")
+else if(roll < 0.99)
 
 {
 
-chance=.04;
+
+rarity="Epic";
+
 
 }
 
-
-
-if(item.rarity=="Legendary")
+else
 
 {
 
-chance=.01;
+
+rarity="Legendary";
+
 
 }
 
@@ -1577,17 +1341,15 @@ chance=.01;
 
 
 
-if(Math.random()<chance)
+let pool = collectibleItems.filter(
 
-{
+(item)=>
 
-pool.push(item);
+item.rarity == rarity
 
-}
+);
 
 
-
-}
 
 
 
@@ -1599,6 +1361,7 @@ if(pool.length==0)
 return collectibleItems[0];
 
 }
+
 
 
 
@@ -1623,49 +1386,296 @@ Math.random()*pool.length
 
 
 
-
-
 // =====================================
-// ITEM COUNTER
+// OPEN CHEST REWARD
 // =====================================
 
 
-export function countItem(
-
-name:string
-
-)
+export function openChestReward()
 
 {
 
 
-let amount=0;
+console.log(
+
+"=============================="
+
+);
+
+
+console.log(
+
+"CHEST OPENED"
+
+);
+
+
+console.log(
+
+"=============================="
+
+);
 
 
 
-for(let item of collectedItems)
+
+
+let rewards = generateChestLoot();
+
+
+
+
+
+
+for(let item of rewards)
 
 {
 
 
-if(item.name==name)
+collectedItems.push(item);
+
+
+
+totalValue += item.value;
+
+
+
+
+
+addItemToInventory(
 
 {
 
-amount++;
+
+name:item.name,
+
+
+rarity:item.rarity,
+
+
+amount:1,
+
+
+sellPrice:item.value
+
 
 }
 
 
+);
+
+
+
+
+
+
+
+console.log(
+
+"FOUND: "
+
++
+
+item.name
+
++
+
+" ["
+
++
+
+item.rarity
+
++
+
+"]"
+
+);
+
+
+
 }
 
 
 
-return amount;
+
+
+console.log(
+
+"TOTAL CHEST ITEMS: "
+
++
+
+rewards.length
+
+);
+
+
+
 
 
 }
 
+
+
+
+
+
+
+
+// =====================================
+// SHOW CHEST PREVIEW
+// =====================================
+
+
+export function showChestLoot()
+
+{
+
+
+let loot = generateChestLoot();
+
+
+
+
+
+console.log(
+
+"=============================="
+
+);
+
+
+console.log(
+
+"CHEST CONTENTS"
+
+);
+
+
+console.log(
+
+"=============================="
+
+);
+
+
+
+
+
+
+for(let item of loot)
+
+{
+
+
+console.log(
+
+item.name
+
++
+
+" | "
+
++
+
+item.rarity
+
++
+
+" | "
+
++
+
+item.value
+
++
+
+" gold"
+
+);
+
+
+
+}
+
+
+
+
+
+console.log(
+
+"=============================="
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+// =====================================
+// GIVE TEST ITEMS
+// =====================================
+
+
+export function giveTestItems()
+
+{
+
+
+console.log(
+
+"GIVING TEST TREASURE"
+
+);
+
+
+
+
+
+for(let i=0;i<10;i++)
+
+{
+
+
+let item=getRandomItemAdvanced();
+
+
+
+
+collectedItems.push(item);
+
+
+
+totalValue += item.value;
+
+
+
+
+
+console.log(
+
+"ADDED: "
+
++
+
+item.name
+
+);
+
+
+
+}
+
+
+
+}
 
 
 
@@ -1685,33 +1695,27 @@ export function detailedInventory()
 
 console.log(
 
-"================================"
+"=============================="
 
 );
 
 
 console.log(
 
-" DUNGEON TREASURE REPORT "
+"DUNGEON TREASURE REPORT"
 
 );
 
 
 console.log(
 
-"================================"
+"=============================="
 
 );
 
 
 
-
-let total=0;
-
-
-
-
-let itemMap:any={};
+let map:any={};
 
 
 
@@ -1721,37 +1725,36 @@ for(let item of collectedItems)
 {
 
 
-total += item.value;
-
-
-
-if(!itemMap[item.name])
+if(!map[item.name])
 
 {
 
-itemMap[item.name]=0;
 
-}
-
-
-
-itemMap[item.name]++;
+map[item.name]=0;
 
 
 }
 
 
 
+map[item.name]++;
 
 
-for(let key in itemMap)
+
+}
+
+
+
+
+
+for(let name in map)
 
 {
 
 
 console.log(
 
-key
+name
 
 +
 
@@ -1759,9 +1762,10 @@ key
 
 +
 
-itemMap[key]
+map[name]
 
 );
+
 
 
 }
@@ -1772,15 +1776,14 @@ itemMap[key]
 
 console.log(
 
-"--------------------------------"
+"------------------------------"
 
 );
 
 
-
 console.log(
 
-"ITEMS FOUND: "
+"ITEM COUNT: "
 
 +
 
@@ -1789,22 +1792,20 @@ collectedItems.length
 );
 
 
-
 console.log(
 
-"TOTAL GOLD VALUE: "
+"TOTAL VALUE: "
 
 +
 
-total
+totalValue
 
 );
 
 
-
 console.log(
 
-"================================"
+"=============================="
 
 );
 
@@ -1812,16 +1813,8 @@ console.log(
 
 }
 
-
-
-
-
-
-
-
-
 // =====================================
-// RARE ITEM GLOW
+// ITEM RARITY EFFECTS
 // =====================================
 
 
@@ -1864,11 +1857,11 @@ if(item.rarity=="Epic")
 
 entity.scale = new Vector3(
 
-0.6,
+0.65,
 
-0.6,
+0.65,
 
-0.6
+0.65
 
 );
 
@@ -1876,14 +1869,13 @@ entity.scale = new Vector3(
 
 console.log(
 
-"Epic item spawned"
+"EPIC ITEM SPAWNED"
 
 );
 
 
 
 }
-
 
 
 
@@ -1894,11 +1886,11 @@ if(item.rarity=="Legendary")
 
 entity.scale = new Vector3(
 
-0.75,
+0.8,
 
-0.75,
+0.8,
 
-0.75
+0.8
 
 );
 
@@ -1906,7 +1898,7 @@ entity.scale = new Vector3(
 
 console.log(
 
-"!!! LEGENDARY ITEM SPAWNED !!!"
+"!!! LEGENDARY ITEM !!!"
 
 );
 
@@ -1917,7 +1909,6 @@ console.log(
 
 
 }
-
 
 
 
@@ -1927,7 +1918,7 @@ console.log(
 
 
 // =====================================
-// ITEM COLLECTION EFFECT
+// COLLECTION MESSAGE
 // =====================================
 
 
@@ -1947,14 +1938,14 @@ if(item.rarity=="Legendary")
 
 console.log(
 
-"***********************"
+"********************************"
 
 );
 
 
 console.log(
 
-" LEGENDARY FIND!!! "
+" LEGENDARY TREASURE FOUND "
 
 );
 
@@ -1968,9 +1959,10 @@ item.name
 
 console.log(
 
-"***********************"
+"********************************"
 
 );
+
 
 
 }
@@ -1988,20 +1980,15 @@ console.log(
 
 item.name
 
-+
-
-"!"
-
 );
 
 
-}
-
-
 
 }
 
 
+
+}
 
 
 
@@ -2010,7 +1997,7 @@ item.name
 
 
 // =====================================
-// IMPROVED COLLECT FUNCTION
+// ADVANCED COLLECT FUNCTION
 // =====================================
 
 
@@ -2025,7 +2012,25 @@ item:CollectibleItem
 {
 
 
+if(!entity)
+
+{
+
+return;
+
+}
+
+
+
+
+
 collectedItems.push(item);
+
+
+
+totalValue += item.value;
+
+
 
 
 
@@ -2033,19 +2038,264 @@ collectionMessage(item);
 
 
 
-console.log(
 
-"Value +"
 
-+
+addItemToInventory(
 
-item.value
+{
+
+
+name:item.name,
+
+
+rarity:item.rarity,
+
+
+amount:1,
+
+
+sellPrice:item.value
+
+
+}
+
 
 );
 
 
 
+
+
+
 entity.destroy();
+
+
+
+
+
+}
+
+
+
+
+
+
+
+// =====================================
+// CLEAR WORLD ITEMS
+// =====================================
+
+
+export function clearCollectibles()
+
+{
+
+
+for(let item of activeCollectibles)
+
+{
+
+
+if(item)
+
+{
+
+
+item.destroy();
+
+
+}
+
+
+
+}
+
+
+
+
+
+activeCollectibles=[];
+
+
+
+floatingItems=[];
+
+
+
+
+
+console.log(
+
+"ALL DUNGEON ITEMS CLEARED"
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+// =====================================
+// RESET PLAYER TREASURE
+// =====================================
+
+
+export function resetInventory()
+
+{
+
+
+collectedItems=[];
+
+
+
+totalValue=0;
+
+
+
+
+
+console.log(
+
+"DUNGEON INVENTORY RESET"
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+// =====================================
+// SAVE DATA DEBUG
+// =====================================
+
+
+export function getCollectibleStats()
+
+{
+
+
+return {
+
+
+itemsFound:
+
+collectedItems.length,
+
+
+worldItems:
+
+activeCollectibles.length,
+
+
+totalGold:
+
+totalValue
+
+
+
+};
+
+
+
+}
+
+
+
+
+
+
+
+// =====================================
+// DEBUG DISPLAY
+// =====================================
+
+
+export function showCollectibleStats()
+
+{
+
+
+let stats=getCollectibleStats();
+
+
+
+
+
+console.log(
+
+"=============================="
+
+);
+
+
+console.log(
+
+"DUNGEON COLLECTIBLE STATUS"
+
+);
+
+
+console.log(
+
+"=============================="
+
+);
+
+
+
+console.log(
+
+"Collected Items: "
+
++
+
+stats.itemsFound
+
+);
+
+
+
+console.log(
+
+"World Items: "
+
++
+
+stats.worldItems
+
+);
+
+
+
+console.log(
+
+"Total Gold: "
+
++
+
+stats.totalGold
+
+);
+
+
+
+console.log(
+
+"=============================="
+
+);
 
 
 
@@ -2058,26 +2308,72 @@ entity.destroy();
 
 
 
-
 // =====================================
-// DEBUG GIVE ITEMS
+// REMOVE SINGLE WORLD ITEM
 // =====================================
 
 
-export function giveTestItems()
+export function removeWorldItem(
+
+entity:Entity
+
+)
 
 {
 
 
-console.log(
+let index=
 
-"Giving test treasure..."
+activeCollectibles.indexOf(entity);
+
+
+
+
+if(index!=-1)
+
+{
+
+
+activeCollectibles.splice(
+
+index,
+
+1
 
 );
 
 
 
-for(let i=0;i<10;i++)
+}
+
+
+
+
+if(entity)
+
+{
+
+
+entity.destroy();
+
+
+}
+
+
+
+
+}
+
+// =====================================
+// SPAWN SINGLE RANDOM COLLECTIBLE
+// =====================================
+
+
+export function spawnSingleCollectible(
+
+position:Vector3
+
+)
 
 {
 
@@ -2086,13 +2382,156 @@ let item=getRandomItemAdvanced();
 
 
 
+
+
+let entity=createItemCube(
+
+position,
+
+item
+
+);
+
+
+
+
+
+attachPickup(
+
+entity,
+
+item
+
+);
+
+
+
+
+
+activeCollectibles.push(entity);
+
+
+
+
+
+applyItemEffect(
+
+entity,
+
+item
+
+);
+
+
+
+
+
+return entity;
+
+
+
+}
+
+
+
+
+
+
+
+// =====================================
+// GIVE SPECIFIC ITEM DEBUG
+// =====================================
+
+
+export function giveItem(
+
+name:string
+
+)
+
+{
+
+
+let item = collectibleItems.find(
+
+(x)=>
+
+x.name==name
+
+);
+
+
+
+
+
+if(!item)
+
+{
+
+
+console.log(
+
+"ITEM NOT FOUND: "
+
++
+
+name
+
+);
+
+
+
+return;
+
+
+
+}
+
+
+
+
+
 collectedItems.push(item);
 
 
 
+totalValue += item.value;
+
+
+
+
+
+
+addItemToInventory(
+
+{
+
+
+name:item.name,
+
+
+rarity:item.rarity,
+
+
+amount:1,
+
+
+sellPrice:item.value
+
+
+}
+
+
+);
+
+
+
+
+
+
 console.log(
 
-"Added "
+"GIVEN ITEM: "
 
 +
 
@@ -2106,66 +2545,21 @@ item.name
 
 
 
-}
-
-
-
-
-
 
 
 
 
 // =====================================
-// CHEST LOOT GENERATOR
+// FIND ITEM DATABASE
 // =====================================
 
 
-export function generateChestLoot()
-
-:CollectibleItem[]
+export function getItemDatabase()
 
 {
 
 
-let loot:CollectibleItem[]=[];
-
-
-
-let amount=
-
-3+
-
-Math.floor(
-
-Math.random()*7
-
-);
-
-
-
-
-
-for(let i=0;i<amount;i++)
-
-{
-
-
-loot.push(
-
-getRandomItemAdvanced()
-
-);
-
-
-
-}
-
-
-
-
-
-return loot;
+return collectibleItems;
 
 
 
@@ -2177,77 +2571,69 @@ return loot;
 
 
 
-
-
 // =====================================
-// DISPLAY CHEST CONTENTS
+// START COLLECTIBLE SYSTEM
 // =====================================
 
 
-export function showChestLoot()
+let systemStarted=false;
+
+
+
+
+
+
+export function startCollectibleSystem()
 
 {
 
 
-let loot=
-
-generateChestLoot();
-
-
-
-console.log(
-
-"============================"
-
-);
-
-
-
-console.log(
-
-" CHEST CONTENTS "
-
-);
-
-
-
-for(let item of loot)
+if(systemStarted)
 
 {
 
-
-console.log(
-
-item.name
-
-+
-
-" "
-
-+
-
-item.rarity
-
-+
-
-" VALUE "
-
-+
-
-item.value
-
-);
-
-
+return;
 
 }
+
+
+
+
+
+systemStarted=true;
+
 
 
 
 
 console.log(
 
-"============================"
+"=============================="
+
+);
+
+
+console.log(
+
+"DUNGEON COLLECTIBLE SYSTEM ONLINE"
+
+);
+
+
+console.log(
+
+"ITEM DATABASE: "
+
++
+
+collectibleItems.length
+
+);
+
+
+console.log(
+
+"=============================="
 
 );
 
@@ -2256,140 +2642,6 @@ console.log(
 }
 
 
-// =====================================
-// RARE ITEMS
-// =====================================
-
-
-{
-
-name:"Ruby Dungeon Gem",
-
-rarity:"Rare",
-
-value:250,
-
-color:new Color(1,0.05,0.05)
-
-},
-
-
-{
-
-name:"Sapphire Crystal",
-
-rarity:"Rare",
-
-value:275,
-
-color:new Color(0.05,0.2,1)
-
-},
-
-
-{
-
-name:"Emerald Relic",
-
-rarity:"Rare",
-
-value:300,
-
-color:new Color(0.05,1,0.2)
-
-},
-
-
-{
-
-name:"Golden Ancient Idol",
-
-rarity:"Rare",
-
-value:350,
-
-color:new Color(1,0.8,0.1)
-
-},
-
-
-{
-
-name:"Dragon Scale",
-
-rarity:"Rare",
-
-value:400,
-
-color:new Color(0.8,0.2,0.05)
-
-},
-
-
-{
-
-name:"Shadow Crystal",
-
-rarity:"Rare",
-
-value:450,
-
-color:new Color(0.2,0.05,0.5)
-
-},
-
-
-{
-
-name:"Frozen Heart",
-
-rarity:"Rare",
-
-value:425,
-
-color:new Color(0.3,0.8,1)
-
-},
-
-
-{
-
-name:"Demon Horn",
-
-rarity:"Rare",
-
-value:500,
-
-color:new Color(0.4,0.1,0.05)
-
-},
-
-
-{
-
-name:"Ancient Warrior Medal",
-
-rarity:"Rare",
-
-value:325,
-
-color:new Color(0.7,0.7,0.4)
-
-},
-
-
-{
-
-name:"Lost King's Crown",
-
-rarity:"Rare",
-
-value:600,
-
-color:new Color(1,0.9,0.2)
-
-},
-
 
 
 
@@ -2397,829 +2649,127 @@ color:new Color(1,0.9,0.2)
 
 
 // =====================================
-// EPIC ITEMS
+// COMPLETE SYSTEM RESET
 // =====================================
 
 
-{
-
-name:"Void Blade Fragment",
-
-rarity:"Epic",
-
-value:900,
-
-color:new Color(0.3,0,1)
-
-},
-
+export function resetCollectibleSystem()
 
 {
 
-name:"Phoenix Feather",
 
-rarity:"Epic",
+clearCollectibles();
 
-value:850,
 
-color:new Color(1,0.4,0.05)
 
-},
+collectedItems=[];
 
 
-{
 
-name:"Titan Core",
+totalValue=0;
 
-rarity:"Epic",
 
-value:1000,
 
-color:new Color(0.5,0.5,0.6)
 
-},
 
+systemStarted=false;
 
-{
 
-name:"Cyber Reactor",
 
-rarity:"Epic",
 
-value:1200,
 
-color:new Color(0,1,1)
 
-},
+console.log(
 
+"COLLECTIBLE SYSTEM RESET"
 
-{
+);
 
-name:"Ancient Machine Brain",
 
-rarity:"Epic",
-
-value:1300,
-
-color:new Color(0.8,0.8,0.9)
-
-},
-
-
-{
-
-name:"Crystal Power Matrix",
-
-rarity:"Epic",
-
-value:1500,
-
-color:new Color(0.4,1,0.8)
-
-},
-
-
-{
-
-name:"Demon Energy Core",
-
-rarity:"Epic",
-
-value:1700,
-
-color:new Color(1,0,0.2)
-
-},
-
-
-{
-
-name:"Quantum Gear",
-
-rarity:"Epic",
-
-value:1400,
-
-color:new Color(0.2,0.7,1)
-
-},
-
-
-{
-
-name:"Alien Technology Chip",
-
-rarity:"Epic",
-
-value:1600,
-
-color:new Color(0.1,1,0.6)
-
-},
-
-
-{
-
-name:"Royal Wizard Staff",
-
-rarity:"Epic",
-
-value:1800,
-
-color:new Color(0.8,0.2,1)
-
-},
-
-
-
-
-
-
-
-// =====================================
-// LEGENDARY ITEMS
-// =====================================
-
-
-{
-
-name:"Sword of the Forgotten Hero",
-
-rarity:"Legendary",
-
-value:5000,
-
-color:new Color(1,0.85,0)
-
-},
-
-
-{
-
-name:"Dragon Eye Artifact",
-
-rarity:"Legendary",
-
-value:6000,
-
-color:new Color(1,0.2,0.05)
-
-},
-
-
-{
-
-name:"The Golden Skull",
-
-rarity:"Legendary",
-
-value:7500,
-
-color:new Color(1,0.9,0.4)
-
-},
-
-
-{
-
-name:"Ancient Alien Core",
-
-rarity:"Legendary",
-
-value:9000,
-
-color:new Color(0,1,1)
-
-},
-
-
-{
-
-name:"Time Crystal",
-
-rarity:"Legendary",
-
-value:10000,
-
-color:new Color(0.7,0.2,1)
-
-},
-
-
-{
-
-name:"Soul Collector Gem",
-
-rarity:"Legendary",
-
-value:11000,
-
-color:new Color(0.1,0,0.3)
-
-},
-
-
-{
-
-name:"God Machine Component",
-
-rarity:"Legendary",
-
-value:15000,
-
-color:new Color(0.8,0.8,1)
-
-},
-
-
-{
-
-name:"Lost Civilization Key",
-
-rarity:"Legendary",
-
-value:12500,
-
-color:new Color(1,0.6,0.1)
-
-},
-
-
-{
-
-name:"Infinity Power Cell",
-
-rarity:"Legendary",
-
-value:20000,
-
-color:new Color(0,1,0.8)
-
-},
-
-
-{
-
-name:"Dungeon Master Relic",
-
-rarity:"Legendary",
-
-value:25000,
-
-color:new Color(1,1,1)
-
-},
-
-// =====================================
-// CURSED ITEMS
-// =====================================
-
-
-{
-
-name:"Cursed Bone Necklace",
-
-rarity:"Cursed",
-
-value:650,
-
-color:new Color(0.4,0.1,0.2)
-
-},
-
-
-{
-
-name:"Haunted Doll",
-
-rarity:"Cursed",
-
-value:700,
-
-color:new Color(0.2,0.05,0.05)
-
-},
-
-
-{
-
-name:"Blood Crystal",
-
-rarity:"Cursed",
-
-value:900,
-
-color:new Color(0.8,0,0)
-
-},
-
-
-{
-
-name:"Shadow Orb",
-
-rarity:"Cursed",
-
-value:1200,
-
-color:new Color(0.05,0,0.1)
-
-},
-
-
-{
-
-name:"Demon Contract",
-
-rarity:"Cursed",
-
-value:1500,
-
-color:new Color(0.3,0,0)
-
-},
-
-
-{
-
-name:"Forbidden Spell Book",
-
-rarity:"Cursed",
-
-value:1800,
-
-color:new Color(0.2,0.1,0.4)
-
-},
-
-
-{
-
-name:"Ghost Lantern",
-
-rarity:"Cursed",
-
-value:2200,
-
-color:new Color(0.4,0.8,1)
-
-},
-
-
-{
-
-name:"Dead King's Ring",
-
-rarity:"Cursed",
-
-value:2500,
-
-color:new Color(0.6,0.5,0.1)
-
-},
-
-
-{
-
-name:"Corrupted Crystal",
-
-rarity:"Cursed",
-
-value:3000,
-
-color:new Color(0.5,0,0.8)
-
-},
-
-
-{
-
-name:"Soul Prison",
-
-rarity:"Cursed",
-
-value:3500,
-
-color:new Color(0.1,0.1,0.1)
-
-},
-
-
-
-
-
-
-
-// =====================================
-// MACHINE / STEAM DUNGEON ITEMS
-// =====================================
-
-
-{
-
-name:"Rusty Gear",
-
-rarity:"Mechanical",
-
-value:100,
-
-color:new Color(.35,.35,.35)
-
-},
-
-
-{
-
-name:"Copper Valve",
-
-rarity:"Mechanical",
-
-value:150,
-
-color:new Color(.8,.45,.15)
-
-},
-
-
-{
-
-name:"Steam Pressure Gauge",
-
-rarity:"Mechanical",
-
-value:250,
-
-color:new Color(.7,.7,.7)
-
-},
-
-
-{
-
-name:"Broken Robot Arm",
-
-rarity:"Mechanical",
-
-value:400,
-
-color:new Color(.4,.5,.6)
-
-},
-
-
-{
-
-name:"Ancient Circuit Board",
-
-rarity:"Mechanical",
-
-value:650,
-
-color:new Color(0,.8,.4)
-
-},
-
-
-{
-
-name:"Power Generator Coil",
-
-rarity:"Mechanical",
-
-value:800,
-
-color:new Color(1,.7,.1)
-
-},
-
-
-{
-
-name:"Mini Reactor",
-
-rarity:"Mechanical",
-
-value:1200,
-
-color:new Color(0,1,1)
-
-},
-
-
-{
-
-name:"Mechanical Heart",
-
-rarity:"Mechanical",
-
-value:2000,
-
-color:new Color(.8,.2,.2)
-
-},
-
-
-{
-
-name:"Clockwork Brain",
-
-rarity:"Mechanical",
-
-value:3000,
-
-color:new Color(.5,.7,1)
-
-},
-
-
-{
-
-name:"Ancient War Machine Core",
-
-rarity:"Mechanical",
-
-value:5000,
-
-color:new Color(1,.5,0)
-
-},
-
-
-
-
-
-
-
-// =====================================
-// QUEST ITEMS
-// =====================================
-
-
-{
-
-name:"Lost Explorer Journal",
-
-rarity:"Quest",
-
-value:300,
-
-color:new Color(.7,.5,.3)
-
-},
-
-
-{
-
-name:"Royal Seal",
-
-rarity:"Quest",
-
-value:900,
-
-color:new Color(1,.8,.2)
-
-},
-
-
-{
-
-name:"Dungeon Gate Key",
-
-rarity:"Quest",
-
-value:1000,
-
-color:new Color(.6,.6,.6)
-
-},
-
-
-{
-
-name:"Crystal Temple Key",
-
-rarity:"Quest",
-
-value:1500,
-
-color:new Color(.2,.8,1)
-
-},
-
-
-{
-
-name:"Ancient Map Fragment",
-
-rarity:"Quest",
-
-value:500,
-
-color:new Color(.8,.7,.4)
-
-},
-
-
-{
-
-name:"Wizard Tower Pass",
-
-rarity:"Quest",
-
-value:1200,
-
-color:new Color(.5,.1,1)
-
-},
-
-
-{
-
-name:"Dragon Tomb Key",
-
-rarity:"Quest",
-
-value:2500,
-
-color:new Color(1,.2,.1)
-
-},
-
-
-{
-
-name:"Lost Civilization Tablet",
-
-rarity:"Quest",
-
-value:4000,
-
-color:new Color(.6,.4,.2)
-
-},
-
-
-{
-
-name:"Portal Activation Crystal",
-
-rarity:"Quest",
-
-value:6000,
-
-color:new Color(.2,1,.8)
-
-},
-
-
-{
-
-name:"Final Dungeon Artifact",
-
-rarity:"Quest",
-
-value:10000,
-
-color:new Color(1,1,.5)
-
-},
-
-
-
-
-
-
-
-// =====================================
-// TROPHIES
-// =====================================
-
-
-{
-
-name:"Goblin Trophy",
-
-rarity:"Trophy",
-
-value:250,
-
-color:new Color(.2,.8,.2)
-
-},
-
-
-{
-
-name:"Skeleton Skull",
-
-rarity:"Trophy",
-
-value:350,
-
-color:new Color(.9,.9,.8)
-
-},
-
-
-{
-
-name:"Orc War Banner",
-
-rarity:"Trophy",
-
-value:600,
-
-color:new Color(.1,.5,.1)
-
-},
-
-
-{
-
-name:"Demon Horn Trophy",
-
-rarity:"Trophy",
-
-value:1000,
-
-color:new Color(.8,.1,.05)
-
-},
-
-
-{
-
-name:"Cyber Demon Chip",
-
-rarity:"Trophy",
-
-value:2000,
-
-color:new Color(.1,.5,1)
-
-},
-
-
-{
-
-name:"Ancient Knight Helmet",
-
-rarity:"Trophy",
-
-value:3000,
-
-color:new Color(.7,.7,.7)
-
-},
-
-
-{
-
-name:"Shadow Beast Claw",
-
-rarity:"Trophy",
-
-value:4000,
-
-color:new Color(.1,.05,.2)
-
-},
-
-
-{
-
-name:"Dungeon Champion Medal",
-
-rarity:"Trophy",
-
-value:5000,
-
-color:new Color(1,.8,.1)
-
-},
-
-
-{
-
-name:"Monster Hunter Badge",
-
-rarity:"Trophy",
-
-value:7000,
-
-color:new Color(.8,.3,.1)
-
-},
-
-
-{
-
-name:"Ultimate Dungeon Trophy",
-
-rarity:"Trophy",
-
-value:15000,
-
-color:new Color(1,1,1)
 
 }
+
+
+
+
+
+
+
+
+// =====================================
+// INITIAL TEST
+// =====================================
+
+
+export function testCollectibleSystem()
+
+{
+
+
+console.log(
+
+"=============================="
+
+);
+
+
+console.log(
+
+"COLLECTIBLE TEST"
+
+);
+
+
+console.log(
+
+"Items Database: "
+
++
+
+collectibleItems.length
+
+);
+
+
+
+console.log(
+
+"Collected: "
+
++
+
+collectedItems.length
+
+);
+
+
+
+console.log(
+
+"World Items: "
+
++
+
+activeCollectibles.length
+
+);
+
+
+
+console.log(
+
+"=============================="
+
+);
+
+
+
+}
+
+
+
+
+
+// =====================================
+// END OF DUNGEON COLLECTABLES SYSTEM
+// =====================================

@@ -1,6 +1,6 @@
 // =====================================
 // RETRO VOXEL DUNGEON SYSTEM
-// FIXED STABLE VERSION
+// FIXED ENEMY MOVEMENT VERSION
 // =====================================
 
 
@@ -9,7 +9,9 @@ import { Color } from "./Yuu API/Basic Types/Color";
 import { Quaternion } from "./Yuu API/Basic Types/Quaternion";
 import { Entity } from "./Yuu API/Entity";
 import { Player } from "./Yuu API/Player";
+import { Events } from "./Yuu API/Events";
 import { spawnPrimitive } from "./Yuu API/SpawnPrimitive";
+
 
 
 
@@ -17,10 +19,6 @@ import { spawnPrimitive } from "./Yuu API/SpawnPrimitive";
 // =====================================
 // SAFE INVENTORY CONNECTOR
 // =====================================
-
-
-// Inventory is connected later.
-// Dungeon will load without it.
 
 
 let inventoryReady=false;
@@ -58,8 +56,6 @@ console.log(
 
 
 
-
-
 // =====================================
 // DUNGEON SIZE
 // =====================================
@@ -73,11 +69,7 @@ const blockSize = 8;
 
 
 
-
-
 let maze:number[][]=[];
-
-
 
 
 
@@ -97,6 +89,17 @@ export let chests:Entity[]=[];
 
 
 
+
+
+// =====================================
+// ENEMY SETTINGS
+// =====================================
+
+
+const enemySpeed = 2.5;
+
+
+const enemyAttackDistance = 2.5;
 
 
 
@@ -119,7 +122,6 @@ rarity:string;
 sellValue:number;
 
 }
-
 
 
 
@@ -290,6 +292,10 @@ console.log(
 
 );
 
+
+
+
+
 // =====================================
 // CREATE CUBE
 // =====================================
@@ -358,14 +364,6 @@ undefined
 
 
 }
-
-
-
-
-
-
-
-
 
 // =====================================
 // WALL COLORS
@@ -510,6 +508,8 @@ return new Color(
 
 
 
+
+
 return new Color(
 
 0.10,
@@ -523,8 +523,6 @@ return new Color(
 
 
 }
-
-
 
 
 
@@ -549,8 +547,6 @@ maze=[];
 
 
 
-
-// Fill with walls
 
 for(let x=0;x<mazeWidth;x++)
 
@@ -585,8 +581,6 @@ maze[x][z]=1;
 
 
 
-
-// Create rooms
 
 for(
 
@@ -626,9 +620,6 @@ let exits=0;
 
 
 
-
-// EAST
-
 if(x<mazeWidth-2)
 
 {
@@ -650,7 +641,6 @@ exits++;
 
 
 
-// WEST
 
 if(
 
@@ -679,7 +669,6 @@ exits++;
 
 
 
-// SOUTH
 
 if(z<mazeHeight-2)
 
@@ -702,7 +691,6 @@ exits++;
 
 
 
-// NORTH
 
 if(
 
@@ -731,7 +719,6 @@ exits++;
 
 
 
-// Safety opening
 
 if(exits==0)
 
@@ -760,8 +747,6 @@ maze[x+1][z]=0;
 
 
 
-// Starting room
-
 maze[1][1]=0;
 
 maze[2][1]=0;
@@ -774,14 +759,9 @@ maze[1][2]=0;
 
 
 
-
-
-// Ending room
-
 maze[mazeWidth-2][mazeHeight-2]=0;
 
 maze[mazeWidth-3][mazeHeight-2]=0;
-
 
 
 
@@ -798,6 +778,14 @@ console.log(
 
 
 }
+
+
+
+
+
+
+
+
 
 // =====================================
 // BUILD DUNGEON WORLD
@@ -826,7 +814,6 @@ console.log(
 
 
 
-
 let offsetX =
 
 -(mazeWidth * blockSize) / 2;
@@ -838,7 +825,6 @@ let offsetX =
 let offsetZ =
 
 -(mazeHeight * blockSize) / 2;
-
 
 
 
@@ -874,11 +860,6 @@ let worldZ =
 
 
 
-
-
-// =================================
-// WALLS
-// =================================
 
 
 if(maze[x][z]==1)
@@ -936,11 +917,6 @@ z
 
 
 
-// =================================
-// FLOORS
-// =================================
-
-
 else
 
 {
@@ -991,9 +967,6 @@ z
 
 
 
-
-// Do not spawn objects in start room
-
 if(
 
 !(x==1 && z==1)
@@ -1041,13 +1014,6 @@ worldZ
 
 
 
-
-
-// =================================
-// PLAYER START POSITION
-// =================================
-
-
 Player.position.set(
 
 new Vector3(
@@ -1061,7 +1027,6 @@ offsetZ + blockSize
 )
 
 );
-
 
 
 
@@ -1182,6 +1147,7 @@ new Color(
 
 
 
+
 let data =
 
 {
@@ -1199,7 +1165,10 @@ hp:100,
 damage:10,
 
 
-alive:true
+alive:true,
+
+
+attacking:false
 
 
 
@@ -1211,10 +1180,7 @@ alive:true
 
 
 
-
 enemies.push(data);
-
-
 
 
 
@@ -1299,7 +1265,6 @@ new Color(
 
 
 
-
 chests.push(chest);
 
 
@@ -1307,11 +1272,7 @@ chests.push(chest);
 
 
 
-
-// Add interaction safely
-
 attachChestLoot(chest);
-
 
 
 
@@ -1404,6 +1365,220 @@ Math.random()*list.length
 
 }
 
+
+
+
+
+
+
+
+
+// =====================================
+// ENEMY MOVEMENT AI
+// =====================================
+
+
+function updateEnemies()
+
+{
+
+
+for(let i=0;i<enemies.length;i++)
+
+{
+
+
+let enemyData=enemies[i];
+
+
+
+
+if(!enemyData.alive)
+
+continue;
+
+
+
+
+
+let enemy=enemyData.entity;
+
+
+
+
+if(!enemy)
+
+continue;
+
+
+
+
+
+
+
+let enemyPos=enemy.pos;
+
+
+let playerPos=Player.position;
+
+
+
+
+
+
+
+let dx =
+
+playerPos.x -
+
+enemyPos.x;
+
+
+
+let dz =
+
+playerPos.z -
+
+enemyPos.z;
+
+
+
+
+
+
+
+let distance = Math.sqrt(
+
+(dx*dx)
+
++
+
+(dz*dz)
+
+);
+
+
+
+
+
+
+
+
+
+if(distance > enemyAttackDistance)
+
+{
+
+
+
+let moveX =
+
+dx / distance;
+
+
+
+let moveZ =
+
+dz / distance;
+
+
+
+
+
+
+
+enemy.pos = new Vector3(
+
+enemyPos.x +
+
+(moveX * enemySpeed * 0.016),
+
+
+
+enemyPos.y,
+
+
+
+enemyPos.z +
+
+(moveZ * enemySpeed * 0.016)
+
+
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+else
+
+{
+
+
+if(!enemyData.attacking)
+
+{
+
+
+enemyData.attacking=true;
+
+
+
+console.log(
+
+enemyData.name +
+
+" attacking player"
+
+);
+
+
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// ENEMY UPDATE LOOP
+// =====================================
+
+
+Events.onPhysicsUpdate(
+
+()=>{
+
+
+updateEnemies();
+
+
+
+});
+
 // =====================================
 // CHEST INTERACTION
 // =====================================
@@ -1417,8 +1592,6 @@ chest:Entity
 
 {
 
-
-// Safety check
 
 if(!chest.trigger)
 
@@ -1437,6 +1610,7 @@ return;
 
 
 }
+
 
 
 
@@ -1496,7 +1670,6 @@ return;
 
 
 
-
 let distance =
 
 Player.position.distanceTo(
@@ -1534,9 +1707,8 @@ openChest(chest);
 
 
 
+
 }
-
-
 
 
 
@@ -1572,6 +1744,7 @@ console.log(
 "CHEST OPENED"
 
 );
+
 
 
 
@@ -1619,6 +1792,7 @@ Math.random()*lootTable.length
 
 
 
+
 let reward =
 
 {
@@ -1646,7 +1820,6 @@ sellPrice:item.sellValue
 
 
 
-// SEND TO INVENTORY ONLY IF CONNECTED
 
 if(inventoryReady && inventoryFunction)
 
@@ -1726,8 +1899,6 @@ item.sellValue
 
 
 
-
-
 }
 
 
@@ -1757,13 +1928,21 @@ console.log(
 
 
 
-
-
 chest.destroy();
 
 
 
 }
+
+
+
+
+
+
+
+
+
+
 
 // =====================================
 // LOOT DATABASE EXPORT
@@ -1780,6 +1959,8 @@ return lootTable;
 
 
 }
+
+
 
 
 
@@ -1892,6 +2073,8 @@ let stats=getDungeonStats();
 
 
 
+
+
 console.log(
 
 "===================="
@@ -1905,6 +2088,8 @@ console.log(
 "RETRO DUNGEON STATUS"
 
 );
+
+
 
 
 
@@ -1924,6 +2109,8 @@ stats.enemies
 
 
 
+
+
 console.log(
 
 "Chests: "
@@ -1933,6 +2120,8 @@ console.log(
 stats.chests
 
 );
+
+
 
 
 
@@ -1952,100 +2141,11 @@ stats.loot
 
 
 
+
+
 console.log(
 
 "===================="
-
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// =====================================
-// RESET DATA
-// =====================================
-
-
-export function resetDungeonData()
-
-{
-
-
-enemies=[];
-
-
-chests=[];
-
-
-
-
-
-
-console.log(
-
-"DUNGEON DATA RESET"
-
-);
-
-
-
-}
-
-
-
-
-
-
-
-
-
-// =====================================
-// START SYSTEM
-// =====================================
-
-
-let dungeonStarted=false;
-
-
-
-
-
-
-
-
-export function startDungeonSystem()
-
-{
-
-
-if(dungeonStarted)
-
-return;
-
-
-
-
-
-
-dungeonStarted=true;
-
-
-
-
-
-
-console.log(
-
-"DUNGEON SYSTEM STARTED"
 
 );
 
