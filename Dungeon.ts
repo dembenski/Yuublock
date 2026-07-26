@@ -16,9 +16,7 @@ import { spawnPrimitive } from "./Yuu API/SpawnPrimitive";
 import { addEnemyAI } from "./EnemyAI";
 import { registerEnemyCombat } from "./Combat";
 
-import { addItemToInventory } from "./InventorySystem";
-
-import { addItemToInventory } from "./InventorySystem";
+import { addItemToInventory } from "./InventorySystem";;
 
 addItemToInventory(item);
 
