@@ -1,7 +1,6 @@
 // =====================================
 // RETRO VOXEL DUNGEON SYSTEM
-// CLEAN STABLE VERSION
-// CHESTS + INVENTORY LOOT
+// FIXED STABLE VERSION
 // =====================================
 
 
@@ -13,8 +12,50 @@ import { Player } from "./Yuu API/Player";
 import { spawnPrimitive } from "./Yuu API/SpawnPrimitive";
 
 
-// Inventory connection
-import { addItemToInventory } from "./InventorySystem";
+
+
+// =====================================
+// SAFE INVENTORY CONNECTOR
+// =====================================
+
+
+// Inventory is connected later.
+// Dungeon will load without it.
+
+
+let inventoryReady=false;
+
+
+let inventoryFunction:any=null;
+
+
+
+export function connectInventory(
+
+func:any
+
+)
+
+{
+
+inventoryFunction=func;
+
+inventoryReady=true;
+
+
+console.log(
+
+"Inventory connected"
+
+);
+
+
+}
+
+
+
+
+
 
 
 
@@ -33,7 +74,12 @@ const blockSize = 8;
 
 
 
+
 let maze:number[][]=[];
+
+
+
+
 
 
 
@@ -55,6 +101,8 @@ export let chests:Entity[]=[];
 
 
 
+
+
 // =====================================
 // LOOT TYPE
 // =====================================
@@ -64,16 +112,11 @@ interface LootItem
 
 {
 
-
 name:string;
-
 
 rarity:string;
 
-
 sellValue:number;
-
-
 
 }
 
@@ -86,7 +129,7 @@ sellValue:number;
 
 
 // =====================================
-// CHEST LOOT TABLE
+// LOOT TABLE
 // =====================================
 
 
@@ -131,41 +174,10 @@ sellValue:30
 
 
 {
-name:"Torch Oil",
-rarity:"Common",
-sellValue:12
-},
-
-
-{
-name:"Iron Scrap",
-rarity:"Common",
-sellValue:18
-},
-
-
-{
-name:"Old Helmet",
-rarity:"Common",
-sellValue:35
-},
-
-
-{
-name:"Dungeon Bread",
-rarity:"Common",
-sellValue:5
-},
-
-
-{
 name:"Small Healing Potion",
 rarity:"Common",
 sellValue:30
 },
-
-
-
 
 
 {
@@ -197,16 +209,6 @@ sellValue:120
 
 
 {
-name:"Warrior Badge",
-rarity:"Uncommon",
-sellValue:150
-},
-
-
-
-
-
-{
 name:"Cyber Circuit",
 rarity:"Rare",
 sellValue:300
@@ -235,17 +237,6 @@ sellValue:450
 
 
 {
-name:"Demon Core Fragment",
-rarity:"Rare",
-sellValue:500
-},
-
-
-
-
-
-
-{
 name:"Knight Helmet",
 rarity:"Epic",
 sellValue:1000
@@ -267,27 +258,9 @@ sellValue:1400
 
 
 {
-name:"Power Generator Core",
-rarity:"Epic",
-sellValue:2000
-},
-
-
-
-
-
-
-{
 name:"Ancient Dungeon Crown",
 rarity:"Legendary",
 sellValue:5000
-},
-
-
-{
-name:"King Slayer Sword",
-rarity:"Legendary",
-sellValue:6000
 },
 
 
@@ -299,18 +272,10 @@ sellValue:7500
 
 
 {
-name:"Infinity Crystal",
-rarity:"Legendary",
-sellValue:9000
-},
-
-
-{
 name:"God Core",
 rarity:"Legendary",
 sellValue:10000
 }
-
 
 
 ];
@@ -319,10 +284,9 @@ sellValue:10000
 
 
 
-
 console.log(
 
-"RETRO DUNGEON SYSTEM LOADED"
+"FIXED RETRO DUNGEON LOADED"
 
 );
 
@@ -350,6 +314,7 @@ pos,
 
 
 scale,
+
 
 
 Quaternion.fromEuler(
@@ -425,9 +390,6 @@ let pattern=(x+z)%5;
 
 if(pattern==0)
 
-{
-
-
 return new Color(
 
 0.55,
@@ -439,15 +401,9 @@ return new Color(
 );
 
 
-}
-
-
 
 
 if(pattern==1)
-
-{
-
 
 return new Color(
 
@@ -460,15 +416,9 @@ return new Color(
 );
 
 
-}
-
-
 
 
 if(pattern==2)
-
-{
-
 
 return new Color(
 
@@ -481,15 +431,9 @@ return new Color(
 );
 
 
-}
-
-
 
 
 if(pattern==3)
-
-{
-
 
 return new Color(
 
@@ -500,9 +444,6 @@ return new Color(
 0.18
 
 );
-
-
-}
 
 
 
@@ -609,7 +550,7 @@ maze=[];
 
 
 
-// Create all walls
+// Fill with walls
 
 for(let x=0;x<mazeWidth;x++)
 
@@ -685,6 +626,7 @@ let exits=0;
 
 
 
+
 // EAST
 
 if(x<mazeWidth-2)
@@ -700,6 +642,7 @@ exits++;
 
 
 }
+
 
 
 
@@ -735,6 +678,7 @@ exits++;
 
 
 
+
 // SOUTH
 
 if(z<mazeHeight-2)
@@ -750,6 +694,7 @@ exits++;
 
 
 }
+
 
 
 
@@ -785,7 +730,8 @@ exits++;
 
 
 
-// Emergency opening
+
+// Safety opening
 
 if(exits==0)
 
@@ -814,7 +760,7 @@ maze[x+1][z]=0;
 
 
 
-// PLAYER START ROOM
+// Starting room
 
 maze[1][1]=0;
 
@@ -829,7 +775,8 @@ maze[1][2]=0;
 
 
 
-// FINAL ROOM
+
+// Ending room
 
 maze[mazeWidth-2][mazeHeight-2]=0;
 
@@ -841,9 +788,10 @@ maze[mazeWidth-3][mazeHeight-2]=0;
 
 
 
+
 console.log(
 
-"OPEN ROOM MAZE GENERATED"
+"MAZE GENERATED"
 
 );
 
@@ -879,10 +827,10 @@ console.log(
 
 
 
-
 let offsetX =
 
 -(mazeWidth * blockSize) / 2;
+
 
 
 
@@ -904,11 +852,9 @@ for(let x=0;x<mazeWidth;x++)
 {
 
 
-
 for(let z=0;z<mazeHeight;z++)
 
 {
-
 
 
 let worldX =
@@ -931,7 +877,7 @@ let worldZ =
 
 
 // =================================
-// WALL BLOCKS
+// WALLS
 // =================================
 
 
@@ -991,7 +937,7 @@ z
 
 
 // =================================
-// FLOOR BLOCKS
+// FLOORS
 // =================================
 
 
@@ -1046,7 +992,7 @@ z
 
 
 
-// Leave player spawn room empty
+// Do not spawn objects in start room
 
 if(
 
@@ -1098,7 +1044,7 @@ worldZ
 
 
 // =================================
-// PLAYER SPAWN
+// PLAYER START POSITION
 // =================================
 
 
@@ -1115,7 +1061,6 @@ offsetZ + blockSize
 )
 
 );
-
 
 
 
@@ -1173,7 +1118,6 @@ z:number
 
 
 let chance=Math.random();
-
 
 
 
@@ -1279,14 +1223,13 @@ enemies.push(data);
 
 console.log(
 
-"Enemy spawned: "
+"ENEMY SPAWNED: "
 
 +
 
 data.name
 
 );
-
 
 
 
@@ -1359,14 +1302,32 @@ new Color(
 
 chests.push(chest);
 
+
+
+
+
+
+
+// Add interaction safely
+
 attachChestLoot(chest);
 
+
+
+
+
+
+
+
 console.log(
-"Treasure chest spawned"
+
+"TREASURE CHEST SPAWNED"
+
 );
 
 
 
+}
 
 
 
@@ -1381,7 +1342,7 @@ console.log(
 
 
 // =====================================
-// ENEMY NAME LIST
+// ENEMY NAMES
 // =====================================
 
 
@@ -1441,12 +1402,10 @@ Math.random()*list.length
 
 
 
-
-
 }
 
 // =====================================
-// ATTACH CHEST INTERACTION
+// CHEST INTERACTION
 // =====================================
 
 
@@ -1459,7 +1418,35 @@ chest:Entity
 {
 
 
+// Safety check
+
+if(!chest.trigger)
+
+{
+
+
+console.log(
+
+"Chest trigger unavailable"
+
+);
+
+
+return;
+
+
+
+}
+
+
+
+
+
+
+
 let opened=false;
+
+
 
 
 
@@ -1480,9 +1467,15 @@ chest.trigger.initialize(
 
 ],
 
+
+
 undefined
 
+
+
 );
+
+
 
 
 
@@ -1501,6 +1494,9 @@ return;
 
 
 
+
+
+
 let distance =
 
 Player.position.distanceTo(
@@ -1508,6 +1504,7 @@ Player.position.distanceTo(
 chest.pos
 
 );
+
 
 
 
@@ -1538,6 +1535,8 @@ openChest(chest);
 
 
 }
+
+
 
 
 
@@ -1580,6 +1579,7 @@ console.log(
 
 
 
+
 let amount =
 
 1 +
@@ -1589,6 +1589,7 @@ Math.floor(
 Math.random()*5
 
 );
+
 
 
 
@@ -1618,8 +1619,7 @@ Math.random()*lootTable.length
 
 
 
-
-let inventoryItem =
+let reward =
 
 {
 
@@ -1646,13 +1646,38 @@ sellPrice:item.sellValue
 
 
 
-// SEND TO INVENTORY
+// SEND TO INVENTORY ONLY IF CONNECTED
 
-addItemToInventory(
+if(inventoryReady && inventoryFunction)
 
-inventoryItem
+{
+
+
+inventoryFunction(
+
+reward
 
 );
+
+
+
+}
+
+else
+
+{
+
+
+console.log(
+
+"Inventory not connected yet"
+
+);
+
+
+
+}
+
 
 
 
@@ -1687,7 +1712,7 @@ item.rarity
 
 console.log(
 
-"SELL VALUE: "
+"VALUE: "
 
 +
 
@@ -1701,7 +1726,11 @@ item.sellValue
 
 
 
+
+
 }
+
+
 
 
 
@@ -1729,6 +1758,7 @@ console.log(
 
 
 
+
 chest.destroy();
 
 
@@ -1736,7 +1766,7 @@ chest.destroy();
 }
 
 // =====================================
-// EXPORT LOOT DATABASE
+// LOOT DATABASE EXPORT
 // =====================================
 
 
@@ -1760,7 +1790,48 @@ return lootTable;
 
 
 // =====================================
-// DUNGEON STATS
+// CONNECT INVENTORY SYSTEM
+// =====================================
+
+
+export function connectInventorySystem(
+
+inventoryAddFunction:any
+
+)
+
+{
+
+
+inventoryFunction = inventoryAddFunction;
+
+
+inventoryReady = true;
+
+
+
+
+
+console.log(
+
+"INVENTORY SYSTEM CONNECTED"
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+// =====================================
+// DUNGEON STATUS
 // =====================================
 
 
@@ -1784,7 +1855,7 @@ chests.length,
 
 
 
-lootItems:
+loot:
 
 lootTable.length
 
@@ -1805,7 +1876,7 @@ lootTable.length
 
 
 // =====================================
-// DEBUG DUNGEON INFO
+// DEBUG INFO
 // =====================================
 
 
@@ -1837,6 +1908,8 @@ console.log(
 
 
 
+
+
 console.log(
 
 "Enemies: "
@@ -1846,6 +1919,8 @@ console.log(
 stats.enemies
 
 );
+
+
 
 
 
@@ -1861,15 +1936,19 @@ stats.chests
 
 
 
+
+
 console.log(
 
-"Loot Items: "
+"Loot Database: "
 
 +
 
-stats.lootItems
+stats.loot
 
 );
+
+
 
 
 
@@ -1892,7 +1971,7 @@ console.log(
 
 
 // =====================================
-// RESET DUNGEON DATA
+// RESET DATA
 // =====================================
 
 
@@ -1905,6 +1984,7 @@ enemies=[];
 
 
 chests=[];
+
 
 
 
@@ -1929,11 +2009,12 @@ console.log(
 
 
 // =====================================
-// SAFE START FUNCTION
+// START SYSTEM
 // =====================================
 
 
 let dungeonStarted=false;
+
 
 
 
